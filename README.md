@@ -77,6 +77,10 @@ A pull request cannot merge until two checks pass:
 Both run on Node's built-in test runner and use no third-party packages, so the project still has
 no dependencies and no build step.
 
+This is a project rule, not just a setting. Constitution v1.1.0 requires that every change to
+`main` arrives through a pull request whose status checks pass. The rule and its rationale are in
+[amendment 001](.specify/memory/amendments/001-pull-request-requirement.md).
+
 ## Tooling
 
 The project is managed with [GitHub Spec Kit](https://github.com/github/spec-kit), with the

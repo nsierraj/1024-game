@@ -4,26 +4,34 @@ Generated: 2026-10-21
 Template: constitution-template (source: core, sha256 ce7549540fa45543cca797a150201d868e64495fdff39dc38246fb17bd4024b3)
 Constitution file: .specify/memory/constitution.md
 
-Version change: unset (template scaffold only) -> 1.0.0
-Bump rationale: initial ratification. No prior ratified constitution existed; the previous
-  file contained only unresolved placeholders. 1.0.0 marks the first concrete governance
-  baseline.
+Version change: 1.0.0 -> 1.1.0
+Bump rationale: MINOR. Existing guidance is materially expanded. The Development Workflow and
+  Quality Gates section now states the pull request requirement, the required status checks, the
+  linear history and no-bypass rules, the review-count rule, the documentation rule, and the
+  emergency back-fill rule. No Core Principle was added, removed, or redefined, and no
+  NON-NEGOTIABLE constraint was relaxed.
 
-Modified principles (placeholder -> concrete):
-  - PRINCIPLE_1_NAME -> I. Vanilla Web Stack (NON-NEGOTIABLE)
-  - PRINCIPLE_2_NAME -> II. Pure Game Logic Core
-  - PRINCIPLE_3_NAME -> III. Test-First Game Rules (NON-NEGOTIABLE)
-  - PRINCIPLE_4_NAME -> IV. Accessibility First (NON-NEGOTIABLE)
-  - PRINCIPLE_5_NAME -> V. Performance, Offline, and Privacy Budgets
+Modified principles (1.0.0 -> 1.1.0): none
 
-Added sections (placeholder -> concrete):
-  - SECTION_2_NAME -> Scope Boundaries and Constraints
-  - SECTION_3_NAME -> Development Workflow and Quality Gates
-  - Governance -> expanded with amendment procedure, versioning policy, and compliance review
+Added sections: none
+
+Modified sections:
+  - Development Workflow and Quality Gates -> expanded with six pull request and review controls
+    and one verification note
+  - Governance -> amended to require that written proposals be retained in the repository
 
 Removed sections: none
 
 Deferred items (intentionally retained placeholders / TODOs): none
+
+Exceptions granted: none
+
+Amendment proposal: .specify/memory/amendments/001-pull-request-requirement.md
+
+Version history:
+  - 1.0.0 (2026-10-21) initial ratification. No prior constitution existed. The five Core
+    Principles, the scope boundaries, and the development workflow were defined for the first time.
+  - 1.1.0 (2026-10-21) amendment 001. Pull request requirement added to the workflow section.
 -->
 
 # 1024 Game Constitution
@@ -136,6 +144,24 @@ are also the most visible quality signals in a portfolio context.
   cannot be traced to a specification MUST NOT be started.
 - Code review MUST verify compliance with all five Core Principles. A reviewer MUST reject a
   change that violates a NON-NEGOTIABLE principle unless a governance amendment is approved first.
+- Every change to `main` MUST arrive through a pull request. Direct pushes to `main` MUST be
+  blocked, and the block MUST cover repository owners and administrators so it cannot be bypassed
+  by privilege.
+- A pull request MUST NOT become mergeable until its required status checks pass. The required
+  checks MUST include the automated test suite from Principle III and the specification integrity
+  check, so a change to the rules, the data model, or the constitution cannot land without being
+  validated.
+- `main` MUST NOT accept force pushes, branch deletion, or merge commits. The history MUST stay
+  linear, and every change MUST be attributable to a reviewed pull request.
+- The number of required approving reviews MUST NOT exceed the number of people able to give them.
+  While the repository has a single owner the requirement MUST be zero, and it MUST be raised as
+  soon as a second reviewer is available. A gate that nobody can satisfy blocks delivery without
+  adding assurance.
+- The protection configuration MUST be recorded in the repository's documentation, including the
+  names of the required checks, so it can be audited without access to the repository settings.
+- An emergency change that cannot wait for a pull request MUST be applied through a temporary,
+  documented bypass of the protection rule, and MUST be back-filled through a pull request as soon
+  as one is possible. The bypass MUST be removed once it is no longer needed.
 - Before any release, the following gates MUST all pass:
   - the full unit test suite passes;
   - an automated accessibility scan reports no violations, and a manual keyboard and
@@ -148,6 +174,9 @@ are also the most visible quality signals in a portfolio context.
 - A release MUST NOT ship with a failing gate. Fixing the gate takes priority over the release.
 - Source code MUST be readable and documented well enough to serve as a portfolio sample, because
   the code itself is a deliverable.
+- These controls are verified continuously by the platform rather than at a feature gate, because
+  they are properties of the repository configuration and not of any one feature. The Constitution
+  Check at each plan gate MUST still record that the configuration satisfies them.
 
 ## Governance
 
@@ -157,6 +186,7 @@ are also the most visible quality signals in a portfolio context.
   existing specifications, plans, and tasks. An approved amendment MUST update this file in the
   same change, with a new Sync Impact Report, an updated version, and an updated last-amended
   date.
+- The written proposal MUST be retained in the repository under `.specify/memory/amendments/`.
 - Versioning policy, using MAJOR.MINOR.PATCH:
   - MAJOR: a principle is removed, redefined incompatibly, or a NON-NEGOTIABLE constraint is
     relaxed.
@@ -172,4 +202,4 @@ are also the most visible quality signals in a portfolio context.
   `TODO(FIELD_NAME): explanation` rather than guessed, and MUST be listed as a deferred item in
   the Sync Impact Report.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-21 | **Last Amended**: 2026-10-21
+**Version**: 1.1.0 | **Ratified**: 2026-10-21 | **Last Amended**: 2026-10-21
