@@ -197,13 +197,17 @@ The constitution defines six gates. Each is listed here with the check that sati
 
 ## 9. Verify the repository workflow
 
-The repository requires pull requests to merge into `main`. Confirm the workflow still holds:
+The repository requires pull requests to merge into `main`. This is a constitutional requirement,
+not only a platform setting: constitution v1.1.0 and
+[amendment 001](../../.specify/memory/amendments/001-pull-request-requirement.md) require that every
+change arrive through a pull request whose status checks pass. Confirm the workflow still holds:
 
 ```bash
 gh api repos/nsierraj/1024-game/rulesets --jq '.[] | {name, enforcement, rules: [.rules[].type]}'
 ```
 
-Expected: one active branch ruleset targeting `main` that includes a `pull_request` rule.
+Expected: one active branch ruleset named `main-branch-protection`, targeting `main`, that includes
+a `pull_request` rule and a `required_status_checks` rule.
 
 To confirm that a direct push is actually rejected, try one:
 
@@ -211,8 +215,9 @@ To confirm that a direct push is actually rejected, try one:
 git push origin HEAD:main
 ```
 
-Expected: the push is rejected by the ruleset. A rejected push leaves the local branch
-untouched, so nothing needs to be undone afterwards.
+Expected: the push is rejected by the ruleset with `GH013`, naming both the pull request
+requirement and the expected status checks. A rejected push leaves the local branch untouched, so
+nothing needs to be undone afterwards.
 
 To confirm that the normal path still works, open a pull request from the feature branch to
 `main`, wait for the required check to pass, and merge it.

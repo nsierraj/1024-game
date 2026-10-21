@@ -74,8 +74,8 @@ a few hundred lines of JavaScript per module.
 | IV. Accessibility First | WCAG 2.2 AA, keyboard-only play, visible focus, dialog focus handling, text always shown, live announcements, contrast on every theme, reduced motion, 24px targets, 200% zoom | **PASS** | Grid semantics and a polite live region (D-08, D-09); pointer input is an addition to, not a replacement for, keyboard input; themes are contrast-checked per theme (D-16); reduced motion is a stylesheet-level override (D-05). |
 | V. Performance, Offline, and Privacy Budgets | Under 300 KB non-sound, 60 fps, 2 s first load, quality scores 90+, offline install, no data collection, no third parties | **PASS** | Asset strategy: system fonts, inline SVG, small PNG manifest icons, lazy MP3 audio (D-14, D-15). Hand-written service worker, no workbox (D-12). No analytics, no cookies, no third-party requests (D-10, D-11, D-16). |
 | Scope Boundaries | v1 scope exactly; out-of-scope list not implemented | **PASS** | No accounts, no sync, no leaderboard, no selectable board size, no mouse-drag or WASD, no multi-level undo, no monetization, no analytics, no multiplayer, no native store distribution. |
-| Development Workflow and Quality Gates | Spec-driven, BRD-traceable, constitution-checked review, six release gates | **PASS** | This plan traces to spec requirement IDs; tasks will trace to this plan; the six release gates are listed in [quickstart.md](quickstart.md). |
-| Governance | Constitution supersedes, amendments documented, semver versioning, compliance review, documented exceptions with expiry | **PASS** | No violation is being requested, so no exception is needed and no amendment is triggered. Constitution v1.0.0 remains in force. |
+| Development Workflow and Quality Gates | Spec-driven, BRD-traceable, constitution-checked review, pull-request-only merges with required checks, six release gates | **PASS** | This plan traces to spec requirement IDs; tasks will trace to this plan; the six release gates are listed in [quickstart.md](quickstart.md). `main` is protected by the `main-branch-protection` ruleset, which requires a pull request and the `spec-integrity` and `test` checks, so this plan reaches `main` the same way every later change will. |
+| Governance | Constitution supersedes, amendments documented, semver versioning, compliance review, documented exceptions with expiry | **PASS** | No violation is being requested, so no exception is needed. Constitution v1.1.0 is in force. Amendment 001 added the pull request requirement; it did not alter how this plan complies. |
 
 **Gate result**: PASS. No violations, therefore no complexity justification is required and the
 Complexity Tracking table below is intentionally empty.
@@ -86,6 +86,12 @@ Re-evaluated after Phase 1 produced the data model, contracts, and quickstart. T
 made during Phase 1 were the lazy audio path, the grid ARIA structure, and the versioned storage
 envelope; each of those tightens an existing principle rather than bending one. Result unchanged:
 **PASS**.
+
+Re-evaluated again against constitution v1.1.0, after
+[amendment 001](../../.specify/memory/amendments/001-pull-request-requirement.md) added the pull
+request requirement. That amendment expands the workflow section; it does not touch a Core
+Principle, so no principle verdict changed. The workflow row above was updated to record the
+ruleset. Result unchanged: **PASS**.
 
 ## Project Structure
 
@@ -178,8 +184,9 @@ mirror the two halves of that boundary.
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
 No violations were found. The Constitution Check passed on every principle before research and
-again after design, so no exception is requested and no amendment to the constitution is needed.
-The empty table below is intentional.
+again after design, so no exception is requested and no amendment is needed to justify anything in
+this plan. Amendment 001 added a workflow requirement at the product owner's request; it is a
+governance change, not a response to a violation here. The empty table below is intentional.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
