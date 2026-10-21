@@ -248,6 +248,9 @@ and confirm every tile value, score change, win, and game over is perceivable.
 
 - Q: What should happen if the same game is open in two browser tabs at the same time? → A: The
   most recent save wins, and the other tab shows a notice that the game was updated elsewhere
+- Q: How should success and regressions be verified, given that the game is not allowed to collect
+  any usage data? → A: Manual moderated sessions plus the automated test suite, with no
+  in-product instrumentation at all
 
 ## Requirements *(mandatory)*
 
@@ -409,6 +412,12 @@ Robustness and presentation
 - **FR-067**: The game MUST be delivered over a secure connection, so that installing it and
   playing it offline are both supported.
 
+Verification and instrumentation
+
+- **FR-068**: The game MUST NOT include any in-product instrumentation, analytics, crash
+  reporting, or diagnostic data collection of any kind, and MUST NOT transmit usage data of any
+  kind.
+
 ### Key Entities *(include if feature involves data)*
 
 - **Tile**: A square on the board holding a single value. Attributes: the value shown (always a
@@ -430,8 +439,8 @@ Robustness and presentation
 
 ### Measurable Outcomes
 
-- **SC-001**: A first-time player makes a legal move within 10 seconds of the game appearing,
-  without needing to read instructions first.
+- **SC-001**: In a moderated session, at least 95% of first-time players make a legal move within
+  10 seconds of the game appearing, without needing to read instructions first.
 - **SC-002**: A player using only the arrow keys can complete 50 consecutive legal moves in under
   three minutes with no incorrect board state at any point.
 - **SC-003**: Every rule listed in the Functional Requirements section is covered by an automated
@@ -474,8 +483,9 @@ Robustness and presentation
   interrupt play.
 - This is a single-person project: the same person acts as product owner and developer, and
   sign-off happens through the specified review gates rather than a separate approval board.
-- The game collects no telemetry, so player-behavior success criteria are verified in moderated
-  manual sessions rather than from tracked data.
+- The game carries no in-product instrumentation of any kind. Player-behavior success criteria are
+  verified in moderated manual sessions, and correctness is verified by the automated test suite
+  that covers the rules in the Functional Requirements section.
 - The scope of this feature is the first release described in the BRD. Items the BRD lists as out
   of scope, including accounts, cloud synchronisation, leaderboards, selectable board sizes,
   mouse-drag and WASD controls, multi-level undo, monetisation, analytics, multiplayer, and native
