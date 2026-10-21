@@ -225,6 +225,8 @@ and confirm every tile value, score change, win, and game over is perceivable.
   than failing to open.
 - A swipe is too short, or a touch is a tap rather than a gesture: it is ignored, and no move is
   made.
+- A swipe is diagonal rather than perfectly vertical or horizontal: the tiles move in whichever
+  direction the gesture is dominated by, and the weaker axis is ignored.
 - A swipe happens while the page is being scrolled or the browser's back gesture is triggered:
   the gesture is absorbed by the board and the player does not lose their place.
 - Input arrives repeatedly in quick succession, faster than the on-screen animation finishes: the
@@ -251,6 +253,8 @@ and confirm every tile value, score change, win, and game over is perceivable.
 - Q: How should success and regressions be verified, given that the game is not allowed to collect
   any usage data? → A: Manual moderated sessions plus the automated test suite, with no
   in-product instrumentation at all
+- Q: How far must a finger travel across the board before the game treats the gesture as a move? →
+  A: A fraction of the board's size, with the dominant direction deciding which way the tiles move
 
 ## Requirements *(mandatory)*
 
@@ -278,10 +282,12 @@ Movement and merging
   to the direction of travel MUST merge first. A row of 2, 2, 2, empty slid to the left MUST become
   4, 2, empty, empty.
 - **FR-010**: On desktop, the four arrow keys MUST move the tiles in the matching direction.
-- **FR-011**: On touch devices, a swipe across the board MUST move the tiles in the swipe
-  direction.
-- **FR-012**: A swipe shorter than the minimum travel distance MUST be ignored, so that taps and
-  accidental touches never count as moves.
+- **FR-011**: On touch devices, a swipe across the board MUST move the tiles in the dominant
+  direction of that swipe.
+- **FR-012**: A swipe MUST be ignored when the finger travels less than one quarter of the
+  board's width or height, so that taps and accidental touches never count as moves. The
+  threshold MUST be measured against the board's own size, so that it behaves identically on every
+  screen size.
 - **FR-013**: A swipe on the board MUST NOT scroll the page, zoom the page, or trigger the
   browser's back or forward navigation.
 
@@ -468,6 +474,9 @@ Verification and instrumentation
 - **SC-013**: When the same game is open in two tabs, the tab that did not save last shows a notice
   within one second of the other tab's save, and the board it displays afterwards matches the most
   recent save.
+- **SC-014**: A swipe that covers less than a quarter of the board is ignored, and a swipe that
+  covers more than a quarter moves the tiles in the dominant direction, with the same result on a
+  320 pixel phone screen and on a desktop monitor.
 
 ## Assumptions
 
