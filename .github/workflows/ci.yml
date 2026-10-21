@@ -1,0 +1,36 @@
+name: CI
+
+# Required check for the protected main branch. Nothing reaches main except through a pull
+# request, and a pull request cannot merge until these jobs pass.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  spec-integrity:
+    name: spec-integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Validate specifications
+        run: node scripts/check-specs.mjs
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Run the test suite
+        run: npm test
