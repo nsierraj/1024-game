@@ -379,11 +379,14 @@ Performance and delivery
 Privacy and independence
 
 - **FR-061**: The game MUST NOT collect, transmit, or store personal data, MUST NOT set cookies,
-  and MUST NOT load content from third parties.
+  and MUST load no content from any origin other than the one that serves the game.
 - **FR-062**: The game MUST be fully playable without an account, without a server, and without a
   network connection.
-- **FR-063**: Input received while an animation is still running MUST be queued or ignored in a
-  consistent way, so that rapid play never leaves the board in an impossible state.
+
+Robustness and presentation
+
+- **FR-063**: Input received while an animation is still running MUST be handled consistently, so
+  that rapid play never leaves the board in an impossible state.
 - **FR-064**: The layout MUST remain usable from a viewport 320 pixels wide up to a large desktop
   monitor, and MUST NOT require horizontal scrolling at any supported size.
 - **FR-065**: The board MUST scale to fit the available space and MUST stay square in both
@@ -461,3 +464,8 @@ Privacy and independence
   store distribution, remain out of scope.
 - Product owner and approver names are recorded in the BRD, not in this specification, because
   they do not affect any requirement here.
+- The BRD's code-quality requirements, covering separation of game logic from presentation,
+  automated unit tests for that logic, and readable documented source, are engineering constraints
+  rather than product requirements. They are governed by the ratified project constitution and are
+  expected to be carried into the technical plan, not restated here. The automated-test obligation
+  is additionally visible to users of this specification through SC-003.

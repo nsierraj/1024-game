@@ -32,6 +32,11 @@
 ## Notes
 
 - Validation iteration 1 found no failing items; no spec rewrite was required.
+- Validation iteration 2 added FR-063 through FR-066 after a coverage check against the BRD found
+  four gaps: consistent handling of input during animation, usable layout from 320 pixels up,
+  a square board that scales in portrait and landscape, and secure delivery. FR-061 was also
+  tightened to forbid loading content from any origin other than the one serving the game.
+  All items still pass.
 - Scope check: "no implementation details" passed. The only two literal matches on the keyword scan
   were FR-052 "24 by 24 CSS pixels" (the accessibility standard's unit of measurement, which
   constrains no implementation choice) and the Assumptions line "no server-side component" (a
@@ -39,9 +44,14 @@
   is built, so both were left as written.
 - Technology-agnostic check: the quality thresholds in SC-008 and SC-009 are stated as byte and
   millisecond budgets rather than tool names, so any assessment tool can be used to verify them.
-- Requirement coverage: FR-001 through FR-062 map one-to-one onto BRD FR-1 through FR-45 and NFR-1
-  through NFR-27. No BRD requirement was dropped, and no requirement was added that the BRD does
-  not support.
+- Requirement coverage: FR-001 through FR-066 cover all 45 functional requirements in BRD
+  section 6 and 24 of the 27 non-functional requirements in BRD section 7.
+- Deliberate deferral: BRD NFR-25 (game logic separated from rendering), NFR-26 (automated unit
+  tests for game logic), and NFR-27 (readable, documented source) are engineering constraints
+  rather than product requirements. They are governed by Constitution Principles II and III and by
+  the release gates in the constitution's Development Workflow section, and NFR-26 is additionally
+  surfaced as SC-003. They are intentionally not restated as product requirements here, and the
+  planning phase is expected to carry them into the technical plan.
 - Measurement caveat: SC-001, SC-002, and SC-012 describe player behaviour. The BRD forbids
   analytics and tracking, so these are verified in moderated manual sessions rather than from
   collected telemetry. This is recorded in the Assumptions section.
