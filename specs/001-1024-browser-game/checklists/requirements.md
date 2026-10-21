@@ -41,7 +41,7 @@
   its Clarifications section: multi-tab conflict resolution (FR-034, SC-013), verification without
   telemetry (FR-068, reworded SC-001), the swipe threshold (FR-011, FR-012, SC-014), and the sound
   asset budget (FR-040, FR-058, SC-008, SC-015). Re-validation after integration found no
-  regressions: all 18 items still pass.
+  regressions: all 16 items still pass.
 - Scope check: "no implementation details" passed. The only two literal matches on the keyword scan
   were FR-053 "24 by 24 CSS pixels" (the accessibility standard's unit of measurement, which
   constrains no implementation choice) and the Assumptions line "no server-side component" (a
