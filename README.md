@@ -13,7 +13,7 @@ feature specification are written first; the implementation follows them.
 | Business requirements | Done — [`1024-game-BRD.md`](1024-game-BRD.md) |
 | Project constitution | Ratified v1.0.0 — [`constitution.md`](.specify/memory/constitution.md) |
 | Feature specification | Done — [`spec.md`](specs/001-1024-browser-game/spec.md) |
-| Technical plan | Not started |
+| Technical plan | Done — [`plan.md`](specs/001-1024-browser-game/plan.md) |
 | Implementation | Not started |
 
 ## What the game will do
@@ -52,8 +52,30 @@ See [the full constitution](.specify/memory/constitution.md) for the non-negotia
   memory/constitution.md        The project's governing principles
 specs/001-1024-browser-game/
   spec.md                       Feature specification for the game
+  plan.md                       Technical plan and constitution check
+  research.md                   Design decisions and their rejected alternatives
+  data-model.md                 Entities, invariants, and state transitions
+  quickstart.md                 How to validate the finished game
+  contracts/                    Interfaces: logic core, storage, UI, offline
   checklists/requirements.md    Specification quality checklist
+scripts/check-specs.mjs       Spec integrity check (no dependencies)
+.github/workflows/ci.yml       The required check for protected branches
 ```
+
+## Contributing
+
+`main` is protected. Every change reaches it through a pull request — direct pushes are
+rejected, force pushes and branch deletion are blocked, and the history is kept linear.
+
+A pull request cannot merge until two checks pass:
+
+| Check | What it does |
+|---|---|
+| `spec-integrity` | Verifies that each feature's specification and plan are complete and self-consistent: no unresolved placeholders, contiguous requirement and success-criterion ids, and a checklist that references only real ids |
+| `test` | Runs the automated test suite |
+
+Both run on Node's built-in test runner and use no third-party packages, so the project still has
+no dependencies and no build step.
 
 ## Tooling
 
