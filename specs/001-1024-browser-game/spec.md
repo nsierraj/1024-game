@@ -259,6 +259,8 @@ and confirm every tile value, score change, win, and game over is perceivable.
   A: A fraction of the board's size, with the dominant direction deciding which way the tiles move
 - Q: How large may the bundled sound effects be, and when do they need to load? → A: Cap the sound
   at 100 KB in total, and load it only when the player first enables sound
+- Q: Which extra color themes should ship alongside the light and dark themes? → A: Two extra
+  themes: one high-contrast theme, and one color-blind-safe palette with its own tile colors
 
 ## Requirements *(mandatory)*
 
@@ -363,8 +365,12 @@ Themes
   preference.
 - **FR-043**: The player MUST be able to choose a theme manually, and the manual choice MUST
   override the operating-system preference and persist across visits.
-- **FR-044**: The game MUST offer at least two additional color themes.
-- **FR-045**: Every theme MUST satisfy the minimum contrast ratios defined in FR-049.
+- **FR-044**: The game MUST offer two additional color themes: one high-contrast theme, and one
+  color-blind-safe palette with its own tile colors. The color-blind-safe palette's tile values
+  MUST remain distinguishable under a common red-green color vision deficiency simulation.
+- **FR-045**: Every theme MUST satisfy the minimum contrast ratios defined in FR-049. The
+  high-contrast theme MUST exceed those minimums, meeting at least 7:1 for text and 4.5:1 for
+  non-text interface elements.
 
 Help
 
@@ -485,6 +491,9 @@ Verification and instrumentation
   320 pixel phone screen and on a desktop monitor.
 - **SC-015**: The game ships with no more than 300 KB of visual and code assets plus 100 KB of
   sound, and a player who never enables sound downloads no audio at all.
+- **SC-016**: All four shipped themes pass the contrast checks, the high-contrast theme reaches at
+  least 7:1 for text, and the color-blind-safe palette's tile values stay distinguishable under a
+  red-green color vision deficiency simulation.
 
 ## Assumptions
 

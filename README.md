@@ -21,7 +21,8 @@ feature specification are written first; the implementation follows them.
 - Classic 4x4 board with a win at the 1024 tile, plus an endless mode to keep chasing a score
 - Arrow keys on desktop, swipe on touch
 - Single-step undo, current score, and a best score that survives a restart
-- Light, dark, and additional color themes, following the system preference until you override it
+- Light, dark, high-contrast, and color-blind-safe themes, following the system preference until
+  you override it
 - Installable, and fully playable offline once installed
 - Optional sound effects, off by default
 - WCAG 2.2 Level AA, playable with a keyboard alone and narrated by a screen reader

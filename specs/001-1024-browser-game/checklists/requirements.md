@@ -37,11 +37,11 @@
   a square board that scales in portrait and landscape, and secure delivery. FR-062 was also
   tightened to forbid loading content from any origin other than the one serving the game.
   All items still pass.
-- Clarification session 2026-10-21 answered four questions, integrated into the spec as recorded in
+- Clarification session 2026-10-21 answered five questions, integrated into the spec as recorded in
   its Clarifications section: multi-tab conflict resolution (FR-034, SC-013), verification without
-  telemetry (FR-068, reworded SC-001), the swipe threshold (FR-011, FR-012, SC-014), and the sound
-  asset budget (FR-040, FR-058, SC-008, SC-015). Re-validation after integration found no
-  regressions: all 16 items still pass.
+  telemetry (FR-068, reworded SC-001), the swipe threshold (FR-011, FR-012, SC-014), the sound
+  asset budget (FR-040, FR-058, SC-008, SC-015), and the extra color themes (FR-044, FR-045,
+  SC-016). Re-validation after integration found no regressions: all 16 items still pass.
 - Scope check: "no implementation details" passed. The only two literal matches on the keyword scan
   were FR-053 "24 by 24 CSS pixels" (the accessibility standard's unit of measurement, which
   constrains no implementation choice) and the Assumptions line "no server-side component" (a
