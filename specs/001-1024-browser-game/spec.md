@@ -238,6 +238,8 @@ and confirm every tile value, score change, win, and game over is perceivable.
   removed or reduced to a simple fade, and the game stays fully playable.
 - The device's sound is blocked by the operating system's automatic-play rules: the game remains
   fully playable and simply produces no sound until the player interacts with the page.
+- The player turns sound on for the first time while offline: the bundled sound files load and play
+  normally, because they ship with the game rather than being fetched from a server.
 - The player resizes the window or rotates the phone between portrait and landscape: the board
   stays square and the layout remains usable.
 - The player enlarges text to 200%: no content or control is lost, clipped, or made unreachable.
@@ -255,6 +257,8 @@ and confirm every tile value, score change, win, and game over is perceivable.
   in-product instrumentation at all
 - Q: How far must a finger travel across the board before the game treats the gesture as a move? →
   A: A fraction of the board's size, with the dominant direction deciding which way the tiles move
+- Q: How large may the bundled sound effects be, and when do they need to load? → A: Cap the sound
+  at 100 KB in total, and load it only when the player first enables sound
 
 ## Requirements *(mandatory)*
 
@@ -348,7 +352,9 @@ Animation, motion, and sound
   and spawning motion MUST be removed or reduced to a simple fade.
 - **FR-038**: Sound effects MUST be available for moves, merges, winning, and game over.
 - **FR-039**: Sound MUST be off by default and MUST be switchable through a visible control.
-- **FR-040**: Sound MUST remain available with no network connection.
+- **FR-040**: Sound MUST remain available with no network connection, and the sound files MUST be
+  loaded only when the player first enables sound, so that a player who never turns sound on never
+  downloads any audio.
 
 Themes
 
@@ -391,8 +397,8 @@ Performance and delivery
 
 - **FR-056**: Animations MUST hold 60 frames per second on current mid-range phones.
 - **FR-057**: The first load of the game MUST complete within 2 seconds on a fast 4G connection.
-- **FR-058**: The total transfer size of all assets MUST stay under 300 KB, excluding optional
-  sound files.
+- **FR-058**: The total transfer size of all assets other than sound MUST stay under 300 KB. The
+  bundled sound effects MUST add no more than 100 KB, giving a combined maximum of 400 KB.
 - **FR-059**: Standard web quality assessments for performance, accessibility, best practices, and
   search visibility MUST each score 90 or higher.
 - **FR-060**: The game MUST be installable on a phone home screen and on a desktop application
@@ -459,8 +465,8 @@ Verification and instrumentation
   mode.
 - **SC-007**: The game is fully usable from a 320 pixel-wide phone screen up to a large desktop
   monitor, in both portrait and landscape, with no horizontal scrolling at any supported size.
-- **SC-008**: The total transfer size of all assets stays under 300 KB, excluding optional sound
-  files.
+- **SC-008**: The total transfer size of all assets other than sound stays under 300 KB, and the
+  combined total including bundled sound stays under 400 KB.
 - **SC-009**: Slide and merge animations complete within 150 milliseconds on current mid-range
   phones while holding 60 frames per second.
 - **SC-010**: A player who leaves mid-game and returns within 24 hours finds the board, the current
@@ -477,6 +483,8 @@ Verification and instrumentation
 - **SC-014**: A swipe that covers less than a quarter of the board is ignored, and a swipe that
   covers more than a quarter moves the tiles in the dominant direction, with the same result on a
   320 pixel phone screen and on a desktop monitor.
+- **SC-015**: The game ships with no more than 300 KB of visual and code assets plus 100 KB of
+  sound, and a player who never enables sound downloads no audio at all.
 
 ## Assumptions
 
