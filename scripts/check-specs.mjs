@@ -160,6 +160,91 @@ function checkFeature(featureDir) {
   if (!/^##\s+Clarifications/m.test(spec)) {
     fail(`${featureName}/spec.md`, "missing a Clarifications section");
   }
+
+  checkTasks(join(featureDir, "tasks.md"));
+}
+
+/**
+ * Validates the task list format. Tasks must be machine-readable so the list stays executable
+ * and so a malformed entry cannot slip past a review.
+ */
+function checkTasks(tasksPath) {
+  if (!existsSync(tasksPath)) return; // tasks are optional until the tasks phase runs
+  const label = relative(ROOT, tasksPath);
+  const lines = readFileSync(tasksPath, "utf8").split("\n");
+
+  const TASK = /^(- \[ \] )(T\d{3})( \[P\])?( \[US\d+\])? (.+)$/;
+  const tasks = [];
+  let inFence = false;
+
+  lines.forEach((line, index) => {
+    if (line.trimStart().startsWith("```")) {
+      inFence = !inFence;
+      return;
+    }
+    if (inFence) return;
+    if (!line.startsWith("- [ ]")) return;
+
+    const match = line.match(TASK);
+    if (!match) {
+      fail(label, `line ${index + 1} does not match the required task format: ${line.trim()}`);
+      return;
+    }
+    tasks.push({
+      id: match[2],
+      parallel: Boolean(match[3]),
+      story: match[4] ? match[4].replace(/[[\]]/g, "") : null,
+      description: match[5],
+      line: index + 1,
+    });
+  });
+
+  if (tasks.length === 0) {
+    fail(label, "contains no tasks");
+    return;
+  }
+
+  const ids = tasks.map((t) => t.id);
+  if (new Set(ids).size !== ids.length) {
+    fail(label, "contains duplicate task ids");
+  }
+  tasks.forEach((task, index) => {
+    const expected = `T${String(index + 1).padStart(3, "0")}`;
+    if (task.id !== expected) {
+      fail(label, `task ids are not sequential: expected ${expected}, found ${task.id} on line ${task.line}`);
+    }
+  });
+
+  // A story label belongs only inside a user story phase, and every user story phase task
+  // must carry one.
+  let phase = "";
+  let phaseExpectsStory = false;
+  lines.forEach((line, index) => {
+    if (line.startsWith("## ")) {
+      phase = line.slice(3).trim();
+      phaseExpectsStory = /^Phase \d+: User Story \d/.test(phase);
+    }
+    if (!line.startsWith("- [ ]")) return;
+    const match = line.match(TASK);
+    if (!match) return;
+    const hasStory = Boolean(match[4]);
+    if (phaseExpectsStory && !hasStory) {
+      fail(label, `line ${index + 1} is in "${phase}" but has no user story label`);
+    }
+    if (!phaseExpectsStory && hasStory) {
+      fail(label, `line ${index + 1} carries a user story label but is not in a user story phase`);
+    }
+  });
+
+  // Every task must point at a concrete file so it can be executed without further context.
+  const pathPattern = /`[^`]*(\/[^`]*|[A-Za-z0-9_-][A-Za-z0-9._-]*\.[A-Za-z0-9]{2,12})`/;
+  tasks.forEach((task) => {
+    if (!pathPattern.test(task.description)) {
+      fail(label, `task ${task.id} does not name a file path: ${task.description}`);
+    }
+  });
+
+  notes.push(`${label}: ${tasks.length} tasks`);
 }
 
 // --- run -------------------------------------------------------------------
