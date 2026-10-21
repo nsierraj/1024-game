@@ -200,7 +200,7 @@ and confirm every tile value, score change, win, and game over is perceivable.
 4. **Given** a screen reader is running, **When** the score changes, the game is won, or the game is
    over, **Then** the change is announced.
 5. **Given** any theme, **When** text and controls are inspected, **Then** they meet the minimum
-   contrast ratios and tile values are always shown as numbers, so colour is never the only clue.
+   contrast ratios and tile values are always shown as numbers, so color is never the only clue.
 
 ---
 
@@ -230,7 +230,7 @@ and confirm every tile value, score change, win, and game over is perceivable.
 - Input arrives repeatedly in quick succession, faster than the on-screen animation finishes: the
   result is consistent every time and the board never ends up in an impossible state.
 - The player reaches the 1024 tile and chooses "keep playing", then later the board fills up:
-  the game ends normally with the standard game-over behaviour, without a second win message.
+  the game ends normally with the standard game-over behavior, without a second win message.
 - A tile shows a value of 2048 or higher: it remains readable and distinguishable.
 - The operating system's reduced-motion preference is on: sliding, merging, and spawning motion is
   removed or reduced to a simple fade, and the game stays fully playable.
@@ -239,6 +239,15 @@ and confirm every tile value, score change, win, and game over is perceivable.
 - The player resizes the window or rotates the phone between portrait and landscape: the board
   stays square and the layout remains usable.
 - The player enlarges text to 200%: no content or control is lost, clipped, or made unreachable.
+- The same game is open in two tabs and the player moves in both: the most recent save takes
+  effect, and the other tab shows a notice that the game was updated elsewhere.
+
+## Clarifications
+
+### Session 2026-10-21
+
+- Q: What should happen if the same game is open in two browser tabs at the same time? → A: The
+  most recent save wins, and the other tab shows a notice that the game was updated elsewhere
 
 ## Requirements *(mandatory)*
 
@@ -316,82 +325,88 @@ Controls, persistence, and settings
 - **FR-033**: Settings, including theme and sound, MUST be saved on the player's device and
   restored on the next visit.
 
+Concurrent sessions
+
+- **FR-034**: If the same game is open in more than one tab on the same device, the most recent
+  save MUST take effect, and every other tab MUST show a notice that the game was updated
+  elsewhere.
+
 Animation, motion, and sound
 
-- **FR-034**: Tiles MUST animate when they slide, when they merge, and when they appear.
-- **FR-035**: Slide and merge animations MUST be complete within 150 milliseconds.
-- **FR-036**: When the operating system's reduced-motion preference is active, sliding, merging,
+- **FR-035**: Tiles MUST animate when they slide, when they merge, and when they appear.
+- **FR-036**: Slide and merge animations MUST be complete within 150 milliseconds.
+- **FR-037**: When the operating system's reduced-motion preference is active, sliding, merging,
   and spawning motion MUST be removed or reduced to a simple fade.
-- **FR-037**: Sound effects MUST be available for moves, merges, winning, and game over.
-- **FR-038**: Sound MUST be off by default and MUST be switchable through a visible control.
-- **FR-039**: Sound MUST remain available with no network connection.
+- **FR-038**: Sound effects MUST be available for moves, merges, winning, and game over.
+- **FR-039**: Sound MUST be off by default and MUST be switchable through a visible control.
+- **FR-040**: Sound MUST remain available with no network connection.
 
 Themes
 
-- **FR-040**: The game MUST offer a light theme and a dark theme.
-- **FR-041**: On a first visit, the active theme MUST follow the operating system's light or dark
+- **FR-041**: The game MUST offer a light theme and a dark theme.
+- **FR-042**: On a first visit, the active theme MUST follow the operating system's light or dark
   preference.
-- **FR-042**: The player MUST be able to choose a theme manually, and the manual choice MUST
+- **FR-043**: The player MUST be able to choose a theme manually, and the manual choice MUST
   override the operating-system preference and persist across visits.
-- **FR-043**: The game MUST offer at least two additional colour themes.
-- **FR-044**: Every theme MUST satisfy the minimum contrast ratios defined in FR-048.
+- **FR-044**: The game MUST offer at least two additional color themes.
+- **FR-045**: Every theme MUST satisfy the minimum contrast ratios defined in FR-049.
 
 Help
 
-- **FR-045**: The game MUST include a short explanation of the goal and the controls, reachable at
+- **FR-046**: The game MUST include a short explanation of the goal and the controls, reachable at
   any time from within the game.
 
 ### Non-Functional Requirements
 
 Accessibility
 
-- **FR-046**: The full game MUST be playable using only a keyboard, including every control, every
+- **FR-047**: The full game MUST be playable using only a keyboard, including every control, every
   dialog, and every setting.
-- **FR-047**: Keyboard focus MUST always be visibly indicated, MUST move into a dialog when the
+- **FR-048**: Keyboard focus MUST always be visibly indicated, MUST move into a dialog when the
   dialog opens, and MUST return to the control that opened it when the dialog closes.
-- **FR-048**: Text and tile values MUST meet a minimum contrast ratio of 4.5:1, and non-text
+- **FR-049**: Text and tile values MUST meet a minimum contrast ratio of 4.5:1, and non-text
   interface elements MUST meet a minimum ratio of 3:1.
-- **FR-049**: Tile values MUST always be presented as numbers. Colour MUST NOT be the only way to
+- **FR-050**: Tile values MUST always be presented as numbers. Colour MUST NOT be the only way to
   tell two tiles apart.
-- **FR-050**: Score changes, the win message, and the game-over message MUST be announced to
+- **FR-051**: Score changes, the win message, and the game-over message MUST be announced to
   screen readers.
-- **FR-051**: The board MUST expose its contents to assistive technology so that each cell reads
+- **FR-052**: The board MUST expose its contents to assistive technology so that each cell reads
   its tile value or "empty".
-- **FR-052**: Interactive controls MUST offer a touch target of at least 24 by 24 CSS pixels.
-- **FR-053**: The game MUST remain fully usable when text is enlarged to 200%, with no loss of
+- **FR-053**: Interactive controls MUST offer a touch target of at least 24 by 24 CSS pixels.
+- **FR-054**: The game MUST remain fully usable when text is enlarged to 200%, with no loss of
   content or function.
-- **FR-054**: The game MUST meet WCAG 2.2 Level AA for every must-have requirement in this
+- **FR-055**: The game MUST meet WCAG 2.2 Level AA for every must-have requirement in this
   specification.
 
 Performance and delivery
 
-- **FR-055**: Animations MUST hold 60 frames per second on current mid-range phones.
-- **FR-056**: The first load of the game MUST complete within 2 seconds on a fast 4G connection.
-- **FR-057**: The total transfer size of all assets MUST stay under 300 KB, excluding optional
+- **FR-056**: Animations MUST hold 60 frames per second on current mid-range phones.
+- **FR-057**: The first load of the game MUST complete within 2 seconds on a fast 4G connection.
+- **FR-058**: The total transfer size of all assets MUST stay under 300 KB, excluding optional
   sound files.
-- **FR-058**: Standard web quality assessments for performance, accessibility, best practices, and
+- **FR-059**: Standard web quality assessments for performance, accessibility, best practices, and
   search visibility MUST each score 90 or higher.
-- **FR-059**: The game MUST be installable on a phone home screen and on a desktop application
+- **FR-060**: The game MUST be installable on a phone home screen and on a desktop application
   list, and MUST run fully offline once installed.
-- **FR-060**: A newly published version of the game MUST become available to returning players
+- **FR-061**: A newly published version of the game MUST become available to returning players
   without breaking a game that is in progress.
 
 Privacy and independence
 
-- **FR-061**: The game MUST NOT collect, transmit, or store personal data, MUST NOT set cookies,
+- **FR-062**: The game MUST NOT collect, transmit, or store personal data, MUST NOT set cookies,
   and MUST load no content from any origin other than the one that serves the game.
-- **FR-062**: The game MUST be fully playable without an account, without a server, and without a
+- **FR-063**: The game MUST be fully playable without an account, without a server, and without a
   network connection.
 
 Robustness and presentation
 
-- **FR-063**: Input received while an animation is still running MUST be handled consistently, so
+- **FR-064**: Input received while an animation is still running MUST be handled consistently, so
   that rapid play never leaves the board in an impossible state.
-- **FR-064**: The layout MUST remain usable from a viewport 320 pixels wide up to a large desktop
+- **FR-065**: The layout MUST remain usable from a viewport 320 pixels wide up to a large desktop
   monitor, and MUST NOT require horizontal scrolling at any supported size.
-- **FR-065**: The board MUST scale to fit the available space and MUST stay square in both
+- **FR-066**: The board MUST scale to fit the available space and MUST stay square in both
   portrait and landscape orientation.
-- **FR-066**: The game MUST be delivered over a secure connection, so that installing it and
+- **FR-067**: The game MUST be delivered over a secure connection, so that installing it and
   playing it offline are both supported.
 
 ### Key Entities *(include if feature involves data)*
@@ -441,6 +456,9 @@ Robustness and presentation
 - **SC-012**: In a moderated 10-minute play session, at least 4 of 5 testers describe the game as
   polished, responsive, and worth returning to, and all 5 complete at least one move without
   instruction.
+- **SC-013**: When the same game is open in two tabs, the tab that did not save last shows a notice
+  within one second of the other tab's save, and the board it displays afterwards matches the most
+  recent save.
 
 ## Assumptions
 
@@ -456,7 +474,7 @@ Robustness and presentation
   interrupt play.
 - This is a single-person project: the same person acts as product owner and developer, and
   sign-off happens through the specified review gates rather than a separate approval board.
-- The game collects no telemetry, so player-behaviour success criteria are verified in moderated
+- The game collects no telemetry, so player-behavior success criteria are verified in moderated
   manual sessions rather than from tracked data.
 - The scope of this feature is the first release described in the BRD. Items the BRD lists as out
   of scope, including accounts, cloud synchronisation, leaderboards, selectable board sizes,
