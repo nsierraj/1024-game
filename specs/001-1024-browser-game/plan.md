@@ -143,10 +143,15 @@ src/
 │   ├── render.js                # Tiles, score, best score, board DOM
 │   ├── animations.js            # Slide, merge, spawn; reduced-motion aware
 │   ├── input.js                 # Arrow keys, pointer swipe, queued input
+│   ├── swipe.js                 # Pure gesture math: threshold, dominant axis
 │   ├── dialogs.js               # Win, game over, and confirm dialogs
 │   ├── a11y.js                  # Live region announcements, focus management
 │   ├── themes.js                # Theme application and system-preference following
 │   └── strings.js               # All user-facing text in one place
+├── styles/                      # Plain CSS. No preprocessor, no build step.
+│   ├── base.css                 # Layout, focus ring, utilities, default palette
+│   ├── themes.css               # The four explicit themes and the system preference
+│   └── board.css                # Board grid, cells, tiles, transitions, reduced motion
 ├── services/                    # Browser-only side effects
 │   ├── persist.js               # localStorage read/write, failure tolerant
 │   ├── settings.js              # Settings persistence and first-visit detection
