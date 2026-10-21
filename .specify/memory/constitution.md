@@ -27,6 +27,7 @@ Deferred items (intentionally retained placeholders / TODOs): none
 Exceptions granted: none
 
 Amendment proposal: .specify/memory/amendments/001-pull-request-requirement.md
+Approval: approved 2026-10-21 by the product owner, merged as pull request #3
 
 Version history:
   - 1.0.0 (2026-10-21) initial ratification. No prior constitution existed. The five Core

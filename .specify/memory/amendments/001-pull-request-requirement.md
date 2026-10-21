@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Proposed** | 2026-10-21 |
-| **Status** | Draft — awaiting approval by the product owner |
+| **Status** | **Approved** 2026-10-21 by the product owner. Merged as pull request #3. |
 | **Constitution version** | 1.0.0 -> 1.1.0 (MINOR) |
 | **Amends** | `Development Workflow and Quality Gates` |
 | **Proposal author** | Project owner (drafted in session) |
@@ -164,7 +164,15 @@ remote: - 2 of 2 required status checks are expected.
   Those become worth revisiting when a second reviewer exists.
 - It does **not** grant any exception and does not create any deferred item.
 
-## 8. Decision requested
+## 8. Decision
 
-Approve the text in section 3 as written, or mark up the wording. On approval, the constitution
-moves to v1.1.0 and this proposal is retained alongside it.
+**Approved 2026-10-21 by the product owner**, with the text in section 3 adopted as written. The
+amendment took effect as constitution v1.1.0 through pull request #3, which reached `main` through
+the workflow this amendment makes binding.
+
+Two consequences follow from the approval and are recorded here so they are not lost:
+
+- The required approving review count remains **zero**, because the repository has a single owner.
+  It is to be raised as soon as a second reviewer is available.
+- The `spec-integrity` and `test` checks are now required status checks on `main`, not merely
+  checks that happen to run.
