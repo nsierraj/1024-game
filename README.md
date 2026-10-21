@@ -64,3 +64,7 @@ OpenCode integration. The command definitions live in
 
 The game collects nothing: no personal data, no cookies, no analytics, no crash reporting, and no
 third-party requests. Everything stays on the device.
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2026 Amado Sierra
