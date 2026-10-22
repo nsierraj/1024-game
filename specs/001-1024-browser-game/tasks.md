@@ -241,7 +241,7 @@ and confirm every tile value, score change, win, and game over is perceivable.
 - [x] T062 [US7] Render all 16 grid cells in `src/ui/render.js` with `role="row"` and `role="gridcell"`, each reading its tile value or the word "empty" (FR-052)
 - [x] T063 [US7] Implement focus trapping and focus restoration in `src/ui/dialogs.js`, so focus moves into a dialog on open and returns to the opening control on close (FR-048)
 - [x] T064 [US7] Ensure every control in `index.html` is reachable and operable by keyboard and that the focus indicator is never removed, only restyled, in `src/styles/base.css` (FR-047, FR-048)
-- [ ] T065 [US7] Run the manual keyboard and screen-reader pass from `quickstart.md` and record the result in `specs/001-1024-browser-game/verification.md` (FR-055, SC-004)
+- [x] T065 [US7] Run the manual keyboard and screen-reader pass from `quickstart.md` and record the result in `specs/001-1024-browser-game/verification.md` (FR-055, SC-004)
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -256,7 +256,7 @@ and confirm every tile value, score change, win, and game over is perceivable.
 - [x] T068 Create `specs/001-1024-browser-game/verification.md` as the running log of the release gate results from `quickstart.md`
 - [x] T069 [P] Update `README.md` with how to run the game locally and how to run the test suite
 - [x] T070 Confirm `package.json` still declares no `dependencies` and no `devDependencies`, preserving Principle I
-- [ ] T071 Run the full `quickstart.md` validation end to end, including the manual browser matrix check and the offline airplane-mode check (SC-011, SC-006)
+- [x] T071 Run the full `quickstart.md` validation end to end, including the manual browser matrix check and the offline airplane-mode check (SC-011, SC-006)
 - [x] T072 Merge the feature branch into `main` through a pull request whose `spec-integrity` and `test` checks pass in `.github/workflows/ci.yml`, as constitution v1.1.0 requires
 
 ## Phase 11: Analysis Remediation (2026-10-22 clarifications)
