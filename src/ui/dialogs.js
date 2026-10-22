@@ -14,6 +14,7 @@ function noHandlers() {
   return {
     keepPlaying() {},
     newGame() {},
+    undo() {},
     dismissed() {},
     confirm() {},
     cancel() {},
@@ -29,6 +30,7 @@ function noHandlers() {
  * @param {HTMLButtonElement} elements.win.newGame The button that starts a new game after a win.
  * @param {HTMLDialogElement} elements.gameover.dialog The dialog that reports the end of the game.
  * @param {HTMLElement} elements.gameover.score The element that shows the final score.
+ * @param {HTMLButtonElement} elements.gameover.undo The button that takes back the final move.
  * @param {HTMLButtonElement} elements.gameover.newGame The button that starts a new game.
  * @param {HTMLDialogElement} elements.confirm.dialog The dialog that asks before a new game.
  * @param {HTMLButtonElement} elements.confirm.start The button that starts the new game.
@@ -61,6 +63,11 @@ export function createDialogs({ win, gameover, confirm }) {
     event.preventDefault();
     win.dialog.close();
     winHandlers.dismissed();
+  });
+
+  gameover.undo.addEventListener("click", () => {
+    gameover.dialog.close();
+    gameOverHandlers.undo();
   });
 
   gameover.newGame.addEventListener("click", () => {
@@ -103,7 +110,7 @@ export function createDialogs({ win, gameover, confirm }) {
 
     /**
      * Reports the end of the game and waits for the player to try again.
-     * @param {{score: number, newGame: () => void, dismissed: () => void}} handlers
+     * @param {{score: number, undo: () => void, newGame: () => void, dismissed: () => void}} handlers
      */
     showGameOver(handlers) {
       gameOverHandlers = { ...noHandlers(), ...handlers };
@@ -128,37 +135,4 @@ export function createDialogs({ win, gameover, confirm }) {
       return win.dialog.open || gameover.dialog.open || confirm.dialog.open;
     },
   };
-}
-
-/**
- * Focus management helpers (additional).
- */
-export function trapFocus(dialog) {
-  if (!dialog) return () => {};
-  const focusable = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  
-  function handler(e) {
-    if (e.key !== 'Tab') return;
-    if (focusable.length === 0) {
-      e.preventDefault();
-      return;
-    }
-    if (e.shiftKey) {
-      if (document.activeElement === first) {
-        last.focus();
-        e.preventDefault();
-      }
-    } else {
-      if (document.activeElement === last) {
-        first.focus();
-        e.preventDefault();
-      }
-    }
-  }
-  
-  dialog.addEventListener('keydown', handler);
-  if (first) first.focus();
-  return () => dialog.removeEventListener('keydown', handler);
 }

@@ -10,17 +10,22 @@ FR-063).
 
 | Key | Contents | Written when |
 |---|---|---|
-| `1024:v1:game` | Stored game | After every valid move, after an undo, and when a new game starts |
+| `1024:v2:game` | Stored game (version 2) | After every valid move, after an undo, and when a new game starts |
+| `1024:v2:best` | Best score | Every time the game is saved, and so it goes down when an undo lowers the best score (FR-026) |
+| `1024:v1:game` | Stored game (version 1) | Read only, to convert a game saved by an earlier release (FR-061). Removed after the converted game is saved. |
 | `1024:v1:settings` | Stored settings | When the player changes the theme or the sound toggle, and once on first visit |
 
-The `:v1:` segment is the schema version. A future schema gets a new prefix rather than a
-migration, so an old key is simply ignored and a new key is written beside it.
+The `:vN:` segment is the schema version. When the stored game changes shape, it gets a new prefix
+and the previous version is **converted**, not ignored (clarified 2026-10-22, FR-061): a game saved
+by an earlier release the game recognises is converted and resumed, and a record that is corrupted
+or from an unrecognised format starts a fresh game. The settings record has not changed shape and
+keeps its `v1` key.
 
 ## Stored game
 
 ```jsonc
 {
-  "version": 1,
+  "version": 2,
   "savedAt": 1761234567890,      // epoch milliseconds, for diagnostics only
   "board": [0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
   "score": 24,
@@ -33,7 +38,10 @@ migration, so an old key is simply ignored and a new key is written beside it.
     "board": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     "score": 8,
     "bestScore": 64,
-    "moves": 6
+    "moves": 6,
+    "hasWon": false,
+    "endless": false,
+    "status": "active"
   }
 }
 ```
@@ -42,7 +50,7 @@ migration, so an old key is simply ignored and a new key is written beside it.
 
 | Field | Type | Rule |
 |---|---|---|
-| `version` | `number` | MUST be `1`. A record with a different version is discarded. |
+| `version` | `number` | MUST be `2`. A version 1 record is converted (see Migration); any other version is discarded. |
 | `savedAt` | `number` | Epoch milliseconds. Informational only. The game never reads it to decide anything. |
 | `board` | `number[]` | MUST have exactly 16 entries. Each entry MUST be `0` or a power of two `>= 2`. |
 | `score` | `number` | Integer `>= 0`. |
@@ -51,14 +59,14 @@ migration, so an old key is simply ignored and a new key is written beside it.
 | `hasWon` | `boolean` | `true` once a 1024 tile has been created. |
 | `endless` | `boolean` | `true` once the player chose to keep playing after the win. |
 | `status` | `string` | One of `"active"`, `"won"`, `"gameover"`. |
-| `undo` | `object \| null` | MUST have the four fields of the undo snapshot, or be `null`. |
+| `undo` | `object \| null` | MUST have the seven fields of the undo snapshot (`board`, `score`, `bestScore`, `moves`, `hasWon`, `endless`, `status`), or be `null`. |
 
 ### Validation on read
 
 A stored game is discarded, and a fresh game is started, when any of these is true:
 
 1. The record is not valid JSON.
-2. `version` is missing or is not `1`.
+2. `version` is missing or is not `2`, and the record is not a convertible version 1 record.
 3. `board` is not an array of exactly 16 valid entries.
 4. `score`, `bestScore`, or `moves` is not a non-negative integer.
 5. `bestScore < score`.
@@ -66,7 +74,28 @@ A stored game is discarded, and a fresh game is started, when any of these is tr
 7. `undo` is present but malformed.
 
 The game MUST NOT crash on a malformed record, and MUST NOT show a partially loaded board. A
-discarded record is overwritten by the next save.
+discarded record is overwritten by the next save. The best score and the settings are kept
+whenever they can still be read (FR-061); see below.
+
+### Best score record
+
+`1024:v2:best` holds `{ "version": 1, "bestScore": <integer >= 0> }` and is written on every save,
+so a game record that cannot be read does not take the best score with it. On read, the best score
+is taken from, in order: the best score record, the version 2 game record, the version 1 game
+record. The first one with a readable non-negative integer wins. When none can be read the best
+score is `0`.
+
+### Migration from version 1
+
+A valid version 1 record is converted on read:
+
+- Every field except `undo` is carried over unchanged.
+- The version 1 snapshot did not record the win. It is converted by reading its board: the win had
+  already happened before the undone move only if the game had won and the snapshot board holds a
+  tile of 1024 or more. So `hasWon` is `record.hasWon && snapshotBoardHas1024OrMore`, `endless` is
+  `hasWon && record.endless`, and `status` is `"active"`.
+- A version 2 record, when valid, always wins over a version 1 record. The version 1 key is
+  removed once a version 2 record has been written, so a converted game is never resumed twice.
 
 ### Validation on write
 
@@ -129,7 +158,7 @@ The game key is written on every save. A listener for the `storage` event watche
 - When another tab's write is detected, the tab that did not write last shows a notice (FR-034).
   The most recent save wins; the other tab does not overwrite it.
 - The notice is informational. It does not interrupt play and does not require a response.
-- The event's `key` MUST be compared against `1024:v1:game` exactly, so that a settings change
+- The event's `key` MUST be compared against `1024:v2:game` exactly, so that a settings change
   in another tab does not trigger the notice.
 
 The notice text and its presentation are specified in

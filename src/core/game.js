@@ -47,17 +47,6 @@ function pickIndex(indices, random) {
 }
 
 /**
- * The status a board implies, used when a state is restored rather than played forward.
- * @param {number[]} board
- * @returns {"active" | "won" | "gameover"}
- */
-function statusFor(board) {
-  if (board.some((value) => value >= TARGET_VALUE)) return "won";
-  if (!hasAvailableMoves(board)) return "gameover";
-  return "active";
-}
-
-/**
  * Starts a new game.
  *
  * The board begins with exactly two tiles in random empty cells, each of them a 2 with
@@ -162,6 +151,9 @@ export function applyMove(game, direction) {
       score: game.score,
       bestScore: game.bestScore,
       moves: game.moves,
+      hasWon: game.hasWon,
+      endless: game.endless,
+      status: game.status,
     },
     changed: true,
     gained: result.gained,
@@ -188,8 +180,10 @@ export function keepPlaying(game) {
 /**
  * Restores the state before the most recent valid move.
  *
- * The best score is never restored downwards: it keeps the higher of its current value and the
- * snapshot's.
+ * Everything the move changed is put back: the board, the score, the best score, the move count,
+ * and the win. When the undone move created the first 1024 tile, the win and any keep-playing
+ * choice are rewound with it, so the win is raised again when 1024 is next created. (FR-019,
+ * FR-026)
  *
  * @param {import("./types.js").Game} game
  * @returns {import("./types.js").Game} The restored state, or the same state when there is nothing
@@ -199,18 +193,15 @@ export function undo(game) {
   const snapshot = game.undo;
   if (!snapshot) return game;
 
-  const board = snapshot.board.slice();
-  const bestScore = Math.max(game.bestScore, snapshot.bestScore);
-  const restored = statusFor(board);
-  const status = game.endless && restored === "won" ? "active" : restored;
-
   return {
     ...game,
-    board,
+    board: snapshot.board.slice(),
     score: snapshot.score,
-    bestScore,
+    bestScore: snapshot.bestScore,
     moves: snapshot.moves,
-    status,
+    hasWon: snapshot.hasWon,
+    endless: snapshot.endless,
+    status: snapshot.status,
     undo: null,
     // The report of the move that was undone does not describe the restored state, so it is
     // cleared rather than left to be read as if it did.

@@ -67,6 +67,7 @@ function setup() {
   const gameover = {
     dialog: fakeDialog(),
     score: { textContent: "" },
+    undo: fakeButton(),
     newGame: fakeButton(),
   };
   const confirm = { dialog: fakeDialog(), start: fakeButton(), cancel: fakeButton() };
@@ -143,6 +144,21 @@ describe("createDialogs", () => {
     gameover.newGame.click();
 
     assert.deepEqual(chosen, ["newGame"]);
+    assert.equal(gameover.dialog.open, false);
+  });
+
+  it("offers the undo from the game-over dialog, without a keyboard (FR-028)", () => {
+    const { gameover, dialogs } = setup();
+    const chosen = [];
+
+    dialogs.showGameOver({
+      score: 0,
+      undo: () => chosen.push("undo"),
+      newGame: () => chosen.push("newGame"),
+    });
+    gameover.undo.click();
+
+    assert.deepEqual(chosen, ["undo"]);
     assert.equal(gameover.dialog.open, false);
   });
 

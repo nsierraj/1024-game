@@ -33,7 +33,7 @@ documented with JSDoc and specified in [data-model.md](data-model.md).
 built-in `node:test` runner and the development server uses only `node:http`. Both are dev-time
 only, which is the only category of dependency Principle I permits.
 
-**Storage**: Browser `localStorage`, under versioned keys `1024:v1:game` and `1024:v1:settings`.
+**Storage**: Browser `localStorage`, under versioned keys `1024:v2:game`, `1024:v2:best`, and `1024:v1:settings`; a game saved under `1024:v1:game` is converted.
 Every access is failure-tolerant, so a device that refuses storage degrades to a session-only game
 rather than an error.
 

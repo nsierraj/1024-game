@@ -3,10 +3,11 @@
  */
 
 import { applyMove, canUndo, createGame, keepPlaying, undo } from "./core/game.js";
-import { loadGame, loadSettings, saveGame, saveSettings, GAME_KEY } from "./services/persist.js";
+import { loadBestScore, loadGame, loadSettings, saveGame, saveSettings, GAME_KEY } from "./services/persist.js";
 import { createAudio } from "./services/audio.js";
 import { registerServiceWorker } from "./services/sw-register.js";
 import { applyTheme } from "./ui/themes.js";
+import { createAnnouncer } from "./ui/a11y.js";
 import { playMove } from "./ui/animations.js";
 import { createDialogs } from "./ui/dialogs.js";
 import { createInput } from "./ui/input.js";
@@ -28,6 +29,7 @@ function readElements() {
     helpToggle: byId("help-toggle"),
     helpPanel: byId("help-panel"),
     crossTabNotice: byId("cross-tab-notice"),
+    statusRegion: byId("status-region"),
     themeSelect: byId("theme-select"),
     soundToggle: byId("sound-toggle"),
     win: {
@@ -38,6 +40,7 @@ function readElements() {
     gameover: {
       dialog: byId("gameover-dialog"),
       score: byId("gameover-score"),
+      undo: byId("gameover-undo"),
       newGame: byId("gameover-new-game"),
     },
     confirm: {
@@ -58,6 +61,7 @@ const dialogs = createDialogs({
 });
 
 const audio = createAudio();
+const announcer = createAnnouncer(elements.statusRegion);
 
 let settings = loadSettings(null);
 applyTheme(settings.theme);
@@ -103,37 +107,32 @@ if (elements.soundToggle) {
   });
 }
 
-function restoreGame(savedGame) {
-  if (!savedGame) return null;
-  try {
-    const g = createGame({ seed: Date.now(), bestScore: savedGame.bestScore });
-    g.board = Array.isArray(savedGame.board) ? savedGame.board.slice() : g.board;
-    g.score = typeof savedGame.score === "number" ? savedGame.score : g.score;
-    g.bestScore = typeof savedGame.bestScore === "number" ? savedGame.bestScore : g.bestScore;
-    g.moves = typeof savedGame.moves === "number" ? savedGame.moves : g.moves;
-    g.hasWon = !!savedGame.hasWon;
-    g.endless = !!savedGame.endless;
-    g.status = savedGame.status === "won" || savedGame.status === "gameover" || savedGame.status === "active" ? savedGame.status : g.status;
-    if (savedGame.undo === null) {
-      g.undo = null;
-    } else if (savedGame.undo && Array.isArray(savedGame.undo.board)) {
-      g.undo = {
-        board: savedGame.undo.board.slice(),
-        score: savedGame.undo.score || 0,
-        bestScore: savedGame.undo.bestScore || 0,
-        moves: savedGame.undo.moves || 0,
-      };
-    }
-    return g;
-  } catch {
-    return null;
-  }
+// A saved "sound on" is honoured after a reload by fetching the files again. If they cannot be
+// fetched (offline, never cached), the control stays off and play is unaffected. (FR-040)
+if (settings.sound) {
+  audio.enable().then((ok) => {
+    if (ok) return;
+    settings = { ...settings, sound: false };
+    updateSoundUI(false);
+    saveSettings(null, settings);
+  });
 }
 
-const saved = loadGame(null);
-let game = restoreGame(saved);
-if (game && saved && saved.bestScore > game.bestScore) game.bestScore = saved.bestScore;
-if (!game) game = createGame({ seed: Date.now() });
+/**
+ * Builds a live game from a stored one. The stored record carries the state; the random source
+ * and the seed are not stored, so a new one is made.
+ * @param {object | null} savedGame
+ * @returns {object | null}
+ */
+function restoreGame(savedGame) {
+  if (!savedGame) return null;
+  return { ...createGame({ seed: Date.now() }), ...savedGame };
+}
+
+// The best score is read on its own, so a game record that cannot be read does not take it down.
+const bestScore = loadBestScore(null);
+let game = restoreGame(loadGame(null)) ?? createGame({ seed: Date.now(), bestScore });
+game.bestScore = Math.max(game.bestScore, bestScore);
 saveGame(null, game);
 
 /** Whether the win has already been reported for this game. */
@@ -179,6 +178,7 @@ function showOutcome() {
 
   if (game.status === "won" && !winShown) {
     winShown = true;
+    announcer.announceWin();
     audio.play("win");
     dialogs.showWin({
       keepPlaying: () => {
@@ -206,9 +206,13 @@ function showOutcome() {
 
   if (game.status === "gameover" && !gameOverShown) {
     gameOverShown = true;
+    announcer.announceGameOver(game.score);
     audio.play("gameover");
     dialogs.showGameOver({
       score: game.score,
+      undo: () => {
+        performUndo();
+      },
       newGame: () => {
         startNewGame();
       },
@@ -225,7 +229,12 @@ function showOutcome() {
 function performUndo() {
   if (!canUndo(game)) return;
   game = undo(game);
+  // The undo can take the game out of its win or its end, so both are reported again if they
+  // happen again. (FR-019, FR-028)
+  winShown = false;
+  gameOverShown = false;
   renderer.render(game);
+  announcer.announceUndo(game.score);
   updateUndo();
   input.release();
   saveGame(null, game);
@@ -251,6 +260,7 @@ async function performMove(direction) {
   audio.play(result.gained > 0 ? "merge" : "move");
   await playMove(groups);
 
+  announcer.announceMove(result.gained, game.score);
   showOutcome();
   updateUndo();
   input.release();
@@ -314,3 +324,5 @@ if (typeof window !== "undefined") {
 renderer.render(game);
 updateUndo();
 saveGame(null, game);
+// A game saved at its win or its end is reported again when it is reopened.
+showOutcome();

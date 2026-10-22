@@ -92,6 +92,9 @@ One retained copy of the state immediately before the most recent valid move.
 | `score` | `number` | Score before the move. |
 | `bestScore` | `number` | Best score before the move. |
 | `moves` | `number` | Move count before the move. |
+| `hasWon` | `boolean` | Whether a 1024 tile had been created before the move. |
+| `endless` | `boolean` | Whether the player had chosen to keep playing before the move. |
+| `status` | `string` | The status before the move. |
 
 **Validation rules**
 
@@ -99,9 +102,11 @@ One retained copy of the state immediately before the most recent valid move.
 - The snapshot MUST be replaced, not stacked, on every valid move (FR-025: "the single most
   recent").
 - An invalid move MUST NOT replace the snapshot (FR-005: a rejected move changes nothing).
-- Restoring a snapshot MUST NOT lower `bestScore` (FR-026). The best score is monotonic; it is
-  restored only if the snapshot's value is higher, which can happen when the undone move set a
-  new record.
+- Restoring a snapshot MUST restore `bestScore` to the snapshot's value, even when that lowers it
+  (FR-026). A best score raised by an undone move does not survive the undo.
+- Restoring a snapshot MUST also restore `hasWon`, `endless`, and `status`, so undoing the move
+  that created the first 1024 tile rewinds the win and any keep-playing choice, and the win is
+  raised again when 1024 is next created (FR-019).
 
 ## 5. Settings
 
@@ -191,7 +196,8 @@ action, and the logic core is the only thing allowed to perform a transition (Pr
 | `won` | Player chooses "keep playing" | `active` | `endless = true`, `hasWon` stays `true`, no further win dialog appears (FR-021). |
 | `won` | Player chooses "start a new game" | `active` | A fresh game begins, with confirmation if a game was in progress (FR-030). |
 | `active` | Board full and no adjacent equal tiles | `gameover` | The game-over dialog opens with the final score (FR-022, FR-023). |
-| `gameover` | Undo | `active` | The snapshot is restored, and `status` is recomputed from the restored board (FR-028). |
+| `gameover` | Undo | `active` | The snapshot is restored, including its `status` (FR-028). |
+| `won` or `active` after a win | Undo of the move that created the first 1024 tile | `active` | The snapshot is restored; `hasWon` and `endless` return to their pre-move values, so the win is raised again (FR-019). |
 | `active` | Undo | `active` | The snapshot is restored; the snapshot is then cleared, because only one level of undo exists (FR-025). |
 | any | New game | `active` | Confirmation is requested first if a game is in progress (FR-030). |
 

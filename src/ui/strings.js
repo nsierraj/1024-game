@@ -34,12 +34,13 @@ export const STRINGS = Object.freeze({
   winBody: "Keep playing or start a new game.",
   winKeepPlaying: "Keep playing",
   winNewGame: "New game",
-  winAnnouncement: "You reached 1024!",
+  winAnnouncement: "You reached 1024. Keep playing or start a new game.",
 
   gameOverTitle: "Game over",
   gameOverBody: "No more moves.",
   gameOverNewGame: "Try again",
-  gameOverAnnouncement: (score) => `Game over. Score ${score}.`,
+  gameOverAnnouncement: (score) => `Game over. Final score ${score}. Start a new game to try again.`,
+  gameOverUndo: "Undo last move",
 
   confirmTitle: "Start a new game?",
   confirmBody: "Your current game will be replaced.",
@@ -48,6 +49,7 @@ export const STRINGS = Object.freeze({
 
   scoreGained: (value) => `+${value}`,
   mergedAnnouncement: (value, score) => `Merged ${value}. Score ${score}.`,
+  undoAnnouncement: (score) => `Move undone. Score ${score}.`,
 
   crossTabNotice: "The game was updated in another tab.",
 });
