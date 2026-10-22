@@ -155,13 +155,13 @@ further win message and that tiles above 1024 remain distinguishable.
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T037 [P] [US4] Write the endless-mode cases in `tests/unit/game.test.js`: choosing keep playing leaves `hasWon` true and `endless` true, no further win is raised (FR-021), and a later game over still ends the game normally without a second win message
+- [x] T037 [P] [US4] Write the endless-mode cases in `tests/unit/game.test.js`: choosing keep playing leaves `hasWon` true and `endless` true, no further win is raised (FR-021), and a later game over still ends the game normally without a second win message
 
 ### Implementation for User Story 4
 
-- [ ] T038 [US4] Implement the endless transition in `src/core/game.js` so that after `endless` is set the status returns to `active` while `hasWon` stays true
-- [ ] T039 [US4] Update the win dialog in `src/ui/dialogs.js` to offer exactly two choices and to suppress the win dialog for every subsequent 1024 tile
-- [ ] T040 [P] [US4] Style tiles above 1024 distinctly in `src/styles/board.css` using the `--tile-high-bg` and `--tile-high-fg` tokens so they remain readable and distinguishable (FR-024)
+- [x] T038 [US4] Implement the endless transition in `src/core/game.js` so that after `endless` is set the status returns to `active` while `hasWon` stays true
+- [x] T039 [US4] Update the win dialog in `src/ui/dialogs.js` to offer exactly two choices and to suppress the win dialog for every subsequent 1024 tile
+- [x] T040 [P] [US4] Style tiles above 1024 distinctly in `src/styles/board.css` using the `--tile-high-bg` and `--tile-high-fg` tokens so they remain readable and distinguishable (FR-024)
 
 **Checkpoint**: User Stories 1 through 4 should all work independently
 
@@ -413,9 +413,6 @@ With multiple developers:
 - 2026-10-21, User Story 1. The renderer keeps its tile map by writing a new one from the old on
   every move rather than moving tiles inside it. A slide to the right can put a tile into a cell
   that another tile is about to leave, and moving them in place loses the tile that is leaving.
-- 2026-10-21, User Story 3. Added persistence for the game and settings under the versioned keys,
-  with validation on read, writer re-derivation where specified, and every access wrapped so
-  denied/evicted/quota/parse failures are non-fatal with no errors shown. The game is saved after
-  every valid move, after undo, and on new game; it is restored on startup or discarded in favour
-  of a fresh game if malformed. The best score is carried across games and reloads. The cross-tab
-  notice appears only when another tab writes `1024:v1:game` exactly, not on settings changes.
+- 2026-10-21, User Story 4. keepPlaying sets endless and returns to active; the win dialog is
+  suppressed after the first win by tracking winShown and resetting it when carrying on, tiles above
+  1024 are styled distinctly.

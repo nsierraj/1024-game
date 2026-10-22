@@ -17,6 +17,10 @@
   --slide-duration: 90ms;
   --merge-duration: 120ms;
   --spawn-duration: 120ms;
+
+  /* Tiles above 1024 are styled distinctly. (FR-024) */
+  --tile-high-bg: #3c3a32;
+  --tile-high-fg: #f9f6f2;
 }
 
 .board-wrap {
@@ -88,6 +92,16 @@
      a quarter of the board, so a whole number moves it exactly one cell. */
   --col: 0;
   --row: 0;
+}
+
+/* Tiles above 1024 are styled distinctly so they remain readable and distinguishable. (FR-024) */
+.tile--2048,
+.tile--4096,
+.tile--8192,
+.tile--16384 {
+  background-color: var(--tile-high-bg);
+  color: var(--tile-high-fg);
+}
   transform: translate(calc(var(--col) * 100%), calc(var(--row) * 100%));
   transition:
     transform var(--slide-duration) cubic-bezier(0.2, 0, 0.2, 1),

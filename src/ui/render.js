@@ -152,6 +152,7 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
     const element = doc.createElement("div");
     element.className = "tile";
     element.dataset.value = String(value);
+    element.classList.add(`tile--${value}`);
     element.textContent = String(value);
     return element;
   }
@@ -165,6 +166,10 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
     if (element.textContent === String(value)) return;
     element.textContent = String(value);
     element.dataset.value = String(value);
+    for (const cls of Array.from(element.classList)) {
+      if (cls.startsWith("tile--")) element.classList.remove(cls);
+    }
+    element.classList.add(`tile--${value}`);
   }
 
   /**
