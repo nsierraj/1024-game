@@ -130,16 +130,16 @@ identical.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T030 [P] [US3] Write `tests/unit/persist.test.js` covering `contracts/storage-schema.md`: the saved record shape, the version check, rejection of a malformed board or score, the settings defaults, and the requirement that a storage failure is non-fatal
-- [ ] T031 [P] [US3] Write `tests/integration/storage-flow.test.js` covering save, reload, resume, best-score continuity across games, and the cross-tab notice raised when another tab writes the game key
+- [x] T030 [P] [US3] Write `tests/unit/persist.test.js` covering `contracts/storage-schema.md`: the saved record shape, the version check, rejection of a malformed board or score, the settings defaults, and the requirement that a storage failure is non-fatal
+- [x] T031 [P] [US3] Write `tests/integration/storage-flow.test.js` covering save, reload, resume, best-score continuity across games, and the cross-tab notice raised when another tab writes the game key
 
 ### Implementation for User Story 3
 
-- [ ] T032 [US3] Create `src/services/persist.js` to read, validate, and write the `1024:v1:game` and `1024:v1:settings` records, wrapping every access so a denied or evicted store degrades to a session-only game with no error shown
-- [ ] T033 [P] [US3] Create `src/services/settings.js` for the theme, sound, and visited flags with the documented defaults, so an unreadable settings record yields `theme: "system"`, `sound: false`, `visited: false`
-- [ ] T034 [US3] Save the game in `src/main.js` after every valid move, after an undo, and when a new game starts, and restore it on startup, starting a fresh game when the record is missing or malformed
-- [ ] T035 [US3] Carry the best score across games in `src/main.js` so the stored best survives a new game and a reload (FR-016)
-- [ ] T036 [US3] Add the cross-tab notice to `index.html` and listen for the `storage` event in `src/main.js`, comparing the event key against `1024:v1:game` so a settings change in another tab does not raise it (FR-034)
+- [x] T032 [US3] Create `src/services/persist.js` to read, validate, and write the `1024:v1:game` and `1024:v1:settings` records, wrapping every access so a denied or evicted store degrades to a session-only game with no error shown
+- [x] T033 [P] [US3] Create `src/services/settings.js` for the theme, sound, and visited flags with the documented defaults, so an unreadable settings record yields `theme: "system"`, `sound: false`, `visited: false`
+- [x] T034 [US3] Save the game in `src/main.js` after every valid move, after an undo, and when a new game starts, and restore it on startup, starting a fresh game when the record is missing or malformed
+- [x] T035 [US3] Carry the best score across games in `src/main.js` so the stored best survives a new game and a reload (FR-016)
+- [x] T036 [US3] Add the cross-tab notice to `index.html` and listen for the `storage` event in `src/main.js`, comparing the event key against `1024:v1:game` so a settings change in another tab does not raise it (FR-034)
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently
 
@@ -413,9 +413,9 @@ With multiple developers:
 - 2026-10-21, User Story 1. The renderer keeps its tile map by writing a new one from the old on
   every move rather than moving tiles inside it. A slide to the right can put a tile into a cell
   that another tile is about to leave, and moving them in place loses the tile that is leaving.
-- 2026-10-21, User Story 2. T025 and the undo tests in the integration suite were already
-  in place from an earlier pass; T027's logic was in place; T028 and T029 added the button and
-  wired it so the undo state follows `canUndo` and the board is re-rendered on undo. The core
-  already restores the board, score and move count, keeps the best score monotonic, clears the
-  snapshot and recomputes the status (never raising a win from an undo). Undo is available from
-  the game-over state and does nothing when there is nothing to undo.
+- 2026-10-21, User Story 3. Added persistence for the game and settings under the versioned keys,
+  with validation on read, writer re-derivation where specified, and every access wrapped so
+  denied/evicted/quota/parse failures are non-fatal with no errors shown. The game is saved after
+  every valid move, after undo, and on new game; it is restored on startup or discarded in favour
+  of a fresh game if malformed. The best score is carried across games and reloads. The cross-tab
+  notice appears only when another tab writes `1024:v1:game` exactly, not on settings changes.
