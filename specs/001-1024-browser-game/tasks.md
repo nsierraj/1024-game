@@ -75,21 +75,21 @@ without any further story.
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T013 [P] [US1] Write `tests/unit/board.test.js` covering the slide rules in `contracts/logic-core-api.md`: tiles compact toward the edge in all four directions, equal neighbours merge, a tile merges at most once per move (FR-008), the pair closest to the destination edge merges first (FR-009), `gained` equals the sum of merged tile values, and `moved` is false when the board is unchanged
-- [ ] T014 [P] [US1] Write `tests/unit/game.test.js` covering the game rules: a new game starts with exactly two tiles (FR-002), a valid move places exactly one tile (FR-004), an invalid move changes nothing and places no tile (FR-005), the score increases by the merged value (FR-014), the best score updates on a new record and never decreases (FR-016, FR-017), the 90/10 spawn distribution holds over many samples (FR-003), the first 1024 tile raises the win (FR-019), and a full board with no equal neighbours ends the game (FR-022)
-- [ ] T015 [P] [US1] Write `tests/integration/game-flow.test.js` that plays a scripted game from a new game through merges to a game over, asserting the board, score, best score, and status at each step
+- [x] T013 [P] [US1] Write `tests/unit/board.test.js` covering the slide rules in `contracts/logic-core-api.md`: tiles compact toward the edge in all four directions, equal neighbours merge, a tile merges at most once per move (FR-008), the pair closest to the destination edge merges first (FR-009), `gained` equals the sum of merged tile values, and `moved` is false when the board is unchanged
+- [x] T014 [P] [US1] Write `tests/unit/game.test.js` covering the game rules: a new game starts with exactly two tiles (FR-002), a valid move places exactly one tile (FR-004), an invalid move changes nothing and places no tile (FR-005), the score increases by the merged value (FR-014), the best score updates on a new record and never decreases (FR-016, FR-017), the 90/10 spawn distribution holds over many samples (FR-003), the first 1024 tile raises the win (FR-019), and a full board with no equal neighbours ends the game (FR-022)
+- [x] T015 [P] [US1] Write `tests/integration/game-flow.test.js` that plays a scripted game from a new game through merges to a game over, asserting the board, score, best score, and status at each step
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Implement `slide`, `hasAvailableMoves`, and `hasNoAdjacentEqual` in `src/core/board.js` to satisfy T013
-- [ ] T017 [US1] Implement `createGame`, `applyMove`, and `canUndo` in `src/core/game.js` to satisfy T014, injecting the random source rather than calling `Math.random`
-- [ ] T018 [US1] Implement the per-cell `transitions` list in the `slide` result in `src/core/board.js`, matching the ratified `SlideResult` and `SlideTransition` shapes in `contracts/logic-core-api.md`, so a tile that slides and merges in one move can be animated correctly
-- [ ] T019 [P] [US1] Create `src/ui/render.js` to draw the 4x4 board, the tiles, the score, and the best score from game state, reusing tile elements between renders so transitions stay continuous, and create `src/styles/board.css` with the board and tile styles and link it from `index.html`, since T040, T049, and T059 extend it
-- [ ] T020 [P] [US1] Create `src/ui/animations.js` for the slide, merge, and spawn animations, finishing within 150 ms (FR-036)
-- [ ] T021 [US1] Create `src/ui/input.js` with arrow-key handling for the four directions (FR-010) and a queue that holds input arriving during an animation so no move is lost (FR-064)
-- [ ] T022 [P] [US1] Create `src/ui/dialogs.js` with the win dialog offering exactly keep playing and new game (FR-020) and the game-over dialog presenting the final score and a way to try again (FR-023)
-- [ ] T023 [US1] Create `src/main.js` to bootstrap the game, wire the core, renderer, input, and dialogs, and start the first animation loop, and load it from `index.html` as a module script
-- [ ] T024 [US1] Add the new-game control to `index.html` and the confirmation dialog to `src/ui/dialogs.js` so starting a new game mid-game asks first and declining keeps the current game (FR-029, FR-030)
+- [x] T016 [US1] Implement `slide`, `hasAvailableMoves`, and `hasNoAdjacentEqual` in `src/core/board.js` to satisfy T013
+- [x] T017 [US1] Implement `createGame`, `applyMove`, and `canUndo` in `src/core/game.js` to satisfy T014, injecting the random source rather than calling `Math.random`
+- [x] T018 [US1] Implement the per-cell `transitions` list in the `slide` result in `src/core/board.js`, matching the ratified `SlideResult` and `SlideTransition` shapes in `contracts/logic-core-api.md`, so a tile that slides and merges in one move can be animated correctly
+- [x] T019 [P] [US1] Create `src/ui/render.js` to draw the 4x4 board, the tiles, the score, and the best score from game state, reusing tile elements between renders so transitions stay continuous, and create `src/styles/board.css` with the board and tile styles and link it from `index.html`, since T040, T049, and T059 extend it
+- [x] T020 [P] [US1] Create `src/ui/animations.js` for the slide, merge, and spawn animations, finishing within 150 ms (FR-036), and write `tests/unit/animations.test.js` covering the duration limit and the classes each group of tiles carries
+- [x] T021 [US1] Create `src/ui/input.js` with arrow-key handling for the four directions (FR-010) and a queue that holds input arriving during an animation so no move is lost (FR-064), and write `tests/unit/input.test.js` covering the four keys and the queue, since the module takes its target and its blocker as arguments and can be driven without a browser
+- [x] T022 [P] [US1] Create `src/ui/dialogs.js` with the win dialog offering exactly keep playing and new game (FR-020) and the game-over dialog presenting the final score and a way to try again (FR-023), and write `tests/unit/dialogs.test.js` covering the choices each dialog offers and what Escape means on each one
+- [x] T023 [US1] Create `src/main.js` to bootstrap the game, wire the core, renderer, input, and dialogs, and start the first animation loop, and load it from `index.html` as a module script
+- [x] T024 [US1] Add the new-game control to `index.html` and the confirmation dialog to `src/ui/dialogs.js` so starting a new game mid-game asks first and declining keeps the current game (FR-029, FR-030)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -233,7 +233,7 @@ and confirm every tile value, score change, win, and game over is perceivable.
 
 ### Tests for User Story 7 ⚠️
 
-- [ ] T060 [P] [US7] Write `tests/unit/a11y.test.js` covering the announcement strings in `src/ui/strings.js` and the board cell text, where an occupied cell reads its value and an empty cell reads "empty" (FR-050, FR-052)
+- [ ] T060 [P] [US7] Write `tests/unit/a11y.test.js` covering the announcement strings in `src/ui/strings.js` and the board cell text, where an occupied cell reads its value and an empty cell reads "empty" (FR-050, FR-052), and check that `index.html` and `STRINGS` do not drift, since the shell carries the same words as the static copy of the interface
 
 ### Implementation for User Story 7
 
@@ -385,3 +385,35 @@ With multiple developers:
   from `index.html`, since an unlinked manifest is never offered for installation
 - T023 now also loads `src/main.js` from `index.html` as a module script, so the shell carries no
   reference to a file that does not exist yet
+- 2026-10-21, User Story 1. Three task descriptions were widened, because the list as written left
+  the interface layer of this story without a test: T020 now also writes
+  `tests/unit/animations.test.js`, T021 now also writes `tests/unit/input.test.js`, and T022 now
+  also writes `tests/unit/dialogs.test.js`. The three modules take their elements and their
+  collaborators as arguments, so each can be driven from Node without a browser and without
+  adding a dependency. The suite is 115 tests.
+- 2026-10-21, User Story 1. The board in the page is a native grid of sixteen cells that carries
+  the meaning, and the tiles are drawn in a separate layer over it that is hidden from assistive
+  technology, because a tile that slides has to travel smoothly from one cell to the next and a
+  grid cell cannot do that on its own. T062 therefore finds its renderer half already in place
+  from T019 and is left with the test of the cell text.
+- 2026-10-21, User Story 1. `src/styles/board.css` already carries the `prefers-reduced-motion`
+  override, because the animation it governs ships in this story. T059 keeps the JavaScript side
+  and the test.
+- 2026-10-21, User Story 1. Escape closes whichever dialog is open, as the UI contract says. On
+  the win dialog a dismissal is a win that carries on rather than one that is raised again, so the
+  game never sits in a state with no way forward. On the confirmation dialog Escape means
+  "cancel", so the game in progress continues. Both are recorded in `contracts/ui-contract.md`.
+- 2026-10-21, User Story 1. The announcements to the live region are T061's, so `#status-region`
+  stays empty in this story. The win and game-over messages are native modal dialogs, so the
+  browser announces them when they open.
+- 2026-10-21, User Story 1. The help toggle is wired in `src/main.js` to open and close the
+  panel, to keep `aria-expanded` in step, and to move the focus to the panel's heading, which
+  needed a `tabindex="-1"` on that heading. T063 and T064 verify the rest of the focus
+  behaviour.
+- 2026-10-21, User Story 1. The renderer keeps its tile map by writing a new one from the old on
+  every move rather than moving tiles inside it. A slide to the right can put a tile into a cell
+  that another tile is about to leave, and moving them in place loses the tile that is leaving.
+- 2026-10-21, User Story 1. T060 now also checks that `index.html` and `STRINGS` do not drift.
+  The shell carries the same words as the static copy of the interface, and `src/ui/strings.js`
+  says that the two are checked; this is the check, and it was left unsaid until the interface
+  existed in both places.
