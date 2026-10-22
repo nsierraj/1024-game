@@ -41,4 +41,30 @@ describe("styles", () => {
     const unstyled = Array.from(used).filter((name) => !defined.has(name));
     assert.deepEqual(unstyled, [], `classes with no CSS rule: ${unstyled.join(", ")}`);
   });
+
+  describe("controls (FR-016, FR-025)", () => {
+    const css = STYLESHEETS.map((path) => stripComments(read(path))).join("\n");
+
+    for (const control of [".btn", ".select"]) {
+      it(`${control} has a hover, a pressed, and a keyboard-focus state`, () => {
+        assert.match(css, new RegExp(`${control.replace(".", "\\.")}:hover`), "no hover rule");
+        assert.match(css, new RegExp(`${control.replace(".", "\\.")}:active`), "no pressed rule");
+      });
+    }
+
+    it("shows a focus ring for the keyboard and never removes it", () => {
+      assert.match(css, /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--focus-ring\)/);
+      assert.ok(!/outline:\s*(none|0)\b/.test(css), "a rule removes the outline");
+    });
+
+    it("loads no font, image, or stylesheet from another origin", () => {
+      assert.ok(!/@import|@font-face/.test(css), "an @import or @font-face is declared");
+      assert.ok(!/url\(\s*["']?(https?:|\/\/|data:)/.test(css), "a url() points off the page");
+    });
+
+    it("styles the dialogs entering, and leaving through data-closing", () => {
+      assert.match(css, /dialog\[open\]|\.modal\[open\]/);
+      assert.match(css, /\[data-closing\]/);
+    });
+  });
 });

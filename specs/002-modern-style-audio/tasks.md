@@ -121,17 +121,17 @@ more modern, every control is recognisable, and nothing is harder to read.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T026 [P] [US3] Extend `tests/unit/dialogs.test.js`: closing a dialog sets `data-closing`, waits for the leave duration, then calls `close()`, and with reduced motion `close()` runs at once (FR-017, FR-007)
-- [ ] T027 [P] [US3] Extend `tests/unit/styles.test.js` so every control (`button`, `select`, the toggle) defines a hover, an `:active`, and a `:focus-visible` rule, that the focus outline is never `none`, and that no rule loads a font or image from another origin (FR-016, FR-025)
-- [ ] T028 [P] [US3] Extend `tests/unit/a11y.test.js` so every control in `index.html` keeps a touch target of at least 24 by 24 CSS pixels in the stylesheet, and assert the current control ids (`new-game`, `undo`, `help-toggle`, `theme-select`, `sound-toggle`, and the dialog buttons) are all still in `index.html` (FR-019)
+- [x] T026 [P] [US3] Extend `tests/unit/dialogs.test.js`: closing a dialog sets `data-closing`, waits for the leave duration, then calls `close()`, and with reduced motion `close()` runs at once (FR-017, FR-007)
+- [x] T027 [P] [US3] Extend `tests/unit/styles.test.js` so every control (`button`, `select`, the toggle) defines a hover, an `:active`, and a `:focus-visible` rule, that the focus outline is never `none`, and that no rule loads a font or image from another origin (FR-016, FR-025)
+- [x] T028 [P] [US3] Extend `tests/unit/a11y.test.js` so every control in `index.html` keeps a touch target of at least 24 by 24 CSS pixels in the stylesheet, and assert the current control ids (`new-game`, `undo`, `help-toggle`, `theme-select`, `sound-toggle`, and the dialog buttons) are all still in `index.html` (FR-019)
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Restyle the page shell, header, score panels, and controls in `src/styles/base.css` with the shape, depth, type, and spacing tokens, including hover, press, and focus states that take 120 ms and respect reduced motion (FR-015, FR-016)
-- [ ] T030 [US3] Restyle the board, cells, and tiles in `src/styles/board.css`: radius, soft two-layer shadow, a 1 px inner highlight, and tabular numbers, keeping the board square and the 24 px targets (FR-015, FR-018, FR-019)
-- [ ] T031 [US3] Add the dialog enter keyframes (160 ms, opacity and a 6 px rise) on `dialog[open]` and `dialog[open]::backdrop` in `src/styles/base.css`, under a `no-preference` motion query (FR-017)
-- [ ] T032 [US3] Add the leave transition to `src/ui/dialogs.js`: set `data-closing`, wait 120 ms, then `close()`, and call `close()` immediately when reduced motion is on (FR-017)
-- [ ] T033 [US3] Check the layout at 320 px, in landscape, and at 200% text, and fix any clipping in `src/styles/base.css` (FR-018, SC-012)
+- [x] T029 [US3] Restyle the page shell, header, score panels, and controls in `src/styles/base.css` with the shape, depth, type, and spacing tokens, including hover, press, and focus states that take 120 ms and respect reduced motion (FR-015, FR-016)
+- [x] T030 [US3] Restyle the board, cells, and tiles in `src/styles/board.css`: radius, soft two-layer shadow, a 1 px inner highlight, and tabular numbers, keeping the board square and the 24 px targets (FR-015, FR-018, FR-019)
+- [x] T031 [US3] Add the dialog enter keyframes (160 ms, opacity and a 6 px rise) on `dialog[open]` and `dialog[open]::backdrop` in `src/styles/base.css`, under a `no-preference` motion query (FR-017)
+- [x] T032 [US3] Add the leave transition to `src/ui/dialogs.js`: set `data-closing`, wait 120 ms, then `close()`, and call `close()` immediately when reduced motion is on (FR-017)
+- [x] T033 [US3] Check the layout at 320 px, in landscape, and at 200% text, and fix any clipping in `src/styles/base.css` (FR-018, SC-012)
 
 **Checkpoint**: User Story 3 works on its own. Run T026 to T028; all pass.
 
@@ -278,4 +278,7 @@ Task: "Rewrite the slide, merge, and spawn motion in src/styles/board.css"  # US
 - 2026-10-22, User Story 2. The compressor in the plan was measured and dropped. In Chromium a `DynamicsCompressorNode` with its threshold above one effect's peak still added make-up gain and acted on the attack of short sounds, so the five effects reached the output at -17.1, -6.3, -7.0, -5.7, and -5.7 dBFS. With a plain gain each measures -9.0 dBFS, and the worst stack of three measures -3.4 dBFS. T020 therefore builds a gain with no compressor, and `audio-contract.md` and `research.md` (R-04) say so.
 - 2026-10-22, User Story 2. `enable()` returns a promise and `restore()` is new. WebKit settles `resume()` after the call returns, so the state is decided from the promise and `statechange`, never from the state straight after `resume()`; and a saved "on" after a reload must not create a context until the first gesture. The tests in `tests/unit/audio.test.js` drive an async `resume()` to cover this. The audio contract and data model say so.
 - 2026-10-22, User Story 2. Superseded feature 001 tests: the two lazy-load tests in `tests/unit/audio.test.js` (they fetched mp3 files that no longer exist) and the audio-path assertions in `tests/unit/precache.test.js`, now replaced by assertions that `sound-synth.js` is precached and no audio file exists. No rule test was touched.
+- 2026-10-22, User Story 3. The tile's colour and shape moved from the tile box to a `::before` face inset from the cell. A tile is a padded box whose background is clipped to the content box, so a `box-shadow` on it would have drawn around the whole cell. The per-value rules now set `--tile-bg`. The `--tile-high-*` fallback that `board.css` declared on `:root` was removed, because it overrode the palette in `base.css` and the contrast test never read `board.css` (analysis finding I6).
+- 2026-10-22, User Story 3. At 320 px with 200% text and a five-digit best score the score boxes overflowed and the page scrolled sideways (366 px of content in a 320 px window). The score row now wraps and its boxes are capped at the row width; the check repeated clean afterwards.
+- 2026-10-22, User Story 3. Superseded feature 001 tests: the immediate-close assertions in `tests/unit/dialogs.test.js` now run with an injected synchronous scheduler, because a dialog leaves through a 120 ms transition and the handler runs after the real close. A new group of tests drives the transition by hand. No rule test was touched.
 

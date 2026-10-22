@@ -198,3 +198,34 @@ describe("createAnnouncer (FR-051)", () => {
     announcer.announceUndo(4);
   });
 });
+
+describe("the new design keeps every control and target (FR-019)", () => {
+  const CONTROL_IDS = [
+    "new-game",
+    "undo",
+    "help-toggle",
+    "theme-select",
+    "sound-toggle",
+    "win-keep-playing",
+    "win-new-game",
+    "gameover-undo",
+    "gameover-new-game",
+    "confirm-start",
+    "confirm-cancel",
+  ];
+
+  for (const id of CONTROL_IDS) {
+    it(`index.html still has #${id}`, () => {
+      assert.ok(readHtml().includes(`id="${id}"`), `#${id} is gone`);
+    });
+  }
+
+  it("sizes buttons and the selector from a token of at least 24 pixels", () => {
+    const base = readFileSync(join(process.cwd(), "src/styles/base.css"), "utf8");
+    const size = Number(base.match(/--control-size:\s*(\d+)px/)[1]);
+    assert.ok(size >= 24, `--control-size is ${size}px`);
+    assert.match(base, /\.btn,\s*\n\.select\s*\{[^}]*min-height:\s*var\(--control-size\)/);
+    assert.match(base, /\.btn,\s*\n\.select\s*\{[^}]*min-width:\s*var\(--control-size\)/);
+  });
+});
+

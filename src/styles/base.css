@@ -126,30 +126,35 @@ ul {
 
 .app-title {
   color: var(--text-strong);
-  font-size: 2.75rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: var(--font-size-title);
+  font-weight: 800;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
 .scores {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--gap);
+  max-width: 100%;
 }
 
 .score-box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 84px;
-  padding: 6px 12px;
-  border-radius: var(--radius-small);
+  min-width: min(84px, 100%);
+  max-width: 100%;
+  padding: 8px 14px;
+  border-radius: var(--radius-control);
   background-color: var(--surface);
+  box-shadow: var(--shadow-tile);
 }
 
 .score-label {
   color: var(--text);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -230,19 +235,42 @@ ul {
 .select {
   min-height: var(--control-size);
   min-width: var(--control-size);
-  padding: 8px 16px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-small);
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
   background-color: var(--surface);
+  box-shadow: var(--shadow-tile);
   color: var(--text-strong);
   font: inherit;
   font-weight: 600;
   text-align: center;
   cursor: pointer;
+  transition:
+    transform 120ms var(--ease-slide),
+    box-shadow 120ms var(--ease-slide),
+    background-color 120ms linear,
+    border-color 120ms linear;
 }
 
 .select {
-  padding-right: 8px;
+  padding-right: 10px;
+}
+
+/* A control lifts a little under the pointer and presses down when it is used. Touch devices have
+   no hover, so the pressed state carries the feedback there. (FR-016) */
+@media (hover: hover) {
+  .btn:hover:not(:disabled),
+  .select:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-raised);
+    border-color: var(--text);
+  }
+}
+
+.btn:active:not(:disabled),
+.select:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-tile);
 }
 
 .settings-row {
@@ -270,11 +298,17 @@ ul {
   color: var(--accent-fg);
 }
 
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
+}
+
 .notice {
   width: 100%;
   padding: 8px 16px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-control);
   background-color: var(--surface);
   color: var(--text-strong);
   text-align: center;
@@ -300,10 +334,11 @@ ul {
 .help-panel {
   width: 100%;
   max-width: 480px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-board);
   background-color: var(--surface);
+  box-shadow: var(--shadow-tile);
   color: var(--text);
 }
 
@@ -329,13 +364,81 @@ ul {
   max-width: min(90vw, 420px);
   padding: 24px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-board);
   background-color: var(--bg);
+  box-shadow: var(--shadow-raised);
   color: var(--text);
 }
 
 .modal::backdrop {
-  background-color: rgb(0 0 0 / 55%);
+  background-color: rgb(20 26 38 / 55%);
+}
+
+/*
+ * A dialog rises and fades in when it opens, and the reverse plays when it leaves. The leave runs
+ * through `data-closing`, set by the script for 120 ms before the dialog is closed. Both sit under
+ * a motion query, so with reduced motion a dialog simply appears and disappears. (FR-017, FR-007)
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .modal[open] {
+    animation: modal-in 160ms var(--ease-slide);
+  }
+
+  .modal[open]::backdrop {
+    animation: backdrop-in 160ms linear;
+  }
+
+  .modal[open][data-closing] {
+    animation: modal-out 120ms var(--ease-slide) forwards;
+  }
+
+  .modal[open][data-closing]::backdrop {
+    animation: backdrop-out 120ms linear forwards;
+  }
+}
+
+@keyframes modal-in {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes modal-out {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@keyframes backdrop-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes backdrop-out {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 .modal-body {

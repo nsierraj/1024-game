@@ -32,6 +32,10 @@
 
 :root[data-theme="contrast"] {
   color-scheme: dark;
+  /* Crisp edges: no soft shadows or highlights in the high-contrast theme. */
+  --shadow-tile: 0 0 0 0 transparent;
+  --shadow-raised: 0 0 0 0 transparent;
+  --tile-highlight: 0 0 0 0 transparent;
   --bg: #000000;
   --surface: #111111;
   --board-bg: #222222;

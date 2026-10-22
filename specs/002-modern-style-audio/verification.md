@@ -51,6 +51,19 @@ person has run them; nothing is recorded for them here before then.
 Not proven here: that the sound is audible through speakers, that WebKit starts the context inside the gesture,
 and behaviour on a phone. Those are T050.
 
+### User Story 3: look and feel (2026-10-22, desktop Chromium via Playwright; not a phone or a tester)
+
+| Check | Result |
+|---|---|
+| `npm test` | 307 passing |
+| Layout at 320x640, 640x320, 375x667, 1280x800 | board square (288, 288, 338, 420 px), no sideways scroll, no control under 24 px |
+| 320 px wide with text at 200% and a five-digit best score | no sideways scroll after the fix (366 px of content before it) |
+| Dialog enter | `modal-in` animation runs, dialog open |
+| Dialog leave | `data-closing` set and `modal-out` running while open; closed and attribute cleared after 120 ms; the choice handled after the close |
+| Console errors under the CSP | none |
+
+The look itself, and the palette, are judged by people (T051), not by these checks.
+
 ## Gates that need a person
 
 | Gate | Task | Result |
