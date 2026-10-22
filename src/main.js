@@ -7,6 +7,7 @@
  */
 
 import { applyMove, canUndo, createGame, keepPlaying, undo } from "./core/game.js";
+import { loadGame, loadSettings, saveGame, saveSettings, GAME_KEY } from "./services/persist.js";
 import { playMove } from "./ui/animations.js";
 import { createDialogs } from "./ui/dialogs.js";
 import { createInput } from "./ui/input.js";
@@ -29,6 +30,7 @@ function readElements() {
     undo: byId("undo"),
     helpToggle: byId("help-toggle"),
     helpPanel: byId("help-panel"),
+    crossTabNotice: byId("cross-tab-notice"),
     win: {
       dialog: byId("win-dialog"),
       keepPlaying: byId("win-keep-playing"),
@@ -61,7 +63,41 @@ const dialogs = createDialogs({
  *
  * The seed comes from the clock, which the core is not allowed to reach for itself. (FR-002)
  */
-let game = createGame({ seed: Date.now() });
+const saved = loadGame(null);
+const settings = loadSettings(null);
+let game;
+
+function restoreGame(savedGame) {
+  if (!savedGame) return null;
+  try {
+    const g = createGame({ seed: Date.now(), bestScore: savedGame.bestScore });
+    g.board = Array.isArray(savedGame.board) ? savedGame.board.slice() : g.board;
+    g.score = typeof savedGame.score === "number" ? savedGame.score : g.score;
+    g.bestScore = typeof savedGame.bestScore === "number" ? savedGame.bestScore : g.bestScore;
+    g.moves = typeof savedGame.moves === "number" ? savedGame.moves : g.moves;
+    g.hasWon = !!savedGame.hasWon;
+    g.endless = !!savedGame.endless;
+    g.status = savedGame.status === "won" || savedGame.status === "gameover" || savedGame.status === "active" ? savedGame.status : g.status;
+    if (savedGame.undo === null) {
+      g.undo = null;
+    } else if (savedGame.undo && Array.isArray(savedGame.undo.board)) {
+      g.undo = {
+        board: savedGame.undo.board.slice(),
+        score: savedGame.undo.score || 0,
+        bestScore: savedGame.undo.bestScore || 0,
+        moves: savedGame.undo.moves || 0,
+      };
+    }
+    return g;
+  } catch {
+    return null;
+  }
+}
+
+game = restoreGame(saved);
+if (game && saved && saved.bestScore > game.bestScore) game.bestScore = saved.bestScore;
+if (!game) game = createGame({ seed: Date.now() });
+saveGame(null, game);
 
 /** Whether the win has already been reported for this game. */
 let winShown = false;
@@ -85,10 +121,10 @@ function startNewGame() {
   winShown = false;
   gameOverShown = false;
   renderer.render(game);
-updateUndo();
   updateUndo();
   input.release();
   elements.board.focus();
+  saveGame(null, game);
 }
 
 /**
@@ -142,9 +178,9 @@ function performUndo() {
   if (!canUndo(game)) return;
   game = undo(game);
   renderer.render(game);
-updateUndo();
   updateUndo();
   input.release();
+  saveGame(null, game);
 }
 
 /**
@@ -161,6 +197,7 @@ async function performMove(direction) {
     // equal neighbours cannot be changed by any slide. (FR-022)
     showOutcome();
     input.release();
+    saveGame(null, game);
     return;
   }
 
@@ -171,6 +208,7 @@ async function performMove(direction) {
   showOutcome();
   updateUndo();
   input.release();
+  saveGame(null, game);
 }
 
 elements.newGame.addEventListener("click", () => {
@@ -208,5 +246,14 @@ elements.helpToggle.addEventListener("click", () => {
   }
 });
 
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === GAME_KEY && elements.crossTabNotice) {
+      elements.crossTabNotice.hidden = false;
+    }
+  });
+}
+
 renderer.render(game);
 updateUndo();
+saveGame(null, game);
