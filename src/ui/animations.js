@@ -15,31 +15,64 @@
  */
 export const MOVE_DURATION = 130;
 
+export function prefersReducedMotion() {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 /**
  * Plays the animation of a move and resolves when it is over.
  *
  * @param {object} groups The tiles the move touched.
- * @param {HTMLElement[]} [groups.moving] The tiles that slid.
  * @param {HTMLElement[]} [groups.merging] The tiles that merged and survived.
  * @param {HTMLElement[]} [groups.absorbed] The tiles a merge absorbed.
  * @param {HTMLElement[]} [groups.spawned] The tiles that appeared.
  * @returns {Promise<void>} Resolves when the animation is over.
  */
 export function playMove(groups = {}) {
+  if (!groups || typeof groups !== "object") {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(), MOVE_DURATION);
+    });
+  }
+
   const { merging = [], absorbed = [], spawned = [] } = groups;
 
-  for (const element of merging) element.classList.add("tile--merged");
-  for (const element of absorbed) element.classList.add("tile--absorbed");
-  for (const element of spawned) element.classList.add("tile--spawned");
+  if (prefersReducedMotion()) {
+    for (const element of absorbed) {
+      if (element && typeof element.remove === "function") {
+        element.remove();
+      }
+    }
+    return Promise.resolve();
+  }
+
+  for (const element of merging || []) {
+    if (element && element.classList) element.classList.add("tile--merged");
+  }
+  for (const element of absorbed || []) {
+    if (element && element.classList) element.classList.add("tile--absorbed");
+  }
+  for (const element of spawned || []) {
+    if (element && element.classList) element.classList.add("tile--spawned");
+  }
 
   return new Promise((resolve) => {
     setTimeout(() => {
-      for (const element of merging) element.classList.remove("tile--merged");
-      for (const element of absorbed) {
-        element.classList.remove("tile--absorbed");
-        element.remove();
+      for (const element of merging || []) {
+        if (element && element.classList) element.classList.remove("tile--merged");
       }
-      for (const element of spawned) element.classList.remove("tile--spawned");
+      for (const element of absorbed || []) {
+        if (element && element.classList) {
+          element.classList.remove("tile--absorbed");
+        }
+        if (element && typeof element.remove === "function") {
+          element.remove();
+        }
+      }
+      for (const element of spawned || []) {
+        if (element && element.classList) element.classList.remove("tile--spawned");
+      }
       resolve();
     }, MOVE_DURATION);
   });

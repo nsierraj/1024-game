@@ -237,3 +237,33 @@
     animation: none !important;
   }
 }
+
+/* Reduced motion: animations suppressed, replaced with instant state changes. (FR-037) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .tile {
+    transition: none !important;
+  }
+
+  .tile-layer--moving .tile {
+    transition: none !important;
+  }
+
+  .tile--merged,
+  .tile--spawn {
+    animation: none !important;
+  }
+
+  .score-gain {
+    animation: none !important;
+    display: none !important;
+  }
+}

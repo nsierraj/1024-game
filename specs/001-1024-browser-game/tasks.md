@@ -206,18 +206,18 @@ choice wins from then on.
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T051 [P] [US6] Write `tests/unit/settings.test.js` covering the settings defaults, theme validation with an unknown value falling back to `system`, and the `visited` flag
-- [ ] T052 [P] [US6] Write `tests/unit/audio.test.js` covering the lazy-load gate: no audio file is fetched until the player first enables sound, the toggle reports on only after the files are ready, and a failed fetch leaves the sound off
+- [x] T051 [P] [US6] Write `tests/unit/settings.test.js` covering the settings defaults, theme validation with an unknown value falling back to `system`, and the `visited` flag
+- [x] T052 [P] [US6] Write `tests/unit/audio.test.js` covering the lazy-load gate: no audio file is fetched until the player first enables sound, the toggle reports on only after the files are ready, and a failed fetch leaves the sound off
 
 ### Implementation for User Story 6
 
-- [ ] T053 [US6] Create `src/styles/themes.css` with the four explicit themes and the `prefers-color-scheme` default applied when no `data-theme` attribute is present (FR-041, FR-042, FR-044)
-- [ ] T054 [US6] Create `src/ui/themes.js` to apply the theme to the root element, follow the system preference until the player overrides it, and re-follow it live when the system setting changes (FR-043)
-- [ ] T055 [US6] Create `src/services/audio.js` to fetch and decode the four effects on the first enable and play them, capping the gain so a burst of merges cannot be startling (FR-038, FR-040)
-- [ ] T056 [P] [US6] Generate the four mono MP3 effects as `assets/audio/move.mp3`, `assets/audio/merge.mp3`, `assets/audio/win.mp3`, and `assets/audio/gameover.mp3`, totalling under 100 KB
-- [ ] T057 [US6] Add the theme selector and the sound toggle to `index.html` and wire both in `src/main.js`, with the sound toggle carrying `aria-pressed` and a visible label stating the current state
-- [ ] T058 [US6] Persist the theme and sound choices through `src/services/settings.js` and restore them on startup (FR-033)
-- [ ] T059 [US6] Honour `prefers-reduced-motion` in `src/styles/board.css` and `src/ui/animations.js` so sliding, merging, and spawning are suppressed and replaced with an instant state change (FR-037)
+- [x] T053 [US6] Create `src/styles/themes.css` with the four explicit themes and the `prefers-color-scheme` default applied when no `data-theme` attribute is present (FR-041, FR-042, FR-044)
+- [x] T054 [US6] Create `src/ui/themes.js` to apply the theme to the root element, follow the system preference until the player overrides it, and re-follow it live when the system setting changes (FR-043)
+- [x] T055 [US6] Create `src/services/audio.js` to fetch and decode the four effects on the first enable and play them, capping the gain so a burst of merges cannot be startling (FR-038, FR-040)
+- [x] T056 [P] [US6] Generate the four mono MP3 effects as `assets/audio/move.mp3`, `assets/audio/merge.mp3`, `assets/audio/win.mp3`, and `assets/audio/gameover.mp3`, totalling under 100 KB
+- [x] T057 [US6] Add the theme selector and the sound toggle to `index.html` and wire both in `src/main.js`, with the sound toggle carrying `aria-pressed` and a visible label stating the current state
+- [x] T058 [US6] Persist the theme and sound choices through `src/services/settings.js` and restore them on startup (FR-033)
+- [x] T059 [US6] Honour `prefers-reduced-motion` in `src/styles/board.css` and `src/ui/animations.js` so sliding, merging, and spawning are suppressed and replaced with an instant state change (FR-037)
 
 **Checkpoint**: User Stories 1 through 6 should all work independently
 
@@ -416,3 +416,6 @@ With multiple developers:
 - 2026-10-21, User Story 5. Added swipe resolution, pointer input with setPointerCapture and
   touch-action, manifest, service worker with precache and navigation/asset strategies, service worker
   registration, icons, responsive board styles, and iOS install steps in the help panel.
+- 2026-10-21, User Story 6. Added themes (system/light/dark/contrast/colorblind), theme
+  selection and persistence, lazy-loaded audio with gain cap, sound toggle with aria-pressed,
+  and reduced-motion support across styles and animations.

@@ -1,0 +1,111 @@
+/*
+ * Theme overrides.
+ * Five themes: system, light, dark, contrast, colorblind.
+ * System follows prefers-color-scheme until the player overrides it. (FR-042, FR-043)
+ */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #faf8ef;
+  --surface: #eee4da;
+  --board-bg: #bbada0;
+  --text: #5c534a;
+  --text-strong: #403a33;
+  --accent: #6b5a4a;
+  --border: #8c8278;
+  --focus-ring: #3b6ea5;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1f1f1f;
+  --surface: #2d2a26;
+  --board-bg: #3a342f;
+  --text: #d7ccc2;
+  --text-strong: #f5f5f5;
+  --accent: #b8a08a;
+  --border: #6b6259;
+  --focus-ring: #7aa2f7;
+}
+
+:root[data-theme="contrast"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #111111;
+  --board-bg: #222222;
+  --text: #ffffff;
+  --text-strong: #ffffff;
+  --accent: #ffff00;
+  --border: #ffffff;
+  --focus-ring: #00ffff;
+  --tile-2-bg: #000000;
+  --tile-2-fg: #ffffff;
+  --tile-4-bg: #000000;
+  --tile-4-fg: #ffffff;
+  --tile-8-bg: #0033ff;
+  --tile-8-fg: #ffffff;
+  --tile-16-bg: #0066ff;
+  --tile-16-fg: #ffffff;
+  --tile-32-bg: #00ccff;
+  --tile-32-fg: #000000;
+  --tile-64-bg: #00ffcc;
+  --tile-64-fg: #000000;
+  --tile-128-bg: #00ff66;
+  --tile-128-fg: #000000;
+  --tile-256-bg: #66ff00;
+  --tile-256-fg: #000000;
+  --tile-512-bg: #ccff00;
+  --tile-512-fg: #000000;
+  --tile-1024-bg: #ffff00;
+  --tile-1024-fg: #000000;
+  --tile-high-bg: #ff00ff;
+  --tile-high-fg: #000000;
+}
+
+:root[data-theme="colorblind"] {
+  color-scheme: light;
+  --bg: #faf8ef;
+  --surface: #eee4da;
+  --board-bg: #bbada0;
+  --text: #3b3b3b;
+  --text-strong: #1f1f1f;
+  --accent: #6b5a4a;
+  --border: #8c8278;
+  --focus-ring: #0072b2;
+  --tile-2-bg: #f0e442;
+  --tile-2-fg: #1f1f1f;
+  --tile-4-bg: #e69f00;
+  --tile-4-fg: #1f1f1f;
+  --tile-8-bg: #56b4e9;
+  --tile-8-fg: #1f1f1f;
+  --tile-16-bg: #009e73;
+  --tile-16-fg: #ffffff;
+  --tile-32-bg: #0072b2;
+  --tile-32-fg: #ffffff;
+  --tile-64-bg: #d55e00;
+  --tile-64-fg: #ffffff;
+  --tile-128-bg: #cc79a7;
+  --tile-128-fg: #1f1f1f;
+  --tile-256-bg: #f0e442;
+  --tile-256-fg: #1f1f1f;
+  --tile-512-bg: #e69f00;
+  --tile-512-fg: #1f1f1f;
+  --tile-1024-bg: #56b4e9;
+  --tile-1024-fg: #1f1f1f;
+  --tile-high-bg: #000000;
+  --tile-high-fg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #1f1f1f;
+    --surface: #2d2a26;
+    --board-bg: #3a342f;
+    --text: #d7ccc2;
+    --text-strong: #f5f5f5;
+    --accent: #b8a08a;
+    --border: #6b6259;
+    --focus-ring: #7aa2f7;
+  }
+}
