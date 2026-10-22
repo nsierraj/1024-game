@@ -5,7 +5,7 @@
  * static assets. The worker MUST NOT call skipWaiting() on its own. (FR-059, FR-061)
  */
 
-const CACHE_NAME = "1024-v1";
+const CACHE_NAME = "1024-v2";
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
@@ -16,17 +16,25 @@ const PRECACHE_ASSETS = [
   "./src/core/constants.js",
   "./src/core/random.js",
   "./src/core/types.js",
+  "./src/ui/a11y.js",
   "./src/ui/animations.js",
   "./src/ui/dialogs.js",
   "./src/ui/input.js",
   "./src/ui/render.js",
   "./src/ui/strings.js",
   "./src/ui/swipe.js",
+  "./src/ui/themes.js",
+  "./src/services/audio.js",
   "./src/services/persist.js",
   "./src/services/settings.js",
   "./src/services/sw-register.js",
   "./src/styles/base.css",
   "./src/styles/board.css",
+  "./src/styles/themes.css",
+  "./assets/audio/gameover.mp3",
+  "./assets/audio/merge.mp3",
+  "./assets/audio/move.mp3",
+  "./assets/audio/win.mp3",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/icon-maskable-512.png",

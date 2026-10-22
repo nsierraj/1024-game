@@ -94,16 +94,6 @@
      a quarter of the board, so a whole number moves it exactly one cell. */
   --col: 0;
   --row: 0;
-}
-
-/* Tiles above 1024 are styled distinctly so they remain readable and distinguishable. (FR-024) */
-.tile--2048,
-.tile--4096,
-.tile--8192,
-.tile--16384 {
-  background-color: var(--tile-high-bg);
-  color: var(--tile-high-fg);
-}
   transform: translate(calc(var(--col) * 100%), calc(var(--row) * 100%));
   transition:
     transform var(--slide-duration) cubic-bezier(0.2, 0, 0.2, 1),
@@ -182,6 +172,15 @@
 .tile[data-value="512"] {
   background-color: var(--tile-512-bg);
   color: var(--tile-512-fg);
+}
+
+/* Tiles above 1024 are styled distinctly so they remain readable and distinguishable. (FR-024) */
+.tile--2048,
+.tile--4096,
+.tile--8192,
+.tile--16384 {
+  background-color: var(--tile-high-bg);
+  color: var(--tile-high-fg);
 }
 
 /* A tile that was absorbed by a merge slides into the tile that absorbed it and fades out. */
