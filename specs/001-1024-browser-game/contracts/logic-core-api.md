@@ -58,7 +58,7 @@ export function createEmptyBoard(size?: number): number[];
  * Slides and merges every row or column in one direction.
  * @param {number[]} board
  * @param {"up" | "down" | "left" | "right"} direction
- * @returns {{ board: number[], gained: number, merged: number[], moved: boolean }}
+ * @returns {SlideResult}
  */
 export function slide(board: number[], direction: Direction): SlideResult;
 ```
@@ -78,6 +78,11 @@ export function slide(board: number[], direction: Direction): SlideResult;
   `gained === 16` (FR-014).
 - `merged` lists the source values of each merge, in the order the merges happened.
 - `moved` is `false` when the board is unchanged by the slide.
+- `transitions` lists one entry for every occupied cell of the resulting board, giving the source
+  index the tile came from, the destination index it landed on, and its value after the slide. A
+  source tile that was absorbed by a merge has no entry of its own, so the renderer recovers the
+  absorbed tiles by taking the set difference between the occupied source cells and the `from`
+  values. This is what lets the renderer animate a tile that both slides and merges in one move.
 
 ```js
 /**
@@ -133,6 +138,8 @@ export function applyMove(game: Game, direction: Direction): MoveResult;
   (FR-017).
 - The pre-move state (board, score, bestScore, moves) becomes the undo snapshot (FR-025).
 - `moves` increments by 1.
+- `transitions` carries the per-cell movement from the slide, so the renderer can animate a tile
+  that both slides and merges.
 - If the board now contains a tile `>= 1024` and `hasWon` was `false`, then `hasWon` becomes
   `true` and `status` becomes `"won"` (FR-019).
 - If `status` was `"won"` and `endless` is `true`, the status returns to `"active"` and no further
@@ -178,6 +185,20 @@ support, not compiled types (D-03).
  * @typedef {number[]} Board            16 entries, 0 means empty
  *
  * @typedef {{
+ *   from: number,   // source index before the slide
+ *   to: number,     // destination index after the slide
+ *   value: number   // the tile's value after the slide, doubled when it merged
+ * }} SlideTransition
+ *
+ * @typedef {{
+ *   board: Board,
+ *   gained: number,
+ *   merged: number[],
+ *   moved: boolean,
+ *   transitions: SlideTransition[]
+ * }} SlideResult
+ *
+ * @typedef {{
  *   board: Board,
  *   score: number,
  *   bestScore: number,
@@ -204,6 +225,7 @@ support, not compiled types (D-03).
  *   moves: number,
  *   gained: number,
  *   merged: number[],
+ *   transitions: SlideTransition[],
  *   spawned: { index: number, value: number } | null,
  *   status: "active" | "won" | "gameover",
  *   hasWon: boolean
@@ -250,3 +272,8 @@ test. The test file that proves each rule is listed here so the mapping can be v
 
 The remaining requirements are not core rules. They belong to the UI, storage, audio, and offline
 layers, and their verification is described in [quickstart.md](../quickstart.md).
+
+The `transitions` list is a contract requirement in its own right rather than a functional
+requirement, so it has no row in the table above. It is covered by `tests/unit/board.test.js`
+alongside FR-006, because a transition list that does not agree with the board the slide produced
+would be worse than no transition list at all.

@@ -174,11 +174,13 @@ The contrast check for all four shipped themes is a release gate; see
 | Arrow keys | Slide in the matching direction. | FR-010 |
 | Pointer swipe | Slide in the dominant direction of the gesture. | FR-011 |
 | Swipe below the threshold | Ignored. | FR-012, SC-014 |
+| Swipe of exactly the threshold | Counts as a move. | FR-012 |
 | Swipe over the threshold | The dominant axis wins. | FR-011 |
 | Swipe on the board | Does not scroll, zoom, or trigger a browser gesture. | FR-013, FR-032 |
 
-- The threshold is one quarter of the board's width or height, whichever axis the gesture is
-  dominant in (D-07).
+- The threshold is one quarter of the board's width for a horizontal gesture and one quarter of
+  its height for a vertical gesture. A gesture travelling exactly one quarter counts as a swipe
+  (D-07).
 - The board carries `touch-action: none` so the browser does not claim the gesture (D-06).
 - Input received while an animation is still running is queued and applied in order, so no move
   is lost (FR-064).

@@ -132,6 +132,7 @@ The value returned by the logic core for one attempted move. Not persisted.
 | `moves` | `number` | The move count after the move. |
 | `gained` | `number` | Points awarded by this move, `0` when nothing merged (FR-014, FR-018). |
 | `merged` | `number[]` | Values of the tiles that merged, in merge order. Drives the merge animation. |
+| `transitions` | `{ from: number, to: number, value: number }[]` | One entry per occupied cell of the resulting board, giving where each tile came from and where it landed. Drives the slide animation. |
 | `spawned` | `{ index: number, value: number } \| null` | The tile placed after the move (FR-004), `null` when the move was rejected. |
 | `status` | `"active" \| "won" \| "gameover"` | The status after the move. |
 | `hasWon` | `boolean` | Whether this move created the first 1024 tile. |
@@ -142,6 +143,9 @@ The value returned by the logic core for one attempted move. Not persisted.
   `null` (FR-005).
 - `gained` MUST equal the sum of the values of the tiles produced by merges (FR-014). Merging two
   8 tiles awards 16, because the merged tile's value is the sum.
+- `transitions` MUST describe the same board the move produced: every occupied destination cell
+  has exactly one entry, and the `value` of each entry equals the value at that cell after the
+  move. A tile absorbed by a merge has no entry of its own.
 
 ## 7. Stored game and Stored settings
 
