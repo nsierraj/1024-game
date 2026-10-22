@@ -44,21 +44,29 @@ good enough.
 ```js
 /** @returns {{
  *   state: () => "off" | "arming" | "on" | "suspended",
- *   enable: () => boolean,          // call synchronously from a user gesture; true only if running
+ *   onChange: (listener: (state: string) => void) => void,
+ *   enable: () => Promise<boolean>, // call synchronously from a user gesture; true if running once it settles
  *   disable: () => void,
- *   unlock: () => void,             // call synchronously from a gesture; re-resumes a suspended context
+ *   restore: () => void,            // a saved "on" after a reload: state becomes suspended, nothing is created
+ *   unlock: () => void,             // call synchronously from a gesture; starts a suspended context
  *   play: (id: "move"|"merge"|"undo"|"win"|"gameover") => void
  * }} */
 export function createAudio(options?: { contextFactory?: () => AudioContext });
+
+/** The effect an event plays, or null. Undo never maps to "move". */
+export function effectFor(event: string): "move"|"merge"|"undo"|"win"|"gameover"|null;
 ```
 
-- `enable()` and `unlock()` are synchronous and do not `await` before `resume()`. `enable()` returns whether
-  the context is `running` immediately afterwards; a `resume()` that settles later is reflected in `state()`.
+- `enable()` and `unlock()` call `resume()` synchronously and do not `await` before it. WebKit settles
+  `resume()` on a later tick, so the result comes from the returned promise and from `statechange`, never from
+  the state read straight after the call. While it is pending the state is `arming` and the control shows off.
+- The `AudioContext` is created lazily inside the first gesture, never at startup, and the effects are rendered at
+  `context.sampleRate` (iOS is often 48 kHz).
 - The five buffers are rendered on the first `enable()` only, so a player who never turns sound on does no
   audio work and downloads nothing (FR-013).
 - `play(id)` does nothing unless the state is `on`.
-- Chain: buffer source -> gain 1.0 -> `DynamicsCompressor` -> destination. Voices are capped at 3, and a
-  `merge` within 60 ms of the previous `merge` replaces it (R-04).
+- Chain: buffer source -> gain 1.0 -> destination. There is no compressor: it was measured and rejected
+  (R-04). Voices are capped at 3, and a `merge` within 60 ms of the previous `merge` replaces it.
 - `contextFactory` lets a test pass a fake context.
 
 ## Events that play a sound

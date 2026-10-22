@@ -4,12 +4,12 @@
  * Precaches the app shell and assets. Uses network-first for navigation and cache-first for
  * static assets. The worker MUST NOT call skipWaiting() on its own. (FR-060, FR-061)
  *
- * The sound files are deliberately not precached: a player who never turns sound on must never
- * download any audio. They are cached by the fetch handler below the first time they are fetched,
- * so sound keeps working offline from then on. (FR-040, SC-015)
+ * There are no sound files. The effects are made in the game itself by `sound-synth.js`, which is
+ * precached like any other module, so sound works offline from the first time it is turned on and a
+ * player who never turns it on downloads no audio. (FR-040, SC-015, feature 002 FR-013)
  */
 
-const CACHE_NAME = "1024-v3";
+const CACHE_NAME = "1024-v4";
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
@@ -29,6 +29,7 @@ const PRECACHE_ASSETS = [
   "./src/ui/swipe.js",
   "./src/ui/themes.js",
   "./src/services/audio.js",
+  "./src/services/sound-synth.js",
   "./src/services/persist.js",
   "./src/services/settings.js",
   "./src/services/sw-register.js",

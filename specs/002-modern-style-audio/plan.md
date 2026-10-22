@@ -32,7 +32,7 @@ spec's requirement IDs through [data-model.md](data-model.md) and the contracts 
 from feature 001. No TypeScript, no build step.
 
 **Primary Dependencies**: None, at runtime or at development time. The Web Audio `AudioBuffer` and
-`DynamicsCompressor` are browser built-ins. The scratch tools used to research this feature (ffmpeg, axe-core,
+`GainNode` are browser built-ins. The scratch tools used to research this feature (ffmpeg, axe-core,
 Lighthouse) are not dependencies of the project.
 
 **Storage**: Unchanged. `localStorage` keys `1024:v2:game`, `1024:v2:best`, and `1024:v1:settings`. No new key
@@ -123,7 +123,7 @@ src/
 │   └── themes.css               # CHANGED: the four themes on the new tokens
 └── services/
     ├── sound-synth.js           # NEW, pure: five recipes and renderEffect
-    └── audio.js                 # REWRITTEN: state machine, unlock, buffers, voices, compressor
+    └── audio.js                 # REWRITTEN: state machine, unlock, buffers, voices
 
 assets/
 └── audio/                       # REMOVED: the four identical mp3 files

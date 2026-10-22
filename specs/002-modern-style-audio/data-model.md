@@ -62,7 +62,10 @@ The state of the single audio context, which drives the sound control.
 | `suspended` | Sound is enabled in settings but the context is not running (blocked, interrupted, or closed by the OS). | Off |
 
 **Transitions**
-- `off` -> `arming`: the player activates the sound control (or a saved "on" is restored at startup).
+- `off` -> `arming`: the player activates the sound control.
+- `off` -> `suspended`: a saved "on" is restored at startup. Nothing is created; the context is made inside the first
+  gesture (FR-014).
+- `suspended` -> `arming` -> `on`: the first gesture (or the player's click on the control) starts the context.
 - `arming` -> `on`: `resume()` resolved with `running` in the same gesture. The setting is saved as on.
 - `arming` -> `off`: the player's own toggle could not start sound (`resume()` failed or the context is not
   running). The setting is saved as off. A reload restore that fails on the first gesture does not change the

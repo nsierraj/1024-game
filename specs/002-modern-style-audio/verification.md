@@ -31,6 +31,26 @@ person has run them; nothing is recorded for them here before then.
 | Console errors under the CSP | none |
 
 
+### User Story 2: sound (2026-10-22, desktop Chromium via Playwright; this is not iPhone or Android evidence)
+
+| Check | Result |
+|---|---|
+| `npm test` | 284 passing |
+| Shipped effects before (decoded, then played at gain 0.3) | all four identical, 0.10 s, about -28 dBFS peak at the speaker |
+| New effects, as rendered | peak -9.0 dBFS each; RMS -22.2 to -18.6 dBFS (3.6 dB spread); 0.12, 0.36, 0.14, 0.85, 0.75 s |
+| New effects, through the real chain in an `OfflineAudioContext` at 48 kHz | peak -9.00 dBFS for each of move, merge, undo, win, game over; three stacked (merge, win, game over) -3.36 dBFS |
+| A `DynamicsCompressor`, tried and rejected | -17.1, -6.3, -7.0, -5.7, -5.7 dBFS: an 11 dB spread. Removed. |
+| Turn sound on in the page | context running, control "Sound: on", setting saved on |
+| Reload with sound saved on | control "Sound: off" and setting still on; no audio request made |
+| First key press after that reload | control "Sound: on" |
+| Click the control while it shows off after a reload | turns on (does not turn off), setting stays on |
+| Turn sound off | control "Sound: off", setting saved off |
+| Network requests for audio | none; `assets/audio/` is removed |
+| Console errors | none |
+
+Not proven here: that the sound is audible through speakers, that WebKit starts the context inside the gesture,
+and behaviour on a phone. Those are T050.
+
 ## Gates that need a person
 
 | Gate | Task | Result |

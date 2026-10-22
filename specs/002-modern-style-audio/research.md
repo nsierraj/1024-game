@@ -76,13 +76,18 @@ cited from the plan, data model, contracts, and quickstart.
   - Every recipe carries a **target peak of -9 dBFS** (0.355). The renderer normalises to it, so the five
     peaks are equal (SC-006 asks for -12 to -3 and a spread of 3 dB). Per-effect trims keep the RMS spread
     under about 6 dB so the flourish and the tap feel equally loud.
-  - Master chain: effect buffer -> gain 1.0 -> `DynamicsCompressor` (threshold -18 dB, ratio 4) ->
-    destination. The compressor stops a run of overlapping merges from summing past full scale.
+  - Master chain: effect buffer -> gain 1.0 -> destination. A `DynamicsCompressor` was planned to stop a run
+    of overlapping merges from summing past full scale, and was **measured and rejected**: in Chromium it adds
+    make-up gain and acts on the attack of a short sound, so the five effects reached the output at -17.1,
+    -6.3, -7.0, -5.7, and -5.7 dBFS (an 11 dB spread, against the 3 dB SC-006 allows). With no processing each
+    effect measures exactly -9.0 dBFS, and the worst stack of three measured -3.4 dBFS, so the voice cap below
+    is enough to stay under full scale.
   - Voice limit: at most **3 effects play at once**; a new merge within **60 ms** of the previous one
     replaces it rather than adding a layer.
   - Each buffer starts and ends with a short fade (3 ms in, 12 ms out) so there is no click.
-- **Alternatives considered**: a limiter implemented with a `WaveShaper` (more code, no benefit over the
-  built-in compressor); lowering all peaks to -18 dBFS (would repeat the original problem).
+- **Alternatives considered**: the built-in `DynamicsCompressor` (measured, uneven, see above); a soft-clip
+  `WaveShaper` (measured: it changes the level of every effect by about +3.6 dB, and is not needed);
+  lowering all peaks to -18 dBFS (would repeat the original problem).
 
 ## R-05. Smoother motion inside 150 milliseconds
 
