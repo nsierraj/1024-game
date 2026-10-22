@@ -140,18 +140,22 @@ function updateUndo() {
     dialogs.showWin({
       keepPlaying: () => {
         game = keepPlaying(game);
+        winShown = false;
         updateUndo();
         input.release();
+        saveGame(null, game);
+        renderer.render(game);
       },
       newGame: () => {
         startNewGame();
       },
       dismissed: () => {
-        // The message was dismissed rather than answered, so the game carries on and no
-        // further win is raised. (FR-021)
         game = keepPlaying(game);
+        winShown = false;
         updateUndo();
         input.release();
+        saveGame(null, game);
+        renderer.render(game);
       },
     });
     return;
