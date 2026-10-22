@@ -23,17 +23,19 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const SRC = join(ROOT, "src");
 
 /**
- * Lists every file under a directory, recursively.
+ * Lists the JavaScript source files under a directory, recursively. Only `.js` files count: a
+ * placeholder such as `.gitkeep`, or a stylesheet, is not implementation code and must not arm
+ * the guard.
  * @param {string} dir
  * @returns {string[]}
  */
-function listFiles(dir) {
+function listSourceFiles(dir) {
   if (!existsSync(dir)) return [];
   const found = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) found.push(...listFiles(full));
-    else found.push(full);
+    if (entry.isDirectory()) found.push(...listSourceFiles(full));
+    else if (entry.name.endsWith(".js")) found.push(full);
   }
   return found;
 }
@@ -70,9 +72,9 @@ if (tests > 0) {
   process.exit(0);
 }
 
-const sources = listFiles(SRC);
+const sources = listSourceFiles(SRC);
 if (sources.length === 0) {
-  console.error("No tests collected. Nothing exists under src/ yet, so there is nothing to test.");
+  console.error("No tests collected. No implementation code exists under src/ yet, so there is nothing to test.");
   process.exit(0);
 }
 

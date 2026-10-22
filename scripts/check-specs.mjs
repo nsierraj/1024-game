@@ -173,7 +173,10 @@ function checkTasks(tasksPath) {
   const label = relative(ROOT, tasksPath);
   const lines = readFileSync(tasksPath, "utf8").split("\n");
 
-  const TASK = /^(- \[ \] )(T\d{3})( \[P\])?( \[US\d+\])? (.+)$/;
+  const TASK = /^(- \[[ x]\] )(T\d{3})( \[P\])?( \[US\d+\])? (.+)$/;
+  // A line that looks like a checkbox must be a task, whatever the checkbox says. A malformed one
+  // is a failure, not a line to skip, or a broken task would hide from the check entirely.
+  const TASK_LINE = /^- \[(?: |x|X)\]/;
   const tasks = [];
   let inFence = false;
 
@@ -183,7 +186,7 @@ function checkTasks(tasksPath) {
       return;
     }
     if (inFence) return;
-    if (!line.startsWith("- [ ]")) return;
+    if (!TASK_LINE.test(line)) return;
 
     const match = line.match(TASK);
     if (!match) {
@@ -192,6 +195,7 @@ function checkTasks(tasksPath) {
     }
     tasks.push({
       id: match[2],
+      done: match[1] === "- [x] ",
       parallel: Boolean(match[3]),
       story: match[4] ? match[4].replace(/[[\]]/g, "") : null,
       description: match[5],
@@ -224,7 +228,7 @@ function checkTasks(tasksPath) {
       phase = line.slice(3).trim();
       phaseExpectsStory = /^Phase \d+: User Story \d/.test(phase);
     }
-    if (!line.startsWith("- [ ]")) return;
+    if (!TASK_LINE.test(line)) return;
     const match = line.match(TASK);
     if (!match) return;
     const hasStory = Boolean(match[4]);
@@ -244,7 +248,8 @@ function checkTasks(tasksPath) {
     }
   });
 
-  notes.push(`${label}: ${tasks.length} tasks`);
+  const done = tasks.filter((task) => task.done).length;
+  notes.push(`${label}: ${tasks.length} tasks (${done} complete)`);
 }
 
 // --- run -------------------------------------------------------------------

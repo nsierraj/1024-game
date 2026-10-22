@@ -32,11 +32,11 @@ delivered as an independent increment.
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create the directory structure from `plan.md`: `src/core/`, `src/ui/`, `src/services/`, `src/styles/`, `assets/icons/`, `assets/audio/`, `tests/unit/`, `tests/integration/`
-- [ ] T002 [P] Add a `serve` script to `package.json` that runs `node scripts/serve.mjs` on port 8080
-- [ ] T003 [P] Create `scripts/serve.mjs`, a zero-dependency static file server on `node:http` that serves the repository root with correct MIME types for `.html`, `.js`, `.css`, `.json`, `.webmanifest`, `.png`, and `.mp3`
-- [ ] T004 [P] Create `robots.txt` allowing all crawlers
-- [ ] T005 [P] Add `.gitignore` entries for `node_modules/`, `.DS_Store`, and `*.log`
+- [x] T001 Create the directory structure from `plan.md`: `src/core/`, `src/ui/`, `src/services/`, `src/styles/`, `assets/icons/`, `assets/audio/`, `tests/unit/`, `tests/integration/`
+- [x] T002 [P] Add a `serve` script to `package.json` that runs `node scripts/serve.mjs` on port 8080
+- [x] T003 [P] Create `scripts/serve.mjs`, a zero-dependency static file server on `node:http` that serves the repository root with correct MIME types for `.html`, `.js`, `.css`, `.json`, `.webmanifest`, `.png`, and `.mp3`
+- [x] T004 [P] Create `robots.txt` allowing all crawlers
+- [x] T005 [P] Add `.gitignore` entries for `node_modules/`, `.DS_Store`, and `*.log`
 
 ---
 
