@@ -46,15 +46,19 @@ delivered as an independent increment.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Create `src/core/constants.js` with `BOARD_SIZE`, `CELL_COUNT`, `TARGET_VALUE`, `INITIAL_TILE_COUNT`, `SPAWN_VALUES`, and `SPAWN_WEIGHTS` exactly as specified in `contracts/logic-core-api.md`
-- [ ] T007 Create `src/core/types.js` with the JSDoc typedefs `Direction`, `Board`, `Game`, `UndoSnapshot`, and `MoveResult` from `contracts/logic-core-api.md`
-- [ ] T008 [P] Create `src/ui/strings.js` holding every user-facing string from `contracts/ui-contract.md`, including the four live-region announcements, so no text is hard-coded anywhere else
-- [ ] T009 [P] Create `src/styles/base.css` with the page layout, the visible focus ring, the `.visually-hidden` utility, the minimum 24x24 px control sizing, and the default light palette as CSS custom properties on `:root`
-- [ ] T010 [P] Write `tests/unit/random.test.js` covering seed determinism, the `[0, 1)` output range, and uniformity over 10,000 samples; this test MUST fail until T012 lands
-- [ ] T011 Create `index.html` with the semantic app shell from `contracts/ui-contract.md`: `role="grid"` board container, `role="status"` live region, labelled score panel, the controls row, the `#help-toggle` button with the goal and controls text in the help panel, and the three `role="dialog"` containers
-- [ ] T012 Implement `src/core/random.js` with `createRandom(seed)` using mulberry32 to satisfy T010, seeded from an unsigned 32-bit integer and returning values in `[0, 1)`
+- [ ] T006 Write `tests/unit/random.test.js` covering seed determinism, the `[0, 1)` output range, and uniformity over 10,000 samples; this test MUST fail until T009 lands, and it is the first test in the repository so the required `test` check stops passing vacuously
+- [ ] T007 Create `src/core/constants.js` with `BOARD_SIZE`, `CELL_COUNT`, `TARGET_VALUE`, `INITIAL_TILE_COUNT`, `SPAWN_VALUES`, and `SPAWN_WEIGHTS` exactly as specified in `contracts/logic-core-api.md`
+- [ ] T008 [P] Create `src/core/types.js` with the JSDoc typedefs `Direction`, `Board`, `SlideTransition`, `SlideResult`, `Game`, `UndoSnapshot`, and `MoveResult` from `contracts/logic-core-api.md`
+- [ ] T009 Implement `src/core/random.js` with `createRandom(seed)` using mulberry32 to satisfy T006, seeded from an unsigned 32-bit integer and returning values in `[0, 1)`
+- [ ] T010 [P] Create `src/ui/strings.js` holding every user-facing string from `contracts/ui-contract.md`, including the four live-region announcements, so no text is hard-coded anywhere else
+- [ ] T011 [P] Create `src/styles/base.css` with the page layout, the visible focus ring, the `.visually-hidden` utility, the minimum 24x24 px control sizing, and the default light palette as CSS custom properties on `:root`
+- [ ] T012 Create `index.html` with the semantic app shell from `contracts/ui-contract.md`: `role="grid"` board container, `role="status"` live region, labelled score panel, the controls row, the `#help-toggle` button with the goal and controls text in the help panel, and the three `role="dialog"` containers
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
+
+> **Grouping**: T006 and T009 land in the same pull request. T006 is red on its own by design,
+> and the required `test` check must be green for the pull request to merge. The test is still
+> written first, which is what the requirement is about.
 
 ---
 
@@ -79,7 +83,7 @@ without any further story.
 
 - [ ] T016 [US1] Implement `slide`, `hasAvailableMoves`, and `hasNoAdjacentEqual` in `src/core/board.js` to satisfy T013
 - [ ] T017 [US1] Implement `createGame`, `applyMove`, and `canUndo` in `src/core/game.js` to satisfy T014, injecting the random source rather than calling `Math.random`
-- [ ] T018 [US1] Extend the `slide` result in `src/core/board.js` with a per-cell transition list giving each destination cell its source index and merge partner, and update `contracts/logic-core-api.md` to match, so a tile that slides and merges in one move can be animated correctly
+- [ ] T018 [US1] Implement the per-cell `transitions` list in the `slide` result in `src/core/board.js`, matching the ratified `SlideResult` and `SlideTransition` shapes in `contracts/logic-core-api.md`, so a tile that slides and merges in one move can be animated correctly
 - [ ] T019 [P] [US1] Create `src/ui/render.js` to draw the 4x4 board, the tiles, the score, and the best score from game state, reusing tile elements between renders so transitions stay continuous
 - [ ] T020 [P] [US1] Create `src/ui/animations.js` for the slide, merge, and spawn animations, finishing within 150 ms (FR-036)
 - [ ] T021 [US1] Create `src/ui/input.js` with arrow-key handling for the four directions (FR-010) and a queue that holds input arriving during an animation so no move is lost (FR-064)
@@ -173,7 +177,7 @@ the device to airplane mode, and confirm a full game can still be played.
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T041 [P] [US5] Write `tests/unit/swipe.test.js` covering `resolveSwipe`: a swipe under one quarter of the board is ignored (FR-012), a swipe over the threshold moves in the dominant axis (FR-011), and a diagonal swipe resolves to the stronger axis
+- [ ] T041 [P] [US5] Write `tests/unit/swipe.test.js` covering `resolveSwipe`: a swipe under one quarter of the board's width, for a horizontal gesture, or under one quarter of its height, for a vertical gesture, is ignored (FR-012), a swipe of exactly one quarter counts as a move (FR-012), a swipe over the threshold moves in the dominant axis (FR-011), and a diagonal swipe resolves to the axis with the greater absolute travel (FR-011)
 - [ ] T042 [P] [US5] Write `tests/unit/precache.test.js` that reads the `PRECACHE_ASSETS` list out of `sw.js` and asserts every listed path exists on disk, so a missing precached asset fails the build rather than the deploy
 
 ### Implementation for User Story 5
@@ -365,6 +369,10 @@ With multiple developers:
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
 - Verify tests fail before implementing
+- A test task and the implementation that satisfies it land in the same pull request. The test is
+  written first, but the required `test` check has to be green for the pull request to merge
+- `scripts/run-tests.mjs` fails the check when the suite collects zero tests and any file exists
+  under `src/`, so the required `test` gate cannot pass vacuously once implementation begins
 - Commit after each task or logical group; each commit reaches `main` only through a pull request
   whose `spec-integrity` and `test` checks pass, per constitution v1.1.0
 - Stop at any checkpoint to validate story independently

@@ -45,15 +45,16 @@ Open <http://localhost:8080> in a browser. The board appears with two tiles and 
 npm test
 ```
 
-`npm test` is a single alias for `node --test` (D-01). It MUST print a summary with zero
-failures, and MUST exit with status 0.
+`npm test` runs `scripts/run-tests.mjs`, which invokes `node --test` (D-01). It MUST print a
+summary with zero failures, and MUST exit with status 0. It MUST also exit non-zero when the suite
+collects zero tests while any file exists under `src/`, so the check cannot pass vacuously.
 
 Expected output shape:
 
 ```text
-# tests 96
-# pass 96
-# fail 0
+ℹ tests 96
+ℹ pass 96
+ℹ fail 0
 ```
 
 **Pass condition**: every test passes and the command exits 0. This is the automated half of

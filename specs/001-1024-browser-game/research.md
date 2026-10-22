@@ -12,12 +12,16 @@ that shape the design. Every decision below is traceable to a requirement in
 ## D-01: Zero-dependency test stack
 
 - **Decision**: Use the Node.js built-in test runner, `node --test`, with `node:test` and
-  `node:assert/strict`. No test framework is installed.
+  `node:assert/strict`. No test framework is installed. `npm test` runs `scripts/run-tests.mjs`,
+  which invokes `node --test` and fails the run when the suite collects zero tests while
+  implementation code exists under `src/`.
 - **Rationale**: Constitution Principle I forbids runtime dependencies and permits only dev-time
   tooling. `node:test` is stable since Node 20, needs no configuration file, and is enough for
   everything this project tests: the rules in spec sections 6.1 to 6.5 are pure functions over
   plain arrays. Principle III and SC-003 require a suite that runs with a single command, which
-  `npm test` -> `node --test` satisfies with zero install cost.
+  `npm test` satisfies with zero install cost. The wrapper exists because `node --test` exits 0
+  when it finds no test files, which would leave the required `test` status check green on a
+  branch that contains no tests.
 - **Alternatives considered**:
   - *Vitest / Jest*: faster to write, but they pull a dependency tree into a project whose entire
     value proposition is that it has none. Rejected.
@@ -96,10 +100,13 @@ that shape the design. Every decision below is traceable to a requirement in
 ## D-07: Swipe threshold measured against the board
 
 - **Decision**: A swipe counts when the pointer travels at least one quarter of the board's width
-  or height, and the dominant axis of the gesture selects the direction.
+  for a horizontal gesture, or at least one quarter of the board's height for a vertical gesture.
+  The dominant axis is the axis with the greater absolute travel, and it selects the direction.
 - **Rationale**: This was settled during clarification and recorded as FR-012 and SC-014. Measuring
   against the board rather than a pixel count is what makes the behavior identical from a 320
-  pixel phone to a desktop monitor.
+  pixel phone to a desktop monitor. One quarter of a 4x4 board is exactly one cell, and it is the
+  only quarter fraction that maps to a whole number of cells: half the board is two cells and
+  feels like a long drag, an eighth is half a cell and feels twitchy.
 - **Alternatives considered**: A fixed pixel threshold (behaves differently across screen sizes) and
   a velocity-only rule (hard to test and unpredictable on slow devices). Both rejected.
 

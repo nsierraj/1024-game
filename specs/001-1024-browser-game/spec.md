@@ -257,6 +257,11 @@ and confirm every tile value, score change, win, and game over is perceivable.
   in-product instrumentation at all
 - Q: How far must a finger travel across the board before the game treats the gesture as a move? →
   A: A fraction of the board's size, with the dominant direction deciding which way the tiles move
+- Q: Which dimension is that fraction measured against, and does a swipe of exactly that distance
+  count? → A: One quarter of the board's width for a horizontal gesture and one quarter of its
+  height for a vertical gesture; a gesture travelling exactly one quarter counts as a swipe; the
+  dominant axis is the axis with the greater absolute travel, not the axis closest to the intended
+  angle
 - Q: How large may the bundled sound effects be, and when do they need to load? → A: Cap the sound
   at 100 KB in total, and load it only when the player first enables sound
 - Q: Which extra color themes should ship alongside the light and dark themes? → A: Two extra
@@ -291,9 +296,10 @@ Movement and merging
 - **FR-011**: On touch devices, a swipe across the board MUST move the tiles in the dominant
   direction of that swipe.
 - **FR-012**: A swipe MUST be ignored when the finger travels less than one quarter of the
-  board's width or height, so that taps and accidental touches never count as moves. The
-  threshold MUST be measured against the board's own size, so that it behaves identically on every
-  screen size.
+  board's width for a horizontal gesture, or less than one quarter of the board's height for a
+  vertical gesture, so that taps and accidental touches never count as moves. A gesture that
+  travels exactly one quarter MUST count as a swipe. The threshold MUST be measured against the
+  board's own size, so that it behaves identically on every screen size.
 - **FR-013**: A swipe on the board MUST NOT scroll the page, zoom the page, or trigger the
   browser's back or forward navigation.
 
@@ -486,9 +492,10 @@ Verification and instrumentation
 - **SC-013**: When the same game is open in two tabs, the tab that did not save last shows a notice
   within one second of the other tab's save, and the board it displays afterwards matches the most
   recent save.
-- **SC-014**: A swipe that covers less than a quarter of the board is ignored, and a swipe that
-  covers more than a quarter moves the tiles in the dominant direction, with the same result on a
-  320 pixel phone screen and on a desktop monitor.
+- **SC-014**: A swipe that covers less than a quarter of the board's width, for a horizontal
+  gesture, or less than a quarter of its height, for a vertical gesture, is ignored, while a swipe
+  that covers exactly a quarter moves the tiles in the dominant direction, with the same result on
+  a 320 pixel phone screen and on a desktop monitor.
 - **SC-015**: The game ships with no more than 300 KB of visual and code assets plus 100 KB of
   sound, and a player who never enables sound downloads no audio at all.
 - **SC-016**: All four shipped themes pass the contrast checks, the high-contrast theme reaches at
