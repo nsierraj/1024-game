@@ -12,6 +12,7 @@
  */
 
 import { BOARD_SIZE } from "../core/constants.js";
+import { MOVE_CAP } from "./animations.js";
 import { STRINGS } from "./strings.js";
 
 /**
@@ -105,6 +106,12 @@ function nextOccupied(board, from, direction) {
  *   showScoreGain: (points: number) => void
  * }}
  */
+/** Classes that mark a tile's motion, not its value. */
+const TRANSIENT_CLASSES = new Set(["tile--merged", "tile--absorbed", "tile--spawned", "tile--leaving"]);
+
+/** How long to leave a fading tile in place before taking it off the page, in milliseconds. */
+const LEAVE_MS = 100;
+
 export function createRenderer({ board, score, bestScore, scoreGain }) {
   const doc = board.ownerDocument;
 
@@ -153,6 +160,7 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
     element.className = "tile";
     element.dataset.value = String(value);
     element.classList.add(`tile--${value}`);
+    if (value > 1024) element.classList.add("tile--high");
     element.textContent = String(value);
     element.setAttribute("aria-label", String(value));
     return element;
@@ -169,9 +177,11 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
     element.dataset.value = String(value);
     element.setAttribute("aria-label", String(value));
     for (const cls of Array.from(element.classList)) {
-      if (cls.startsWith("tile--")) element.classList.remove(cls);
+      if (cls.startsWith("tile--") && !TRANSIENT_CLASSES.has(cls)) element.classList.remove(cls);
     }
     element.classList.add(`tile--${value}`);
+    // Every value above 1024 shares one distinct treatment. (FR-020)
+    if (value > 1024) element.classList.add("tile--high");
   }
 
   /**
@@ -198,21 +208,38 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
   }
 
   /**
-   * Draws the game from scratch, without animating anything.
+   * Fades a tile out where it stands and takes it off the page.
+   * @param {HTMLElement} element
+   */
+  function retire(element) {
+    element.classList.add("tile--leaving");
+    setTimeout(() => element.remove(), LEAVE_MS);
+  }
+
+  /**
+   * Draws the game, optionally with a transition.
+   *
+   * With no transition the board is drawn at once, which is what a reload needs. An undo keeps the
+   * tiles that are in the same cell with the same value, fades the others out, and lets the
+   * restored ones enter. A new game draws at once and fades the whole tile layer in. (FR-004)
    *
    * @param {import("../core/types.js").Game} game
+   * @param {{transition?: "undo" | "newgame" | null}} [options]
    */
-  function render(game) {
-    // The tiles move without a transition while the board is redrawn: a new game or an undo is
-    // a change of state, not a slide.
-    layer.classList.add("tile-layer--instant");
+  function render(game, { transition = null } = {}) {
+    const animateUndo = transition === "undo";
+
+    // The tiles move without a transition while the board is redrawn: a reload is a change of
+    // state, not a slide.
+    if (!animateUndo) layer.classList.add("tile-layer--instant");
 
     score.textContent = String(game.score);
     bestScore.textContent = String(game.bestScore);
 
     for (const [index, element] of tiles) {
-      if (game.board[index] !== 0) continue;
-      element.remove();
+      if (game.board[index] !== 0 && (!animateUndo || element.dataset.value === String(game.board[index]))) continue;
+      if (animateUndo) retire(element);
+      else element.remove();
       tiles.delete(index);
     }
 
@@ -231,14 +258,27 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
       placeTile(fresh, index);
       layer.append(fresh);
       tiles.set(index, fresh);
+      if (animateUndo) {
+        fresh.classList.add("tile--spawned");
+        setTimeout(() => fresh.classList.remove("tile--spawned"), MOVE_CAP);
+      }
     });
 
     drawn = game.board.slice();
 
-    // The browser has to see the class before it is taken off again, or the tiles would slide
-    // from where they were rather than appear where they are.
-    void layer.offsetHeight;
-    layer.classList.remove("tile-layer--instant");
+    if (!animateUndo) {
+      // The browser has to see the class before it is taken off again, or the tiles would slide
+      // from where they were rather than appear where they are.
+      void layer.offsetHeight;
+      layer.classList.remove("tile-layer--instant");
+    }
+
+    if (transition === "newgame") {
+      layer.classList.remove("tile-layer--newgame");
+      void layer.offsetHeight;
+      layer.classList.add("tile-layer--newgame");
+      setTimeout(() => layer.classList.remove("tile-layer--newgame"), MOVE_CAP);
+    }
   }
 
   /**

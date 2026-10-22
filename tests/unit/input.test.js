@@ -133,8 +133,7 @@ describe("createInput", () => {
     assert.deepEqual(directions, ["left"]);
   });
 
-  it("queues the input that arrives while a move is running", () => {
-    // Input that arrives during an animation must not be lost. (FR-064)
+  it("queues the input that arrives while a move is running (FR-006)", () => {
     const directions = [];
     const target = fakeTarget();
     const input = createInput({ target, onMove: (direction) => directions.push(direction) });
@@ -158,7 +157,7 @@ describe("createInput", () => {
     assert.equal(input.pending, 0);
   });
 
-  it("keeps the order of the queued moves", () => {
+  it("holds at most 2 pending moves and ignores a press made while the queue is full (FR-006)", () => {
     const directions = [];
     const target = fakeTarget();
     const input = createInput({ target, onMove: (direction) => directions.push(direction) });
@@ -167,11 +166,53 @@ describe("createInput", () => {
       target.press(key);
     }
 
+    // The first runs, two wait, and the fourth press found the queue full.
+    assert.deepEqual(directions, ["up"]);
+    assert.equal(input.pending, 2);
+
     input.release();
     input.release();
     input.release();
 
-    assert.deepEqual(directions, ["up", "down", "left", "right"]);
+    assert.deepEqual(directions, ["up", "down", "left"]);
+  });
+
+  it("does not queue the repeat events of a held key while a move is running (FR-006)", () => {
+    const directions = [];
+    const target = fakeTarget();
+    const input = createInput({ target, onMove: (direction) => directions.push(direction) });
+
+    target.press("ArrowLeft");
+    for (let i = 0; i < 10; i += 1) target.press("ArrowLeft", { repeat: true });
+
+    assert.deepEqual(directions, ["left"]);
+    assert.equal(input.pending, 0);
+  });
+
+  it("still plays a held key once the board is idle (FR-006)", () => {
+    const directions = [];
+    const target = fakeTarget();
+    const input = createInput({ target, onMove: (direction) => directions.push(direction) });
+
+    target.press("ArrowLeft");
+    input.release();
+    target.press("ArrowLeft", { repeat: true });
+
+    assert.deepEqual(directions, ["left", "left"]);
+  });
+
+  it("starts each queued move as soon as the move before it ends (FR-006)", () => {
+    const directions = [];
+    const target = fakeTarget();
+    const input = createInput({ target, onMove: (direction) => directions.push(direction) });
+
+    target.press("ArrowLeft");
+    target.press("ArrowUp");
+    assert.deepEqual(directions, ["left"]);
+
+    input.release();
+
+    assert.deepEqual(directions, ["left", "up"]);
   });
 
   it("waits for the dialog to close before it plays the queue", () => {

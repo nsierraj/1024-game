@@ -19,16 +19,25 @@ describe("precache", () => {
     }
   });
 
-  it("does not precache the sound files, so a player who never enables sound downloads none (FR-040)", () => {
+  it("precaches the sound synthesiser, so sound works offline from the first time it is turned on (FR-040)", () => {
     const content = readFileSync(join(process.cwd(), "sw.js"), "utf8");
     const match = content.match(/PRECACHE_ASSETS\s*=\s*\[([\s\S]*?)\]/);
     assert.ok(match, "PRECACHE_ASSETS not found");
-    assert.ok(!/\.mp3|assets\/audio/.test(match[1]), "an audio file is precached");
+    assert.ok(match[1].includes("./src/services/sound-synth.js"), "sound-synth.js is not precached");
   });
 
-  it("caches other same-origin requests at runtime, so sound works offline once fetched (FR-040)", () => {
+  it("lists no audio file anywhere, because there are none (FR-013)", () => {
+    const content = readFileSync(join(process.cwd(), "sw.js"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    assert.ok(!/\.mp3|assets\/audio/.test(content), "sw.js refers to an audio file");
+    assert.ok(!existsSync(join(process.cwd(), "assets/audio")), "assets/audio still exists");
+  });
+
+  it("precaches every module the audio service imports", () => {
+    const audio = readFileSync(join(process.cwd(), "src/services/audio.js"), "utf8");
     const content = readFileSync(join(process.cwd(), "sw.js"), "utf8");
-    assert.match(content, /cache\.put\(request, copy\)/);
+    for (const [, path] of audio.matchAll(/from "\.\/([a-z-]+\.js)"/g)) {
+      assert.ok(content.includes(`./src/services/${path}`), `${path} is imported by audio.js but not precached`);
+    }
   });
 
   it("never skips waiting on its own (FR-061)", () => {

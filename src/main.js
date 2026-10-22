@@ -4,7 +4,7 @@
 
 import { applyMove, canUndo, createGame, keepPlaying, undo } from "./core/game.js";
 import { loadBestScore, loadGame, loadSettings, saveGame, saveSettings, GAME_KEY } from "./services/persist.js";
-import { createAudio } from "./services/audio.js";
+import { createAudio, effectFor } from "./services/audio.js";
 import { registerServiceWorker } from "./services/sw-register.js";
 import { applyTheme } from "./ui/themes.js";
 import { createAnnouncer } from "./ui/a11y.js";
@@ -75,48 +75,56 @@ if (elements.themeSelect) {
   });
 }
 
-function updateSoundUI(enabled) {
+/** Shows the sound control from the real state of the audio, never from the saved choice. (FR-014) */
+function updateSoundUI() {
   if (!elements.soundToggle) return;
+  const enabled = audio.state() === "on";
   elements.soundToggle.setAttribute("aria-pressed", String(enabled));
   elements.soundToggle.textContent = enabled ? "Sound: on" : "Sound: off";
   elements.soundToggle.setAttribute("aria-label", enabled ? "Sound on" : "Sound off");
 }
 
-updateSoundUI(!!settings.sound);
+audio.onChange(updateSoundUI);
+updateSoundUI();
 
 if (elements.soundToggle) {
-  elements.soundToggle.addEventListener("click", async () => {
-    if (settings.sound) {
-      settings = { ...settings, sound: false, visited: true };
+  elements.soundToggle.addEventListener("click", () => {
+    const state = audio.state();
+    if (state === "on" || state === "arming") {
       audio.disable();
-      updateSoundUI(false);
+      settings = { ...settings, sound: false, visited: true };
       saveSettings(null, settings);
       return;
     }
 
-    const ok = await audio.enable();
-    if (ok) {
-      settings = { ...settings, sound: true, visited: true };
-      updateSoundUI(true);
+    // Called synchronously, so the context starts inside this click. A saved choice that is waiting
+    // for a gesture is turned on by this click as well.
+    audio.enable().then((running) => {
+      settings = { ...settings, sound: running, visited: true };
       saveSettings(null, settings);
-    } else {
-      settings = { ...settings, sound: false, visited: true };
-      updateSoundUI(false);
-      saveSettings(null, settings);
-    }
+    });
   });
 }
 
-// A saved "sound on" is honoured after a reload by fetching the files again. If they cannot be
-// fetched (offline, never cached), the control stays off and play is unaffected. (FR-040)
-if (settings.sound) {
-  audio.enable().then((ok) => {
-    if (ok) return;
-    settings = { ...settings, sound: false };
-    updateSoundUI(false);
-    saveSettings(null, settings);
-  });
+// A saved "on" is kept, and starts at the first gesture after a reload. Until then the control shows
+// off, and the saved choice is not touched. (FR-014)
+if (settings.sound) audio.restore();
+
+for (const type of ["pointerup", "touchend", "keydown", "click"]) {
+  document.addEventListener(
+    type,
+    (event) => {
+      // The sound control decides for itself; unlocking first would make its click turn sound off.
+      if (event.target && typeof event.target.closest === "function" && event.target.closest("#sound-toggle")) return;
+      audio.unlock();
+    },
+    true,
+  );
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) audio.unlock();
+});
 
 /**
  * Builds a live game from a stored one. The stored record carries the state; the random source
@@ -156,7 +164,7 @@ function startNewGame() {
   game = createGame({ seed: Date.now(), bestScore: game.bestScore });
   winShown = false;
   gameOverShown = false;
-  renderer.render(game);
+  renderer.render(game, { transition: "newgame" });
   updateUndo();
   input.release();
   if (elements.board) elements.board.focus();
@@ -179,7 +187,7 @@ function showOutcome() {
   if (game.status === "won" && !winShown) {
     winShown = true;
     announcer.announceWin();
-    audio.play("win");
+    audio.play(effectFor("win"));
     dialogs.showWin({
       keepPlaying: () => {
         game = keepPlaying(game);
@@ -207,11 +215,11 @@ function showOutcome() {
   if (game.status === "gameover" && !gameOverShown) {
     gameOverShown = true;
     announcer.announceGameOver(game.score);
-    audio.play("gameover");
+    audio.play(effectFor("gameover"));
     dialogs.showGameOver({
       score: game.score,
       undo: () => {
-        performUndo();
+        performUndo("gameover-dialog");
       },
       newGame: () => {
         startNewGame();
@@ -226,19 +234,19 @@ function showOutcome() {
 /**
  * Undoes the most recent move.
  */
-function performUndo() {
+function performUndo(source = "toolbar") {
   if (!canUndo(game)) return;
   game = undo(game);
   // The undo can take the game out of its win or its end, so both are reported again if they
   // happen again. (FR-019, FR-028)
   winShown = false;
   gameOverShown = false;
-  renderer.render(game);
+  renderer.render(game, { transition: "undo" });
   announcer.announceUndo(game.score);
   updateUndo();
   input.release();
   saveGame(null, game);
-  audio.play("move");
+  audio.play(effectFor(source === "gameover-dialog" ? "undo-from-game-over" : "undo"));
 }
 
 /**
@@ -257,7 +265,7 @@ async function performMove(direction) {
 
   const groups = renderer.applyMove(result, direction);
   renderer.showScoreGain(result.gained);
-  audio.play(result.gained > 0 ? "merge" : "move");
+  audio.play(effectFor(result.gained > 0 ? "merge" : "move"));
   await playMove(groups);
 
   announcer.announceMove(result.gained, game.score);

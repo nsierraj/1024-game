@@ -125,6 +125,11 @@ privacy posture (FR-062, FR-068). The design therefore:
 
 ## Audio
 
+> **Superseded by feature 002.** The four mp3 files described here were identical, quiet, and are removed. Sound is now
+> made in the game by a pure renderer and needs no fetch, so it works offline from the first enable. See
+> [`specs/002-modern-style-audio/contracts/audio-contract.md`](../../002-modern-style-audio/contracts/audio-contract.md).
+> The rest of this section is kept as the record of feature 001.
+
 Four effects: `move`, `merge`, `win`, `gameover`.
 
 | Property | Value | Reason |

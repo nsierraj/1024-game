@@ -9,40 +9,40 @@
 :root {
   color-scheme: light;
 
-  /* Surfaces and text. */
-  --bg: #faf8ef;
-  --surface: #eee4da;
-  --board-bg: #bbada0;
-  --text: #5c534a;
-  --text-strong: #403a33;
-  --accent: #6b5a4a;
-  --border: #8c8278;
-  --focus-ring: #3b6ea5;
-
-  /* Tile palette. A tile value is drawn in its foreground colour on its background colour. */
-  --tile-2-bg: #eee4da;
-  --tile-2-fg: #4a4239;
-  --tile-4-bg: #e6d7ba;
-  --tile-4-fg: #4a4239;
-  --tile-8-bg: #d9b98d;
-  --tile-8-fg: #40382f;
-  --tile-16-bg: #c2915c;
-  --tile-16-fg: #2b2015;
-  --tile-32-bg: #9c6c3c;
-  --tile-32-fg: #ffffff;
-  --tile-64-bg: #8f6234;
-  --tile-64-fg: #ffffff;
-  --tile-128-bg: #74502c;
-  --tile-128-fg: #ffffff;
-  --tile-256-bg: #5f4225;
-  --tile-256-fg: #ffffff;
-  --tile-512-bg: #4c3620;
+  /* The calm and soft light palette, with the value of every contrast ratio recorded in
+     specs/002-modern-style-audio/contracts/theme-tokens.md. Tile colours move from cool blue at the
+     low values to warm rose at the high ones; every value above 1024 shares the last pair. */
+  --bg: #f6f3ee;
+  --surface: #ece7de;
+  --board-bg: #d8d1c4;
+  --text: #3b4452;
+  --text-strong: #1f2933;
+  --accent: #4a56c8;
+  --accent-fg: #ffffff;
+  --border: #8a8478;
+  --focus-ring: #3f4bbd;
+  --tile-2-bg: #e3e9f2;
+  --tile-2-fg: #1f2933;
+  --tile-4-bg: #cce0ea;
+  --tile-4-fg: #1f2933;
+  --tile-8-bg: #b6dfe2;
+  --tile-8-fg: #1f2933;
+  --tile-16-bg: #a1d9cc;
+  --tile-16-fg: #1f2933;
+  --tile-32-bg: #95d0a9;
+  --tile-32-fg: #1f2933;
+  --tile-64-bg: #a6cb86;
+  --tile-64-fg: #1f2933;
+  --tile-128-bg: #dac262;
+  --tile-128-fg: #1f2933;
+  --tile-256-bg: #dd8a40;
+  --tile-256-fg: #1f2933;
+  --tile-512-bg: #c54026;
   --tile-512-fg: #ffffff;
-  --tile-1024-bg: #3a2a1a;
+  --tile-1024-bg: #a12b48;
   --tile-1024-fg: #ffffff;
-  /* Every value above 1024 shares this pair. (FR-024) */
-  --tile-high-bg: #2b2015;
-  --tile-high-fg: #ffffff;
+  --tile-high-bg: #3b2a4a;
+  --tile-high-fg: #ffe9a8;
 
   /* Measurements. */
   --radius: 10px;
@@ -50,6 +50,23 @@
   --gap: 12px;
   --control-size: 44px;
   --board-size: min(90vw, 90vh, 420px);
+
+  /* Shape. (FR-015) */
+  --radius-board: 14px;
+  --radius-tile: 10px;
+  --radius-control: 10px;
+
+  /* Depth: soft two-layer shadows and a 1px inner highlight on tiles. */
+  --shadow-tile: 0 1px 2px rgb(31 41 51 / 14%), 0 4px 10px rgb(31 41 51 / 10%);
+  --shadow-raised: 0 1px 2px rgb(31 41 51 / 16%), 0 6px 16px rgb(31 41 51 / 12%);
+  --tile-highlight: inset 0 1px 0 rgb(255 255 255 / 35%);
+
+  /* Type: the device's own fonts, so nothing is downloaded. (FR-025) */
+  --font-ui: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-size-small: 0.75rem;
+  --font-size-body: 1rem;
+  --font-size-large: 1.5rem;
+  --font-size-title: 2.75rem;
 }
 
 *,
@@ -77,7 +94,7 @@ body {
   min-height: 100vh;
   background-color: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-ui);
   font-size: 16px;
   line-height: 1.5;
 }
@@ -108,30 +125,35 @@ ul {
 
 .app-title {
   color: var(--text-strong);
-  font-size: 2.75rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: var(--font-size-title);
+  font-weight: 800;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
 .scores {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--gap);
+  max-width: 100%;
 }
 
 .score-box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 84px;
-  padding: 6px 12px;
-  border-radius: var(--radius-small);
+  min-width: min(84px, 100%);
+  max-width: 100%;
+  padding: 8px 14px;
+  border-radius: var(--radius-control);
   background-color: var(--surface);
+  box-shadow: var(--shadow-tile);
 }
 
 .score-label {
   color: var(--text);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -212,19 +234,42 @@ ul {
 .select {
   min-height: var(--control-size);
   min-width: var(--control-size);
-  padding: 8px 16px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-small);
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
   background-color: var(--surface);
+  box-shadow: var(--shadow-tile);
   color: var(--text-strong);
   font: inherit;
   font-weight: 600;
   text-align: center;
   cursor: pointer;
+  transition:
+    transform 120ms var(--ease-slide),
+    box-shadow 120ms var(--ease-slide),
+    background-color 120ms linear,
+    border-color 120ms linear;
 }
 
 .select {
-  padding-right: 8px;
+  padding-right: 10px;
+}
+
+/* A control lifts a little under the pointer and presses down when it is used. Touch devices have
+   no hover, so the pressed state carries the feedback there. (FR-016) */
+@media (hover: hover) {
+  .btn:hover:not(:disabled),
+  .select:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-raised);
+    border-color: var(--text);
+  }
+}
+
+.btn:active:not(:disabled),
+.select:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-tile);
 }
 
 .settings-row {
@@ -249,14 +294,20 @@ ul {
 .btn-primary {
   border-color: var(--accent);
   background-color: var(--accent);
-  color: var(--bg);
+  color: var(--accent-fg);
+}
+
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
 }
 
 .notice {
   width: 100%;
   padding: 8px 16px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-control);
   background-color: var(--surface);
   color: var(--text-strong);
   text-align: center;
@@ -282,10 +333,11 @@ ul {
 .help-panel {
   width: 100%;
   max-width: 480px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-board);
   background-color: var(--surface);
+  box-shadow: var(--shadow-tile);
   color: var(--text);
 }
 
@@ -311,13 +363,81 @@ ul {
   max-width: min(90vw, 420px);
   padding: 24px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-board);
   background-color: var(--bg);
+  box-shadow: var(--shadow-raised);
   color: var(--text);
 }
 
 .modal::backdrop {
-  background-color: rgb(0 0 0 / 55%);
+  background-color: rgb(20 26 38 / 55%);
+}
+
+/*
+ * A dialog rises and fades in when it opens, and the reverse plays when it leaves. The leave runs
+ * through `data-closing`, set by the script for 120 ms before the dialog is closed. Both sit under
+ * a motion query, so with reduced motion a dialog simply appears and disappears. (FR-017, FR-007)
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .modal[open] {
+    animation: modal-in 160ms var(--ease-slide);
+  }
+
+  .modal[open]::backdrop {
+    animation: backdrop-in 160ms linear;
+  }
+
+  .modal[open][data-closing] {
+    animation: modal-out 120ms var(--ease-slide) forwards;
+  }
+
+  .modal[open][data-closing]::backdrop {
+    animation: backdrop-out 120ms linear forwards;
+  }
+}
+
+@keyframes modal-in {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes modal-out {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@keyframes backdrop-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes backdrop-out {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 .modal-body {

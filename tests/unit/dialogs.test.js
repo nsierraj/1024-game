@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { createDialogs } from "../../src/ui/dialogs.js";
+import { createDialogs, LEAVE_MS } from "../../src/ui/dialogs.js";
 
 /**
  * A stand-in for a native dialog.
@@ -10,9 +10,14 @@ import { createDialogs } from "../../src/ui/dialogs.js";
 function fakeDialog() {
   const listeners = new Map();
 
+  const attributes = new Map();
+
   return {
     open: false,
     showModalCalls: 0,
+    setAttribute: (name, value) => attributes.set(name, value),
+    removeAttribute: (name) => attributes.delete(name),
+    hasAttribute: (name) => attributes.has(name),
     showModal() {
       this.open = true;
       this.showModalCalls += 1;
@@ -62,7 +67,7 @@ function fakeButton() {
  * The three dialogs, wired up.
  * @returns {{win: object, gameover: object, confirm: object, dialogs: object}}
  */
-function setup() {
+function setup(options = {}) {
   const win = { dialog: fakeDialog(), keepPlaying: fakeButton(), newGame: fakeButton() };
   const gameover = {
     dialog: fakeDialog(),
@@ -72,7 +77,10 @@ function setup() {
   };
   const confirm = { dialog: fakeDialog(), start: fakeButton(), cancel: fakeButton() };
 
-  return { win, gameover, confirm, dialogs: createDialogs({ win, gameover, confirm }) };
+  // By default a dialog leaves at once, so the tests of what each button does need no waiting. The
+  // tests of the leave transition pass their own scheduler.
+  const dialogs = createDialogs({ win, gameover, confirm, schedule: (run) => run(), reducedMotion: () => false, ...options });
+  return { win, gameover, confirm, dialogs };
 }
 
 describe("createDialogs", () => {
@@ -231,3 +239,105 @@ describe("createDialogs", () => {
     assert.equal(dialogs.isOpen(), false);
   });
 });
+
+describe("the leave transition (FR-017, FR-007)", () => {
+  /** A scheduler the test runs by hand. */
+  function manualScheduler() {
+    const queued = [];
+    return {
+      schedule: (run, ms) => queued.push({ run, ms }),
+      queued,
+      flush() {
+        while (queued.length) queued.shift().run();
+      },
+    };
+  }
+
+  it("plays the leave for 120 ms before closing and before the handler runs", () => {
+    const clock = manualScheduler();
+    const { win, dialogs } = setup({ schedule: clock.schedule });
+    const chosen = [];
+
+    dialogs.showWin({ keepPlaying: () => chosen.push("keepPlaying") });
+    win.keepPlaying.click();
+
+    assert.equal(LEAVE_MS, 120);
+    assert.equal(clock.queued[0].ms, LEAVE_MS);
+    assert.equal(win.dialog.hasAttribute("data-closing"), true);
+    assert.equal(win.dialog.open, true, "closed before the leave finished");
+    assert.deepEqual(chosen, [], "the handler ran before the dialog closed");
+
+    clock.flush();
+
+    assert.equal(win.dialog.open, false);
+    assert.equal(win.dialog.hasAttribute("data-closing"), false);
+    assert.deepEqual(chosen, ["keepPlaying"]);
+  });
+
+  it("still counts as open while it is leaving, so queued moves wait for the real close", () => {
+    const clock = manualScheduler();
+    const { win, dialogs } = setup({ schedule: clock.schedule });
+
+    dialogs.showWin({});
+    win.keepPlaying.click();
+    assert.equal(dialogs.isOpen(), true);
+
+    clock.flush();
+    assert.equal(dialogs.isOpen(), false);
+  });
+
+  it("ignores a second click while the dialog is leaving, so a double click cannot start two games", () => {
+    const clock = manualScheduler();
+    const { win, dialogs } = setup({ schedule: clock.schedule });
+    const chosen = [];
+
+    dialogs.showWin({ newGame: () => chosen.push("newGame") });
+    win.newGame.click();
+    win.newGame.click();
+    clock.flush();
+
+    assert.deepEqual(chosen, ["newGame"]);
+  });
+
+  it("leaves the same way when dismissed with Escape", () => {
+    const clock = manualScheduler();
+    const { confirm, dialogs } = setup({ schedule: clock.schedule });
+    const chosen = [];
+
+    dialogs.showConfirm({ cancel: () => chosen.push("cancel") });
+    const event = confirm.dialog.dispatch("cancel");
+
+    assert.equal(event.defaultPrevented, true);
+    assert.equal(confirm.dialog.open, true);
+    clock.flush();
+    assert.deepEqual(chosen, ["cancel"]);
+    assert.equal(confirm.dialog.open, false);
+  });
+
+  it("closes at once and runs the handler at once when reduced motion is on (FR-007)", () => {
+    const clock = manualScheduler();
+    const { win, dialogs } = setup({ schedule: clock.schedule, reducedMotion: () => true });
+    const chosen = [];
+
+    dialogs.showWin({ keepPlaying: () => chosen.push("keepPlaying") });
+    win.keepPlaying.click();
+
+    assert.equal(clock.queued.length, 0, "scheduled a wait under reduced motion");
+    assert.equal(win.dialog.open, false);
+    assert.deepEqual(chosen, ["keepPlaying"]);
+  });
+
+  it("can be opened again after it has left", () => {
+    const clock = manualScheduler();
+    const { win, dialogs } = setup({ schedule: clock.schedule });
+
+    dialogs.showWin({});
+    win.keepPlaying.click();
+    clock.flush();
+    dialogs.showWin({});
+
+    assert.equal(win.dialog.open, true);
+    assert.equal(win.dialog.hasAttribute("data-closing"), false);
+  });
+});
+
