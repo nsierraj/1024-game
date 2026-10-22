@@ -32,11 +32,11 @@ delivered as an independent increment.
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create the directory structure from `plan.md`: `src/core/`, `src/ui/`, `src/services/`, `src/styles/`, `assets/icons/`, `assets/audio/`, `tests/unit/`, `tests/integration/`
-- [ ] T002 [P] Add a `serve` script to `package.json` that runs `node scripts/serve.mjs` on port 8080
-- [ ] T003 [P] Create `scripts/serve.mjs`, a zero-dependency static file server on `node:http` that serves the repository root with correct MIME types for `.html`, `.js`, `.css`, `.json`, `.webmanifest`, `.png`, and `.mp3`
-- [ ] T004 [P] Create `robots.txt` allowing all crawlers
-- [ ] T005 [P] Add `.gitignore` entries for `node_modules/`, `.DS_Store`, and `*.log`
+- [x] T001 Create the directory structure from `plan.md`: `src/core/`, `src/ui/`, `src/services/`, `src/styles/`, `assets/icons/`, `assets/audio/`, `tests/unit/`, `tests/integration/`
+- [x] T002 [P] Add a `serve` script to `package.json` that runs `node scripts/serve.mjs` on port 8080
+- [x] T003 [P] Create `scripts/serve.mjs`, a zero-dependency static file server on `node:http` that serves the repository root with correct MIME types for `.html`, `.js`, `.css`, `.json`, `.webmanifest`, `.png`, and `.mp3`
+- [x] T004 [P] Create `robots.txt` allowing all crawlers
+- [x] T005 [P] Add `.gitignore` entries for `node_modules/`, `.DS_Store`, and `*.log`
 
 ---
 
@@ -46,13 +46,13 @@ delivered as an independent increment.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Write `tests/unit/random.test.js` covering seed determinism, the `[0, 1)` output range, and uniformity over 10,000 samples; this test MUST fail until T009 lands, and it is the first test in the repository so the required `test` check stops passing vacuously
-- [ ] T007 Create `src/core/constants.js` with `BOARD_SIZE`, `CELL_COUNT`, `TARGET_VALUE`, `INITIAL_TILE_COUNT`, `SPAWN_VALUES`, and `SPAWN_WEIGHTS` exactly as specified in `contracts/logic-core-api.md`
-- [ ] T008 [P] Create `src/core/types.js` with the JSDoc typedefs `Direction`, `Board`, `SlideTransition`, `SlideResult`, `Game`, `UndoSnapshot`, and `MoveResult` from `contracts/logic-core-api.md`
-- [ ] T009 Implement `src/core/random.js` with `createRandom(seed)` using mulberry32 to satisfy T006, seeded from an unsigned 32-bit integer and returning values in `[0, 1)`
-- [ ] T010 [P] Create `src/ui/strings.js` holding every user-facing string from `contracts/ui-contract.md`, including the four live-region announcements, so no text is hard-coded anywhere else
-- [ ] T011 [P] Create `src/styles/base.css` with the page layout, the visible focus ring, the `.visually-hidden` utility, the minimum 24x24 px control sizing, and the default light palette as CSS custom properties on `:root`
-- [ ] T012 Create `index.html` with the semantic app shell from `contracts/ui-contract.md`: `role="grid"` board container, `role="status"` live region, labelled score panel, the controls row, the `#help-toggle` button with the goal and controls text in the help panel, and the three `role="dialog"` containers
+- [x] T006 Write `tests/unit/random.test.js` covering seed determinism, the `[0, 1)` output range, and uniformity over 10,000 samples; this test MUST fail until T009 lands, and it is the first test in the repository so the required `test` check stops passing vacuously
+- [x] T007 Create `src/core/constants.js` with `BOARD_SIZE`, `CELL_COUNT`, `TARGET_VALUE`, `INITIAL_TILE_COUNT`, `SPAWN_VALUES`, and `SPAWN_WEIGHTS` exactly as specified in `contracts/logic-core-api.md`
+- [x] T008 [P] Create `src/core/types.js` with the JSDoc typedefs `Direction`, `Board`, `SlideTransition`, `SlideResult`, `Game`, `UndoSnapshot`, and `MoveResult` from `contracts/logic-core-api.md`
+- [x] T009 Implement `src/core/random.js` with `createRandom(seed)` using mulberry32 to satisfy T006, seeded from an unsigned 32-bit integer and returning values in `[0, 1)`
+- [x] T010 [P] Create `src/ui/strings.js` holding every user-facing string from `contracts/ui-contract.md`, including the four live-region announcements, so no text is hard-coded anywhere else
+- [x] T011 [P] Create `src/styles/base.css` with the page layout, the visible focus ring, the `.visually-hidden` utility, the minimum 24x24 px control sizing, and the default light palette as CSS custom properties on `:root`
+- [x] T012 Create `index.html` with the semantic app shell from `contracts/ui-contract.md`: `role="grid"` board container, `role="status"` live region, labelled score panel, the controls row, the `#help-toggle` button with the goal and controls text in the help panel, and the three `role="dialog"` containers
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -84,11 +84,11 @@ without any further story.
 - [ ] T016 [US1] Implement `slide`, `hasAvailableMoves`, and `hasNoAdjacentEqual` in `src/core/board.js` to satisfy T013
 - [ ] T017 [US1] Implement `createGame`, `applyMove`, and `canUndo` in `src/core/game.js` to satisfy T014, injecting the random source rather than calling `Math.random`
 - [ ] T018 [US1] Implement the per-cell `transitions` list in the `slide` result in `src/core/board.js`, matching the ratified `SlideResult` and `SlideTransition` shapes in `contracts/logic-core-api.md`, so a tile that slides and merges in one move can be animated correctly
-- [ ] T019 [P] [US1] Create `src/ui/render.js` to draw the 4x4 board, the tiles, the score, and the best score from game state, reusing tile elements between renders so transitions stay continuous
+- [ ] T019 [P] [US1] Create `src/ui/render.js` to draw the 4x4 board, the tiles, the score, and the best score from game state, reusing tile elements between renders so transitions stay continuous, and create `src/styles/board.css` with the board and tile styles and link it from `index.html`, since T040, T049, and T059 extend it
 - [ ] T020 [P] [US1] Create `src/ui/animations.js` for the slide, merge, and spawn animations, finishing within 150 ms (FR-036)
 - [ ] T021 [US1] Create `src/ui/input.js` with arrow-key handling for the four directions (FR-010) and a queue that holds input arriving during an animation so no move is lost (FR-064)
 - [ ] T022 [P] [US1] Create `src/ui/dialogs.js` with the win dialog offering exactly keep playing and new game (FR-020) and the game-over dialog presenting the final score and a way to try again (FR-023)
-- [ ] T023 [US1] Create `src/main.js` to bootstrap the game, wire the core, renderer, input, and dialogs, and start the first animation loop
+- [ ] T023 [US1] Create `src/main.js` to bootstrap the game, wire the core, renderer, input, and dialogs, and start the first animation loop, and load it from `index.html` as a module script
 - [ ] T024 [US1] Add the new-game control to `index.html` and the confirmation dialog to `src/ui/dialogs.js` so starting a new game mid-game asks first and declining keeps the current game (FR-029, FR-030)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
@@ -184,7 +184,7 @@ the device to airplane mode, and confirm a full game can still be played.
 
 - [ ] T043 [US5] Create `src/ui/swipe.js` with the pure gesture resolution: a `SWIPE_FRACTION` of one quarter of the board's width or height, and a `resolveSwipe(dx, dy, width, height)` returning a direction or null
 - [ ] T044 [US5] Implement pointer handling in `src/ui/input.js` with `pointerdown`, `pointermove`, and `pointerup`, using `setPointerCapture` and `touch-action: none` so the page never scrolls, zooms, or navigates (FR-013, FR-032)
-- [ ] T045 [US5] Create `manifest.webmanifest` with the name, short name, `display: "standalone"`, `start_url`, theme and background colours, and the 192, 512, and maskable icons (FR-060)
+- [ ] T045 [US5] Create `manifest.webmanifest` with the name, short name, `display: "standalone"`, `start_url`, theme and background colours, and the 192, 512, and maskable icons (FR-060), and link it from `index.html` so the browser can offer the game for installation
 - [ ] T046 [US5] Create `sw.js` with the precache list, the network-first navigation strategy, the cache-first asset strategy, the cache cleanup on activate, and the rule that the worker MUST NOT call `skipWaiting()` on its own (FR-059, FR-061)
 - [ ] T047 [US5] Create `src/services/sw-register.js` and register the service worker from `src/main.js`
 - [ ] T048 [P] [US5] Generate the PNG icons at 192, 512, and a maskable 512 in `assets/icons/`, and add the `apple-touch-icon` link to `index.html`
@@ -379,3 +379,9 @@ With multiple developers:
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
 - The MVP is a development increment, not a release. Constitution Principle IV and the release
   gates mean nothing ships until User Story 7 and the `quickstart.md` validation have passed
+- Two task descriptions were widened while implementing, because the list as written left a gap:
+  T019 now also creates `src/styles/board.css` and links it from `index.html`, since T040, T049,
+  and T059 extend a stylesheet nothing created, and T045 now also links `manifest.webmanifest`
+  from `index.html`, since an unlinked manifest is never offered for installation
+- T023 now also loads `src/main.js` from `index.html` as a module script, so the shell carries no
+  reference to a file that does not exist yet

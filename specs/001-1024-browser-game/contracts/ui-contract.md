@@ -29,7 +29,7 @@ dynamic parts.
 
   <main class="app-main">
     <div class="board-wrap">
-      <div id="board" class="board" role="grid" aria-labelledby="score-label"></div>
+      <div id="board" class="board" role="grid" tabindex="0" aria-label="Game board, 4 by 4. Use the arrow keys to slide the tiles."></div>
       <div id="score-gain" class="score-gain" aria-hidden="true"></div>
     </div>
 
@@ -50,18 +50,27 @@ dynamic parts.
       </button>
     </div>
 
-    <section id="help-panel" class="help-panel" hidden aria-labelledby="help-toggle">
+    <section id="help-panel" class="help-panel" hidden aria-labelledby="help-title">
+      <h2 id="help-title">How to play</h2>
       <!-- goal, controls, and the iOS install steps -->
     </section>
   </main>
 
   <div id="status-region" class="visually-hidden" role="status" aria-live="polite"></div>
 
-  <dialog id="win-dialog" class="dialog" aria-labelledby="win-title">…</dialog>
-  <dialog id="gameover-dialog" class="dialog" aria-labelledby="gameover-title">…</dialog>
-  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title">…</dialog>
+  <dialog id="win-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="win-title">…</dialog>
+  <dialog id="gameover-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="gameover-title">…</dialog>
+  <dialog id="confirm-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">…</dialog>
 </body>
 ```
+
+> **Correction (2026-10-21)**: the page structure above labelled `#board` with `aria-labelledby`,
+> pointing at the score label, and labelled `#help-panel` with the button that toggles it. The
+> element contract and the focus management rules both require an `aria-label` on the board that
+> states the controls, and a heading inside the help panel that focus can move to. The structure
+> above now matches those rules. The `role="dialog"` and `aria-modal="true"` attributes are
+> written out on the dialogs as the element contract requires, even though `dialog` already implies
+> the role.
 
 ## Element contract
 
@@ -122,17 +131,31 @@ to the operating system changing while it is open.
 :root {
   --bg: #faf8ef;
   --surface: #eee4da;
-  --text: #776e65;
-  --text-strong: #504b43;
-  --accent: #8f7a66;
+  --text: #5c534a;
+  --text-strong: #403a33;
+  --accent: #6b5a4a;
+  --border: #8c8278;
   --focus-ring: #3b6ea5;
-  --tile-2-bg: #eee4da;   --tile-2-fg: #776e65;
-  --tile-4-bg: #ede0c8;   --tile-4-fg: #776e65;
-  --tile-8-bg: #f2b179;   --tile-8-fg: #ffffff;
-  --tile-16-bg: #f59563;  --tile-16-fg: #ffffff;
-  /* ... up to --tile-1024-bg, plus --tile-high-bg / --tile-high-fg for values above 1024 */
+  --tile-2-bg: #eee4da;    --tile-2-fg: #4a4239;
+  --tile-4-bg: #e6d7ba;    --tile-4-fg: #4a4239;
+  --tile-8-bg: #d9b98d;    --tile-8-fg: #40382f;
+  --tile-16-bg: #c2915c;   --tile-16-fg: #2b2015;
+  --tile-32-bg: #9c6c3c;   --tile-32-fg: #ffffff;
+  --tile-64-bg: #8f6234;   --tile-64-fg: #ffffff;
+  --tile-128-bg: #74502c;  --tile-128-fg: #ffffff;
+  --tile-256-bg: #5f4225;  --tile-256-fg: #ffffff;
+  --tile-512-bg: #4c3620;  --tile-512-fg: #ffffff;
+  --tile-1024-bg: #3a2a1a; --tile-1024-fg: #ffffff;
+  --tile-high-bg: #2b2015; --tile-high-fg: #ffffff;
 }
 ```
+
+> **Correction (2026-10-21)**: the example palette this block replaces failed rule 1 below in four
+> places. Tile 2 was 3.98:1, tile 4 was 3.83:1, tile 8 was 1.85:1, and tile 16 was 2.24:1. The
+> values above are the corrected light palette: every tile value and every text colour reaches at
+> least 4.5:1 against its background, and the focus ring and the control border reach at least
+> 3:1. The tile ladder darkens sooner than the original so that the light text on the mid and high
+> tiles stays readable.
 
 | Theme | `data-theme` | Notes |
 |---|---|---|

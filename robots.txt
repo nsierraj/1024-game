@@ -1,0 +1,4 @@
+# The 1024 game is a public, static browser game with nothing behind it.
+# There is no crawler-hostile content, so everything is allowed.
+User-agent: *
+Allow: /
