@@ -49,13 +49,23 @@
   --radius-small: 6px;
   --gap: 12px;
   --control-size: 44px;
-  --board-size: min(92vw, 480px);
+  --board-size: min(90vw, 90vh, 420px);
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+}
+
+@media (max-width: 360px) {
+  html {
+    font-size: 14px;
+  }
 }
 
 html {

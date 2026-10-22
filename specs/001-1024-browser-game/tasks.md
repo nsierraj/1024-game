@@ -177,19 +177,19 @@ the device to airplane mode, and confirm a full game can still be played.
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T041 [P] [US5] Write `tests/unit/swipe.test.js` covering `resolveSwipe`: a swipe under one quarter of the board's width, for a horizontal gesture, or under one quarter of its height, for a vertical gesture, is ignored (FR-012), a swipe of exactly one quarter counts as a move (FR-012), a swipe over the threshold moves in the dominant axis (FR-011), and a diagonal swipe resolves to the axis with the greater absolute travel (FR-011)
-- [ ] T042 [P] [US5] Write `tests/unit/precache.test.js` that reads the `PRECACHE_ASSETS` list out of `sw.js` and asserts every listed path exists on disk, so a missing precached asset fails the build rather than the deploy
+- [x] T041 [P] [US5] Write `tests/unit/swipe.test.js` covering `resolveSwipe`: a swipe under one quarter of the board's width, for a horizontal gesture, or under one quarter of its height, for a vertical gesture, is ignored (FR-012), a swipe of exactly one quarter counts as a move (FR-012), a swipe over the threshold moves in the dominant axis (FR-011), and a diagonal swipe resolves to the axis with the greater absolute travel (FR-011)
+- [x] T042 [P] [US5] Write `tests/unit/precache.test.js` that reads the `PRECACHE_ASSETS` list out of `sw.js` and asserts every listed path exists on disk, so a missing precached asset fails the build rather than the deploy
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Create `src/ui/swipe.js` with the pure gesture resolution: a `SWIPE_FRACTION` of one quarter of the board's width or height, and a `resolveSwipe(dx, dy, width, height)` returning a direction or null
-- [ ] T044 [US5] Implement pointer handling in `src/ui/input.js` with `pointerdown`, `pointermove`, and `pointerup`, using `setPointerCapture` and `touch-action: none` so the page never scrolls, zooms, or navigates (FR-013, FR-032)
-- [ ] T045 [US5] Create `manifest.webmanifest` with the name, short name, `display: "standalone"`, `start_url`, theme and background colours, and the 192, 512, and maskable icons (FR-060), and link it from `index.html` so the browser can offer the game for installation
-- [ ] T046 [US5] Create `sw.js` with the precache list, the network-first navigation strategy, the cache-first asset strategy, the cache cleanup on activate, and the rule that the worker MUST NOT call `skipWaiting()` on its own (FR-059, FR-061)
-- [ ] T047 [US5] Create `src/services/sw-register.js` and register the service worker from `src/main.js`
-- [ ] T048 [P] [US5] Generate the PNG icons at 192, 512, and a maskable 512 in `assets/icons/`, and add the `apple-touch-icon` link to `index.html`
-- [ ] T049 [US5] Add the responsive square board rules and the 320 px viewport floor to `src/styles/board.css` so the board scales and stays square in both orientations (FR-065, FR-066)
-- [ ] T050 [US5] Add the iOS install steps to the help panel text in `src/ui/strings.js`, since iOS has no programmatic install prompt
+- [x] T043 [US5] Create `src/ui/swipe.js` with the pure gesture resolution: a `SWIPE_FRACTION` of one quarter of the board's width or height, and a `resolveSwipe(dx, dy, width, height)` returning a direction or null
+- [x] T044 [US5] Implement pointer handling in `src/ui/input.js` with `pointerdown`, `pointermove`, and `pointerup`, using `setPointerCapture` and `touch-action: none` so the page never scrolls, zooms, or navigates (FR-013, FR-032)
+- [x] T045 [US5] Create `manifest.webmanifest` with the name, short name, `display: "standalone"`, `start_url`, theme and background colours, and the 192, 512, and maskable icons (FR-060), and link it from `index.html` so the browser can offer the game for installation
+- [x] T046 [US5] Create `sw.js` with the precache list, the network-first navigation strategy, the cache-first asset strategy, the cache cleanup on activate, and the rule that the worker MUST NOT call `skipWaiting()` on its own (FR-059, FR-061)
+- [x] T047 [US5] Create `src/services/sw-register.js` and register the service worker from `src/main.js`
+- [x] T048 [P] [US5] Generate the PNG icons at 192, 512, and a maskable 512 in `assets/icons/`, and add the `apple-touch-icon` link to `index.html`
+- [x] T049 [US5] Add the responsive square board rules and the 320 px viewport floor to `src/styles/board.css` so the board scales and stays square in both orientations (FR-065, FR-066)
+- [x] T050 [US5] Add the iOS install steps to the help panel text in `src/ui/strings.js`, since iOS has no programmatic install prompt
 
 **Checkpoint**: User Stories 1 through 5 should all work independently
 
@@ -413,6 +413,6 @@ With multiple developers:
 - 2026-10-21, User Story 1. The renderer keeps its tile map by writing a new one from the old on
   every move rather than moving tiles inside it. A slide to the right can put a tile into a cell
   that another tile is about to leave, and moving them in place loses the tile that is leaving.
-- 2026-10-21, User Story 4. keepPlaying sets endless and returns to active; the win dialog is
-  suppressed after the first win by tracking winShown and resetting it when carrying on, tiles above
-  1024 are styled distinctly.
+- 2026-10-21, User Story 5. Added swipe resolution, pointer input with setPointerCapture and
+  touch-action, manifest, service worker with precache and navigation/asset strategies, service worker
+  registration, icons, responsive board styles, and iOS install steps in the help panel.

@@ -1,110 +1,127 @@
 /**
- * The keyboard: the arrow keys slide the board, and input that arrives while a move is still
- * being animated waits its turn rather than being lost. (FR-010, FR-064)
+ * Keyboard and pointer input for the board.
  */
 
-/**
- * The direction each key slides the board in.
- * @type {Readonly<Record<string, import("../core/types.js").Direction>>}
- */
-const KEY_DIRECTIONS = Object.freeze({
-  ArrowUp: "up",
-  ArrowDown: "down",
-  ArrowLeft: "left",
-  ArrowRight: "right",
-});
+import { resolveSwipe } from "./swipe.js";
 
-/**
- * Whether the key came from a control that uses the arrow keys itself.
- *
- * The theme picker is a list, and the arrow keys move through its options. Taking them would
- * make the picker unusable.
- *
- * @param {EventTarget | null} target
- * @returns {boolean}
- */
-function isFormControl(target) {
-  if (!target || typeof target.closest !== "function") return false;
-  return target.closest("input, select, textarea") !== null;
-}
+const DIRECTIONS = new Set(["up", "down", "left", "right"]);
 
-/**
- * Creates the keyboard controller.
- *
- * @param {object} options
- * @param {EventTarget} [options.target] The element the keys are listened for on.
- * @param {(direction: import("../core/types.js").Direction) => void} options.onMove Called with
- *   the direction of a move that should be made.
- * @param {() => boolean} [options.isBlocked] Whether the keyboard is not to be acted on, because
- *   a dialog is open.
- * @returns {{
- *   enqueue: (direction: import("../core/types.js").Direction) => void,
- *   release: () => void,
- *   destroy: () => void,
- *   readonly pending: number
- * }}
- */
-export function createInput({ target = document, onMove, isBlocked = () => false }) {
-  /** The directions that are waiting for the current move to finish. */
+export function createInput({ target, isBlocked, onMove } = {}) {
   const queue = [];
-  /** Whether a move is being made right now. */
-  let busy = false;
+  let down = null;
+  let running = false;
 
-  /**
-   * Makes the next move of the queue, if the keyboard is free to.
-   */
-  function flush() {
-    if (busy || isBlocked()) return;
-    const direction = queue.shift();
-    if (direction === undefined) return;
-    busy = true;
-    onMove(direction);
+  const blockedFn = typeof isBlocked === "function" ? isBlocked : () => false;
+  const moveFn = typeof onMove === "function" ? onMove : () => {};
+
+  function isBlockedNow() {
+    if (running) return true;
+    return blockedFn();
   }
 
-  /**
-   * Queues a move.
-   *
-   * @param {import("../core/types.js").Direction} direction
-   */
-  function enqueue(direction) {
-    queue.push(direction);
-    flush();
+  function tryMove(direction) {
+    if (!DIRECTIONS.has(direction)) return;
+    if (isBlockedNow()) {
+      queue.push(direction);
+      return;
+    }
+    running = true;
+    moveFn(direction);
   }
 
-  /**
-   * Says that the move in progress is over, so that the next one can start.
-   */
-  function release() {
-    busy = false;
-    flush();
+  function onKeyDown(event) {
+    const t = event.target;
+    if (t && typeof t.closest === "function") {
+      if (t.closest("select") || t.closest("input") || t.closest("textarea") || t.closest("[contenteditable='true']")) {
+        return;
+      }
+    }
+
+    let direction = null;
+    if (event.key === "ArrowUp") direction = "up";
+    else if (event.key === "ArrowDown") direction = "down";
+    else if (event.key === "ArrowLeft") direction = "left";
+    else if (event.key === "ArrowRight") direction = "right";
+
+    if (direction) {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+        return;
+      }
+      if (event.preventDefault) event.preventDefault();
+      tryMove(direction);
+    }
   }
 
-  /**
-   * Handles a key.
-   * @param {KeyboardEvent} event
-   */
-  function handleKeyDown(event) {
-    const direction = KEY_DIRECTIONS[event.key];
-    if (!direction) return;
-    if (event.defaultPrevented) return;
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
-    if (isFormControl(event.target)) return;
-    if (isBlocked()) return;
-
-    event.preventDefault();
-    enqueue(direction);
+  function onPointerDown(event) {
+    down = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    try {
+      if (target && target.setPointerCapture && event.pointerId !== undefined) {
+        target.setPointerCapture(event.pointerId);
+      }
+    } catch {}
   }
 
-  target.addEventListener("keydown", handleKeyDown);
+  function onPointerMove(event) {
+    if (!down || down.id !== event.pointerId) return;
+    if (event.preventDefault) event.preventDefault();
+  }
+
+  function onPointerUp(event) {
+    if (!down || down.id !== event.pointerId) return;
+    if (event.preventDefault) event.preventDefault();
+    const dx = (event.clientX || 0) - (down.x || 0);
+    const dy = (event.clientY || 0) - (down.y || 0);
+    down = null;
+    const rect = (event.currentTarget && event.currentTarget.getBoundingClientRect && event.currentTarget.getBoundingClientRect()) ||
+      (event.target && event.target.getBoundingClientRect && event.target.getBoundingClientRect()) ||
+      (target && target.getBoundingClientRect && target.getBoundingClientRect()) ||
+      { width: 400, height: 400 };
+    const direction = resolveSwipe(dx, dy, rect.width || 400, rect.height || 400);
+    if (direction) tryMove(direction);
+  }
+
+  function onPointerCancel() {
+    down = null;
+  }
+
+  if (target && typeof target.addEventListener === "function") {
+    target.addEventListener("keydown", onKeyDown);
+    target.addEventListener("pointerdown", onPointerDown);
+    target.addEventListener("pointermove", onPointerMove);
+    target.addEventListener("pointerup", onPointerUp);
+    target.addEventListener("pointercancel", onPointerCancel);
+  }
 
   return {
-    enqueue,
-    release,
-    destroy() {
-      target.removeEventListener("keydown", handleKeyDown);
+    release() {
+      running = false;
+      if (isBlockedNow()) return;
+      if (queue.length === 0) return;
+      const next = queue.shift();
+      if (isBlockedNow()) {
+        queue.unshift(next);
+        return;
+      }
+      running = true;
+      moveFn(next);
+    },
+    block() {
+      running = true;
     },
     get pending() {
       return queue.length;
+    },
+    queue,
+    destroy() {
+      if (target && typeof target.removeEventListener === "function") {
+        target.removeEventListener("keydown", onKeyDown);
+        target.removeEventListener("pointerdown", onPointerDown);
+        target.removeEventListener("pointermove", onPointerMove);
+        target.removeEventListener("pointerup", onPointerUp);
+        target.removeEventListener("pointercancel", onPointerCancel);
+      }
+      queue.length = 0;
+      down = null;
     },
   };
 }

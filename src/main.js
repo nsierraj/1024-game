@@ -8,6 +8,7 @@
 
 import { applyMove, canUndo, createGame, keepPlaying, undo } from "./core/game.js";
 import { loadGame, loadSettings, saveGame, saveSettings, GAME_KEY } from "./services/persist.js";
+import { registerServiceWorker } from "./services/sw-register.js";
 import { playMove } from "./ui/animations.js";
 import { createDialogs } from "./ui/dialogs.js";
 import { createInput } from "./ui/input.js";
@@ -249,6 +250,12 @@ elements.helpToggle.addEventListener("click", () => {
     elements.helpToggle.focus();
   }
 });
+
+if (typeof window !== "undefined") {
+  window.addEventListener("load", () => {
+    registerServiceWorker();
+  });
+}
 
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (event) => {

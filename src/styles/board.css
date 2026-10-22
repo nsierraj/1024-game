@@ -27,6 +27,8 @@
   position: relative;
   width: var(--board-size);
   height: var(--board-size);
+  max-width: 90vw;
+  max-height: 90vw;
 }
 
 .board {

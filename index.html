@@ -2,12 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>1024</title>
     <meta
       name="description"
       content="1024 is a sliding-tile puzzle: combine matching tiles to reach 1024. It works offline and installs to your home screen."
     />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
     <link rel="stylesheet" href="src/styles/base.css" />
     <link rel="stylesheet" href="src/styles/board.css" />
   </head>
@@ -67,6 +69,11 @@
         <p>
           Use the arrow keys, or swipe across the board, to slide the tiles. Every tile slides as
           far as it can, and a new tile appears after each move.
+        </p>
+        <h3>Install</h3>
+        <p>
+          On iOS, tap the Share button and choose Add to Home Screen to install the game. On Android
+          and desktop, the browser may offer an install prompt.
         </p>
       </section>
     </main>
