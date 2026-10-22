@@ -1,14 +1,12 @@
 /**
  * The entry point: it wires the core, the renderer, the input, and the dialogs together.
- *
- * The core knows the rules and nothing else. The renderer draws what the core produced, the
- * input turns the player's hands into directions, the dialogs ask the questions the rules raise,
- * and this module is where the four of them meet.
  */
 
 import { applyMove, canUndo, createGame, keepPlaying, undo } from "./core/game.js";
 import { loadGame, loadSettings, saveGame, saveSettings, GAME_KEY } from "./services/persist.js";
+import { createAudio } from "./services/audio.js";
 import { registerServiceWorker } from "./services/sw-register.js";
+import { applyTheme } from "./ui/themes.js";
 import { playMove } from "./ui/animations.js";
 import { createDialogs } from "./ui/dialogs.js";
 import { createInput } from "./ui/input.js";
@@ -16,8 +14,6 @@ import { createRenderer } from "./ui/render.js";
 
 /**
  * The elements the page shell carries, looked up once.
- *
- * @returns {object}
  */
 function readElements() {
   const byId = (id) => document.getElementById(id);
@@ -32,6 +28,8 @@ function readElements() {
     helpToggle: byId("help-toggle"),
     helpPanel: byId("help-panel"),
     crossTabNotice: byId("cross-tab-notice"),
+    themeSelect: byId("theme-select"),
+    soundToggle: byId("sound-toggle"),
     win: {
       dialog: byId("win-dialog"),
       keepPlaying: byId("win-keep-playing"),
@@ -59,14 +57,51 @@ const dialogs = createDialogs({
   confirm: elements.confirm,
 });
 
-/**
- * The game in play.
- *
- * The seed comes from the clock, which the core is not allowed to reach for itself. (FR-002)
- */
-const saved = loadGame(null);
-const settings = loadSettings(null);
-let game;
+const audio = createAudio();
+
+let settings = loadSettings(null);
+applyTheme(settings.theme);
+
+if (elements.themeSelect) {
+  elements.themeSelect.value = settings.theme;
+  elements.themeSelect.addEventListener("change", () => {
+    settings = { ...settings, theme: elements.themeSelect.value, visited: true };
+    applyTheme(settings.theme);
+    saveSettings(null, settings);
+  });
+}
+
+function updateSoundUI(enabled) {
+  if (!elements.soundToggle) return;
+  elements.soundToggle.setAttribute("aria-pressed", String(enabled));
+  elements.soundToggle.textContent = enabled ? "Sound: on" : "Sound: off";
+  elements.soundToggle.setAttribute("aria-label", enabled ? "Sound on" : "Sound off");
+}
+
+updateSoundUI(!!settings.sound);
+
+if (elements.soundToggle) {
+  elements.soundToggle.addEventListener("click", async () => {
+    if (settings.sound) {
+      settings = { ...settings, sound: false, visited: true };
+      audio.disable();
+      updateSoundUI(false);
+      saveSettings(null, settings);
+      return;
+    }
+
+    const ok = await audio.enable();
+    if (ok) {
+      settings = { ...settings, sound: true, visited: true };
+      updateSoundUI(true);
+      saveSettings(null, settings);
+    } else {
+      settings = { ...settings, sound: false, visited: true };
+      updateSoundUI(false);
+      saveSettings(null, settings);
+    }
+  });
+}
 
 function restoreGame(savedGame) {
   if (!savedGame) return null;
@@ -95,7 +130,8 @@ function restoreGame(savedGame) {
   }
 }
 
-game = restoreGame(saved);
+const saved = loadGame(null);
+let game = restoreGame(saved);
 if (game && saved && saved.bestScore > game.bestScore) game.bestScore = saved.bestScore;
 if (!game) game = createGame({ seed: Date.now() });
 saveGame(null, game);
@@ -124,7 +160,7 @@ function startNewGame() {
   renderer.render(game);
   updateUndo();
   input.release();
-  elements.board.focus();
+  if (elements.board) elements.board.focus();
   saveGame(null, game);
 }
 
@@ -132,12 +168,18 @@ function startNewGame() {
  * Updates the undo button from the game's state.
  */
 function updateUndo() {
-  elements.undo.disabled = !canUndo(game);
+  if (elements.undo) elements.undo.disabled = !canUndo(game);
 }
+
+/**
+ * Reports the win or the end of the game.
+ */
+function showOutcome() {
   if (dialogs.isOpen()) return;
 
   if (game.status === "won" && !winShown) {
     winShown = true;
+    audio.play("win");
     dialogs.showWin({
       keepPlaying: () => {
         game = keepPlaying(game);
@@ -164,6 +206,7 @@ function updateUndo() {
 
   if (game.status === "gameover" && !gameOverShown) {
     gameOverShown = true;
+    audio.play("gameover");
     dialogs.showGameOver({
       score: game.score,
       newGame: () => {
@@ -186,20 +229,17 @@ function performUndo() {
   updateUndo();
   input.release();
   saveGame(null, game);
+  audio.play("move");
 }
 
 /**
  * Slides the board and draws the result.
- *
- * @param {import("./core/types.js").Direction} direction
  */
 async function performMove(direction) {
   const result = applyMove(game, direction);
   game = result;
 
   if (!result.changed) {
-    // Nothing moved. The game can still end here, because a board that is full and has no
-    // equal neighbours cannot be changed by any slide. (FR-022)
     showOutcome();
     input.release();
     saveGame(null, game);
@@ -208,6 +248,7 @@ async function performMove(direction) {
 
   const groups = renderer.applyMove(result, direction);
   renderer.showScoreGain(result.gained);
+  audio.play(result.gained > 0 ? "merge" : "move");
   await playMove(groups);
 
   showOutcome();
@@ -216,40 +257,45 @@ async function performMove(direction) {
   saveGame(null, game);
 }
 
-elements.newGame.addEventListener("click", () => {
-  const inProgress = game.status === "active" && game.moves > 0;
-  if (!inProgress) {
-    startNewGame();
-    return;
-  }
-
-  dialogs.showConfirm({
-    confirm: () => {
+if (elements.newGame) {
+  elements.newGame.addEventListener("click", () => {
+    const inProgress = game.status === "active" && game.moves > 0;
+    if (!inProgress) {
       startNewGame();
-    },
-    cancel: () => {
-      // Declining keeps the game in progress. (FR-030)
-      input.release();
-    },
+      return;
+    }
+
+    dialogs.showConfirm({
+      confirm: () => {
+        startNewGame();
+      },
+      cancel: () => {
+        input.release();
+      },
+    });
   });
-});
+}
 
-elements.undo.addEventListener("click", () => {
-  performUndo();
-});
+if (elements.undo) {
+  elements.undo.addEventListener("click", () => {
+    performUndo();
+  });
+}
 
-elements.helpToggle.addEventListener("click", () => {
-  const opening = elements.helpPanel.hidden;
-  elements.helpPanel.hidden = !opening;
-  elements.helpToggle.setAttribute("aria-expanded", String(opening));
+if (elements.helpToggle && elements.helpPanel) {
+  elements.helpToggle.addEventListener("click", () => {
+    const opening = elements.helpPanel.hidden;
+    elements.helpPanel.hidden = !opening;
+    elements.helpToggle.setAttribute("aria-expanded", String(opening));
 
-  if (opening) {
-    const heading = elements.helpPanel.querySelector("h2");
-    if (heading) heading.focus();
-  } else {
-    elements.helpToggle.focus();
-  }
-});
+    if (opening) {
+      const heading = elements.helpPanel.querySelector("h2");
+      if (heading) heading.focus();
+    } else {
+      elements.helpToggle.focus();
+    }
+  });
+}
 
 if (typeof window !== "undefined") {
   window.addEventListener("load", () => {

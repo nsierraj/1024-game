@@ -12,33 +12,23 @@
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
     <link rel="stylesheet" href="src/styles/base.css" />
     <link rel="stylesheet" href="src/styles/board.css" />
+    <link rel="stylesheet" href="src/styles/themes.css" />
   </head>
   <body>
-    <header class="app-header">
-      <h1 class="app-title">1024</h1>
-      <div class="score-panel">
-        <div class="score-box">
-          <span class="score-label" id="score-label">Score</span>
-          <span class="score-value" id="score">0</span>
+    <main class="app">
+      <header class="app-header">
+        <h1 class="app-title">1024</h1>
+        <div class="scores">
+          <div class="score-box">
+            <span class="score-label">Score</span>
+            <span id="score" class="score-value">0</span>
+          </div>
+          <div class="score-box">
+            <span class="score-label">Best</span>
+            <span id="best-score" class="score-value">0</span>
+          </div>
         </div>
-        <div class="score-box">
-          <span class="score-label" id="best-score-label">Best</span>
-          <span class="score-value" id="best-score">0</span>
-        </div>
-      </div>
-    </header>
-
-    <main class="app-main">
-      <div class="board-wrap">
-        <div
-          id="board"
-          class="board"
-          role="grid"
-          tabindex="0"
-          aria-label="Game board, 4 by 4. Use the arrow keys to slide the tiles."
-        ></div>
-        <div id="score-gain" class="score-gain" aria-hidden="true"></div>
-      </div>
+      </header>
 
       <div class="controls">
         <button type="button" id="new-game" class="btn">New game</button>
@@ -51,6 +41,28 @@
           aria-controls="help-panel"
         >
           How to play
+        </button>
+      </div>
+
+      <div class="settings-row">
+        <label class="setting">
+          <span class="setting-label">Theme</span>
+          <select id="theme-select" class="select">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="contrast">High contrast</option>
+            <option value="colorblind">Colour-blind safe</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          id="sound-toggle"
+          class="btn"
+          aria-pressed="false"
+          aria-label="Sound off"
+        >
+          Sound: off
         </button>
       </div>
 
@@ -76,49 +88,81 @@
           and desktop, the browser may offer an install prompt.
         </p>
       </section>
+
+      <section class="board-section" aria-label="Game">
+        <div class="board-wrap">
+          <div
+            id="board"
+            class="board"
+            role="grid"
+            aria-label="Game board, 4 by 4. Use the arrow keys to slide the tiles."
+            tabindex="0"
+          >
+            <div class="board-row">
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+            </div>
+            <div class="board-row">
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+            </div>
+            <div class="board-row">
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+            </div>
+            <div class="board-row">
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+              <div class="board-cell" role="gridcell"></div>
+            </div>
+          </div>
+          <div id="tile-layer" class="tile-layer" aria-hidden="true"></div>
+        </div>
+        <div id="score-gain" class="score-gain" aria-live="polite"></div>
+      </section>
     </main>
 
-    <div id="status-region" class="visually-hidden" role="status" aria-live="polite"></div>
-
-    <dialog id="win-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="win-title">
-      <h2 id="win-title" class="dialog-title">You reached 1024!</h2>
-      <p id="win-body" class="dialog-body">Keep playing for a higher score, or start a new game.</p>
-      <div class="dialog-actions">
-        <button type="button" id="win-keep-playing" class="btn">Keep playing</button>
-        <button type="button" id="win-new-game" class="btn">New game</button>
-      </div>
+    <dialog id="win-dialog" class="modal">
+      <form method="dialog" class="modal-body">
+        <h2 class="modal-title">You reached 1024!</h2>
+        <p class="modal-text">Keep playing or start a new game.</p>
+        <div class="modal-actions">
+          <button type="button" id="win-keep-playing" class="btn btn-primary">Keep playing</button>
+          <button type="button" id="win-new-game" class="btn">New game</button>
+        </div>
+      </form>
     </dialog>
 
-    <dialog
-      id="gameover-dialog"
-      class="dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="gameover-title"
-    >
-      <h2 id="gameover-title" class="dialog-title">Game over</h2>
-      <p id="gameover-body" class="dialog-body">
-        Final score <span id="gameover-score">0</span>.
-      </p>
-      <div class="dialog-actions">
-        <button type="button" id="gameover-new-game" class="btn">New game</button>
-      </div>
+    <dialog id="gameover-dialog" class="modal">
+      <form method="dialog" class="modal-body">
+        <h2 class="modal-title">Game over</h2>
+        <p class="modal-text">No more moves.</p>
+        <p class="modal-score">Score: <span id="gameover-score">0</span></p>
+        <div class="modal-actions">
+          <button type="button" id="gameover-new-game" class="btn btn-primary">Try again</button>
+        </div>
+      </form>
     </dialog>
 
-    <dialog
-      id="confirm-dialog"
-      class="dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirm-title"
-    >
-      <h2 id="confirm-title" class="dialog-title">Start a new game?</h2>
-      <p id="confirm-body" class="dialog-body">The game in progress will be lost.</p>
-      <div class="dialog-actions">
-        <button type="button" id="confirm-cancel" class="btn">Keep playing</button>
-        <button type="button" id="confirm-start" class="btn">Start new game</button>
-      </div>
+    <dialog id="confirm-dialog" class="modal">
+      <form method="dialog" class="modal-body">
+        <h2 class="modal-title">Start a new game?</h2>
+        <p class="modal-text">Your current game will be replaced.</p>
+        <div class="modal-actions">
+          <button type="button" id="confirm-start" class="btn btn-primary">Start new game</button>
+          <button type="button" id="confirm-cancel" class="btn">Cancel</button>
+        </div>
+      </form>
     </dialog>
+
+    <div id="announcer" class="sr-only" aria-live="polite"></div>
 
     <script type="module" src="src/main.js"></script>
   </body>

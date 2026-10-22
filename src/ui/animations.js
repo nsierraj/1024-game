@@ -1,46 +1,70 @@
 /**
- * The animation of a move.
+ * Animation orchestration for moves.
  *
- * The renderer decides what happened to each tile; this module decides how it looks while it
- * happens, and how long the move takes. The stylesheet owns the movement itself, so honouring
- * the reduced-motion preference is a matter of one rule in the stylesheet rather than a branch
- * here. (FR-037)
+ * The slide and the merge must finish together within 150 ms (FR-036). The CSS transitions own the
+ * geometry; the animation controller marks the layer and waits for the transition end so that
+ * tiles can be repossessed after a move.
  */
+
+const SLIDE_DURATION_MS = 150;
+
+export function prefersReducedMotion() {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 /**
- * How long a move takes, in milliseconds.
- *
- * The contract allows 150 milliseconds for the slide and the merge together, and the two overlap:
- * the tile grows as it travels rather than after it arrives. (FR-036)
+ * Plays the move animation for the affected tiles.
+ * @param {Array<Array<HTMLElement>>} groups
+ * @returns {Promise<void>}
  */
-export const MOVE_DURATION = 130;
+export function playMove(groups) {
+  if (!Array.isArray(groups) || groups.length === 0) return Promise.resolve();
 
-/**
- * Plays the animation of a move and resolves when it is over.
- *
- * @param {object} groups The tiles the move touched.
- * @param {HTMLElement[]} [groups.moving] The tiles that slid.
- * @param {HTMLElement[]} [groups.merging] The tiles that merged and survived.
- * @param {HTMLElement[]} [groups.absorbed] The tiles a merge absorbed.
- * @param {HTMLElement[]} [groups.spawned] The tiles that appeared.
- * @returns {Promise<void>} Resolves when the animation is over.
- */
-export function playMove(groups = {}) {
-  const { merging = [], absorbed = [], spawned = [] } = groups;
+  if (prefersReducedMotion()) {
+    return Promise.resolve();
+  }
 
-  for (const element of merging) element.classList.add("tile--merged");
-  for (const element of absorbed) element.classList.add("tile--absorbed");
-  for (const element of spawned) element.classList.add("tile--spawned");
+  const layer = groups[0] && groups[0][0] && groups[0][0].parentElement;
+  if (!layer) return Promise.resolve();
+
+  layer.classList.remove("tile-layer--instant");
+  layer.classList.add("tile-layer--moving");
+
+  const tiles = [];
+  for (const group of groups) {
+    for (const tile of group) {
+      if (tile) tiles.push(tile);
+    }
+  }
 
   return new Promise((resolve) => {
-    setTimeout(() => {
-      for (const element of merging) element.classList.remove("tile--merged");
-      for (const element of absorbed) {
-        element.classList.remove("tile--absorbed");
-        element.remove();
-      }
-      for (const element of spawned) element.classList.remove("tile--spawned");
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      layer.classList.remove("tile-layer--moving");
       resolve();
-    }, MOVE_DURATION);
+    };
+
+    const timeout = setTimeout(finish, SLIDE_DURATION_MS + 50);
+
+    const onEnd = (event) => {
+      if (event.propertyName !== "transform") return;
+      if (tiles.length === 0) {
+        clearTimeout(timeout);
+        layer.removeEventListener("transitionend", onEnd);
+        finish();
+        return;
+      }
+      const remaining = tiles.filter((tile) => !tile.dataset.animDone);
+      if (remaining.length === 0) {
+        clearTimeout(timeout);
+        layer.removeEventListener("transitionend", onEnd);
+        finish();
+      }
+    };
+
+    layer.addEventListener("transitionend", onEnd);
   });
 }
