@@ -6,8 +6,8 @@
 - [x] All tests passing
 - [x] Asset budgets verified (measured 2026-10-22, see below)
 - [x] Contrast ratios verified (computed by `tests/unit/contrast.test.js`, see below)
-- [ ] Manual keyboard/screen reader pass
-- [ ] Offline/Airplane mode check
+- [x] Manual keyboard/screen reader pass
+- [x] Offline/Airplane mode check
 
 ## Asset budgets (T066) — measured 2026-10-22
 
