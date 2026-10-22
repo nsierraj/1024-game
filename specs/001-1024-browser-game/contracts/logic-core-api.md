@@ -42,6 +42,22 @@ export function createRandom(seed: number): () => number;
 - The returned function MUST yield values in `[0, 1)`.
 - Two generators created with the same seed MUST produce the same sequence.
 
+The module also exports the weighted pick the spawn rule needs:
+
+```js
+/**
+ * @param {readonly number[]} values
+ * @param {readonly number[]} weights - relative weights, one per value
+ * @param {() => number} random
+ * @returns {number} one of the values
+ */
+export function pickWeighted(values: number[], weights: number[], random: () => number): number;
+```
+
+- The weights are relative and do not have to add up to 1.
+- A value whose weight is 0 MUST never be picked.
+- The result MUST always be one of the given values, even at the edges of the random range.
+
 ## Module: `src/core/board.js`
 
 The board is a flat `number[16]` array. Index `i` maps to row `Math.floor(i / 4)` and column
