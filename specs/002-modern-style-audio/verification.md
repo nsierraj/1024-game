@@ -48,6 +48,9 @@ person has run them; nothing is recorded for them here before then.
 | Network requests for audio | none; `assets/audio/` is removed |
 | Console errors | none |
 
+| First key press after a reload with sound saved on | control "Sound: off" before; after the press "Sound: on" and exactly one merge effect started (17,280 samples at 48 kHz). Re-checked after the pending-effect change. |
+| Both start paths, with a fake context | state turns on at once if the context is running as `resume()` returns; a request made while `resume()` is pending is played on settling, or dropped if older than 150 ms |
+
 Not proven here: that the sound is audible through speakers, that WebKit starts the context inside the gesture,
 and behaviour on a phone. Those are T050.
 

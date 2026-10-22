@@ -370,3 +370,100 @@ describe("a saved choice after a reload (FR-014)", () => {
     assert.equal(audio.state(), "on");
   });
 });
+
+describe("the first effect after a reload (FR-014)", () => {
+  /** The effect sources that were started, leaving out the one-sample silent unlock. */
+  const effectsStarted = (ctx) => ctx.sources.filter((source) => source.started && source.buffer && source.buffer.length > 1);
+
+  it("plays at once when the context is already running as resume() returns, as Chromium's is", () => {
+    const ctx = fakeContext({ resumeMode: "sync" });
+    const audio = createAudio({ contextFactory: () => ctx });
+    audio.restore();
+
+    audio.unlock();
+    audio.play("merge");
+
+    assert.equal(audio.state(), "on", "must act on a running context straight away");
+    assert.equal(effectsStarted(ctx).length, 1);
+  });
+
+  it("plays the effect that was asked for while WebKit was still starting, once it runs", async () => {
+    const ctx = fakeContext({ resumeMode: "async" });
+    const audio = createAudio({ contextFactory: () => ctx });
+    audio.restore();
+
+    audio.unlock();
+    audio.play("move");
+    assert.equal(effectsStarted(ctx).length, 0, "played before the context was running");
+
+    await later();
+
+    assert.equal(audio.state(), "on");
+    assert.equal(effectsStarted(ctx).length, 1);
+  });
+
+  it("keeps only the latest effect asked for while starting", async () => {
+    const ctx = fakeContext({ resumeMode: "async" });
+    const audio = createAudio({ contextFactory: () => ctx });
+    audio.restore();
+
+    audio.unlock();
+    audio.play("move");
+    audio.play("merge");
+    await later();
+
+    assert.equal(effectsStarted(ctx).length, 1);
+  });
+
+  it("drops an effect that is more than 150 ms old by the time sound runs", async () => {
+    const ctx = fakeContext({ resumeMode: "async" });
+    let time = 0;
+    const audio = createAudio({ contextFactory: () => ctx, now: () => time });
+    audio.restore();
+
+    audio.unlock();
+    audio.play("move");
+    time = 400;
+    await later();
+
+    assert.equal(audio.state(), "on");
+    assert.equal(effectsStarted(ctx).length, 0, "played a sound that came 400 ms late");
+  });
+
+  it("plays nothing it was asked for when no unlock is under way", () => {
+    const ctx = fakeContext({ resumeMode: "async" });
+    const audio = createAudio({ contextFactory: () => ctx });
+    audio.restore();
+
+    audio.play("move");
+
+    assert.equal(effectsStarted(ctx).length, 0);
+  });
+
+  it("forgets the waiting effect when sound is turned off before it starts", async () => {
+    const ctx = fakeContext({ resumeMode: "async" });
+    const audio = createAudio({ contextFactory: () => ctx });
+    audio.restore();
+
+    audio.unlock();
+    audio.play("move");
+    audio.disable();
+    await later();
+
+    assert.equal(audio.state(), "off");
+    assert.equal(effectsStarted(ctx).length, 0);
+  });
+
+  it("plays the first effect after the player's own toggle too, when WebKit starts late", async () => {
+    const ctx = fakeContext({ resumeMode: "async" });
+    const audio = createAudio({ contextFactory: () => ctx });
+
+    const pending = audio.enable();
+    audio.play("move");
+    await pending;
+    await later();
+
+    assert.equal(effectsStarted(ctx).length, 1);
+  });
+});
+

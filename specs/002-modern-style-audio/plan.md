@@ -19,7 +19,7 @@ recipes by a pure function** (R-02). That makes loudness, distinctness, and clic
 removes every fetch and decode, and lets the audio module be rebuilt around a state machine that unlocks the
 context inside the user gesture and never shows "on" unless sound can play (R-03).
 
-Motion becomes a three-part timeline inside 150 ms, using only `transform` and `opacity` (R-05). The look
+Motion becomes a three-part timeline inside 150 ms, using only `translate`, `scale`, and `opacity` (R-05). The look
 becomes one token set with a shared hue ladder, verified for contrast before it was written down (R-08).
 Nothing stored changes (R-10).
 
@@ -67,7 +67,7 @@ eight source files change and two are added. No new gameplay.
 | II. Pure Game Logic Core | Rules independent of the DOM; presentation never mutates state; animation never corrupts state | **PASS** | `src/core/` is not touched. Motion and sound read results and never write state. Input stays queued during a move (R-05), so the board is identical to one-at-a-time play (SC-004). The new `sound-synth.js` is itself pure. |
 | III. Test-First Game Rules | Every rule covered by an automated test; tests first for a rule change | **PASS** | No rule changes. New behaviour that can be tested in Node is (R-11): effect loudness and distinctness, the audio state machine, motion timing, contrast, and colour-blind simulation. Tasks write each test before its code. |
 | IV. Accessibility First | WCAG 2.2 AA, keyboard, focus, text always shown, live announcements, contrast on every theme, reduced motion, 24 px targets, 200% zoom | **PASS** | The existing contrast test covers the new tokens (R-08). Reduced motion is one stylesheet block (R-05, motion contract). Focus ring kept in every theme. Undo gains a sound but keeps its screen-reader announcement. |
-| V. Performance, Offline, and Privacy Budgets | Under 300 KB, 60 fps, 150 ms, 2 s load, Lighthouse 90+, offline, no data collection, strict CSP | **PASS** | Only `transform` and `opacity` animate (R-05). The 150 ms limit is unchanged (clarification). Audio data drops from 5.5 KB of files to none (R-02). No inline style or script, so the CSP stands. |
+| V. Performance, Offline, and Privacy Budgets | Under 300 KB, 60 fps, 150 ms, 2 s load, Lighthouse 90+, offline, no data collection, strict CSP | **PASS** | Only `translate`, `scale`, and `opacity` animate (R-05). The 150 ms limit is unchanged (clarification). Audio data drops from 5.5 KB of files to none (R-02). No inline style or script, so the CSP stands. |
 | Scope Boundaries | v1 scope; out-of-scope list not built | **PASS** | A visual, motion, and sound refresh. No account, leaderboard, board size, control scheme, undo depth, monetization, analytics, or multiplayer. |
 | Development Workflow and Quality Gates | Spec-driven, constitution-checked, PR-only merges with required checks, release gates | **PASS** | This plan follows a specification and its clarification. The work reaches `main` through a pull request with `spec-integrity` and `test`. Release gates are listed in the quickstart. |
 | Governance | Constitution supersedes; amendments documented; exceptions recorded | **PASS** | No violation, so no exception or amendment (R-12). |

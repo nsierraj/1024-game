@@ -23,6 +23,13 @@ const MAX_VOICES = 3;
 const MERGE_REPLACE_WINDOW = 0.06;
 
 /**
+ * An effect asked for while the context is still starting is played once it runs, if it is not
+ * older than this, in milliseconds. WebKit settles `resume()` after the first move has already
+ * asked for its sound, and a sound that comes late is worse than none.
+ */
+const PENDING_MAX_AGE = 150;
+
+/**
  * The effect an event plays, or null for an event with no sound.
  *
  * Undo never plays the move effect, including an undo made from the game-over dialog. (FR-012)
@@ -58,6 +65,7 @@ function defaultContextFactory() {
  *
  * @param {object} [options]
  * @param {() => AudioContext | null} [options.contextFactory] Replaceable so a test can pass a fake.
+ * @param {() => number} [options.now] The clock in milliseconds, replaceable for a test.
  * @returns {{
  *   state: () => "off" | "arming" | "on" | "suspended",
  *   onChange: (listener: (state: string) => void) => void,
@@ -68,13 +76,17 @@ function defaultContextFactory() {
  *   play: (id: string) => void
  * }}
  */
-export function createAudio({ contextFactory = defaultContextFactory } = {}) {
+export function createAudio({ contextFactory = defaultContextFactory, now = () => Date.now() } = {}) {
   let state = "off";
   let ctx = null;
   let master = null;
   let buffers = null;
   let voices = [];
   let lastMerge = null;
+  /** Whether a `resume()` is in flight, started by a gesture and not yet settled. */
+  let unlocking = false;
+  /** The latest effect asked for while unlocking: `{ id, at }`. */
+  let pending = null;
   const listeners = new Set();
 
   function setState(next) {
@@ -147,13 +159,34 @@ export function createAudio({ contextFactory = defaultContextFactory } = {}) {
     prepare();
     primeOutput();
 
+    // Chromium is already running when `resume()` returns, and that positive answer is safe to act
+    // on. A "not running yet" answer is not: WebKit says so right before it starts.
+    if (ctx.state === "running") setState("on");
+
+    unlocking = true;
     return Promise.resolve(resumed).then(
-      () => ctx.state === "running",
-      () => false,
+      () => settle(ctx.state === "running"),
+      () => settle(false),
     );
   }
 
-  return {
+  /**
+   * Ends an unlock. If sound is running, plays the effect that was asked for while it started.
+   * @param {boolean} running
+   * @returns {boolean}
+   */
+  function settle(running) {
+    unlocking = false;
+    const waiting = pending;
+    pending = null;
+    if (running && state !== "off") {
+      setState("on");
+      if (waiting && now() - waiting.at <= PENDING_MAX_AGE) api.play(waiting.id);
+    }
+    return running;
+  }
+
+  const api = {
     state: () => state,
 
     /** Calls the listener with the new state each time it changes. */
@@ -173,8 +206,7 @@ export function createAudio({ contextFactory = defaultContextFactory } = {}) {
         return Promise.resolve(false);
       }
       return settled.then((running) => {
-        if (running) setState("on");
-        else setState("off");
+        if (!running) setState("off");
         return running;
       });
     },
@@ -183,6 +215,7 @@ export function createAudio({ contextFactory = defaultContextFactory } = {}) {
       for (const voice of voices) voice.stop();
       voices = [];
       lastMerge = null;
+      pending = null;
       setState("off");
     },
 
@@ -200,11 +233,7 @@ export function createAudio({ contextFactory = defaultContextFactory } = {}) {
      */
     unlock() {
       if (state !== "suspended") return;
-      const settled = start();
-      if (!settled) return;
-      settled.then((running) => {
-        if (running) setState("on");
-      });
+      start();
     },
 
     /**
@@ -212,10 +241,14 @@ export function createAudio({ contextFactory = defaultContextFactory } = {}) {
      * @param {string} id
      */
     play(id) {
-      if (state !== "on" || !buffers || !buffers[id]) return;
+      if (state !== "on" || !buffers || !buffers[id]) {
+        // The sound is starting: keep the latest request and play it the moment it is running.
+        if (unlocking) pending = { id, at: now() };
+        return;
+      }
 
-      const now = ctx.currentTime;
-      if (id === "merge" && lastMerge && now - lastMerge.time < MERGE_REPLACE_WINDOW) lastMerge.voice.stop();
+      const time = ctx.currentTime;
+      if (id === "merge" && lastMerge && time - lastMerge.time < MERGE_REPLACE_WINDOW) lastMerge.voice.stop();
 
       while (voices.length >= MAX_VOICES) voices.shift().stop();
 
@@ -236,11 +269,13 @@ export function createAudio({ contextFactory = defaultContextFactory } = {}) {
           voices = voices.filter((entry) => entry !== voice);
         };
         voices.push(voice);
-        if (id === "merge") lastMerge = { time: now, voice };
+        if (id === "merge") lastMerge = { time, voice };
         source.start(0);
       } catch {
         // A sound that cannot play must never get in the way of the game.
       }
     },
   };
+
+  return api;
 }

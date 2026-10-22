@@ -60,6 +60,10 @@ export function effectFor(event: string): "move"|"merge"|"undo"|"win"|"gameover"
 - `enable()` and `unlock()` call `resume()` synchronously and do not `await` before it. WebKit settles
   `resume()` on a later tick, so the result comes from the returned promise and from `statechange`, never from
   the state read straight after the call. While it is pending the state is `arming` and the control shows off.
+- When `resume()` returns with the context already running (Chromium), the state becomes `on` straight away,
+  and the effect for the very move that was the gesture plays. A "not running yet" answer is never acted on.
+- When `resume()` is still pending (WebKit), `play()` keeps the latest request and plays it the moment the context
+  is running, unless it is more than 150 ms old; turning sound off first forgets it.
 - The `AudioContext` is created lazily inside the first gesture, never at startup, and the effects are rendered at
   `context.sampleRate` (iOS is often 48 kHz).
 - The five buffers are rendered on the first `enable()` only, so a player who never turns sound on does no

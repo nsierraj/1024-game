@@ -72,8 +72,9 @@ Existing tokens keep their names so the stylesheets and tests that use them keep
 ## High-contrast theme
 
 The tile set, text, border, and focus tokens are unchanged: they already reach 7:1 for text and tiles and
-4.5:1 for interface colours. It takes the new shape, spacing, and shadow tokens, with shadows removed so the
-edges stay crisp. It stays visually stark by design.
+4.5:1 for interface colours. It takes the new shape and spacing tokens. Soft shadows are removed so the edges stay crisp, and every tile
+gets a 2 px white edge in place of the soft highlight, so the black 2 and 4 tiles stay visible on the dark
+board. It stays visually stark by design.
 
 ## Colour-blind-safe theme
 
