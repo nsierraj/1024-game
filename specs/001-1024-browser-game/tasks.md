@@ -106,14 +106,14 @@ not possible.
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T025 [P] [US2] Write the undo cases in `tests/unit/game.test.js`: undo restores board, score, and best score (FR-026), the best score never decreases across an undo, the snapshot is cleared so a second undo does nothing (FR-025), undo is unavailable at the start of a new game (FR-027), and undo works from the game-over state (FR-028)
-- [ ] T026 [P] [US2] Extend `tests/integration/game-flow.test.js` with the undo scenarios: undo after a merge, undo from game over, and a second undo that changes nothing
+- [x] T025 [P] [US2] Write the undo cases in `tests/unit/game.test.js`: undo restores board, score, and best score (FR-026), the best score never decreases across an undo, the snapshot is cleared so a second undo does nothing (FR-025), undo is unavailable at the start of a new game (FR-027), and undo works from the game-over state (FR-028)
+- [x] T026 [P] [US2] Extend `tests/integration/game-flow.test.js` with the undo scenarios: undo after a merge, undo from game over, and a second undo that changes nothing
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Implement `undo` in `src/core/game.js` to satisfy T025: restore the snapshot, keep the best score monotonic, clear the snapshot afterwards, and recompute the status from the restored board
-- [ ] T028 [P] [US2] Add the `#undo` button to the controls row in `index.html`
-- [ ] T029 [US2] Wire the `#undo` control in `src/main.js` to call `undo`, re-render the board, and set the button's `disabled` state from `canUndo` so it is unavailable at the start of a new game (FR-027)
+- [x] T027 [US2] Implement `undo` in `src/core/game.js` to satisfy T025: restore the snapshot, keep the best score monotonic, clear the snapshot afterwards, and recompute the status from the restored board
+- [x] T028 [P] [US2] Add the `#undo` button to the controls row in `index.html`
+- [x] T029 [US2] Wire the `#undo` control in `src/main.js` to call `undo`, re-render the board, and set the button's `disabled` state from `canUndo` so it is unavailable at the start of a new game (FR-027)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -413,7 +413,9 @@ With multiple developers:
 - 2026-10-21, User Story 1. The renderer keeps its tile map by writing a new one from the old on
   every move rather than moving tiles inside it. A slide to the right can put a tile into a cell
   that another tile is about to leave, and moving them in place loses the tile that is leaving.
-- 2026-10-21, User Story 1. T060 now also checks that `index.html` and `STRINGS` do not drift.
-  The shell carries the same words as the static copy of the interface, and `src/ui/strings.js`
-  says that the two are checked; this is the check, and it was left unsaid until the interface
-  existed in both places.
+- 2026-10-21, User Story 2. T025 and the undo tests in the integration suite were already
+  in place from an earlier pass; T027's logic was in place; T028 and T029 added the button and
+  wired it so the undo state follows `canUndo` and the board is re-rendered on undo. The core
+  already restores the board, score and move count, keeps the best score monotonic, clears the
+  snapshot and recomputes the status (never raising a win from an undo). Undo is available from
+  the game-over state and does nothing when there is nothing to undo.

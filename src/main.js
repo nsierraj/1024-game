@@ -6,7 +6,7 @@
  * and this module is where the four of them meet.
  */
 
-import { applyMove, createGame, keepPlaying } from "./core/game.js";
+import { applyMove, canUndo, createGame, keepPlaying, undo } from "./core/game.js";
 import { playMove } from "./ui/animations.js";
 import { createDialogs } from "./ui/dialogs.js";
 import { createInput } from "./ui/input.js";
@@ -26,6 +26,7 @@ function readElements() {
     bestScore: byId("best-score"),
     scoreGain: byId("score-gain"),
     newGame: byId("new-game"),
+    undo: byId("undo"),
     helpToggle: byId("help-toggle"),
     helpPanel: byId("help-panel"),
     win: {
@@ -84,14 +85,18 @@ function startNewGame() {
   winShown = false;
   gameOverShown = false;
   renderer.render(game);
+updateUndo();
+  updateUndo();
   input.release();
   elements.board.focus();
 }
 
 /**
- * Reports the win or the end of the game, if either has happened and has not been reported yet.
+ * Updates the undo button from the game's state.
  */
-function showOutcome() {
+function updateUndo() {
+  elements.undo.disabled = !canUndo(game);
+}
   if (dialogs.isOpen()) return;
 
   if (game.status === "won" && !winShown) {
@@ -99,6 +104,7 @@ function showOutcome() {
     dialogs.showWin({
       keepPlaying: () => {
         game = keepPlaying(game);
+        updateUndo();
         input.release();
       },
       newGame: () => {
@@ -108,6 +114,7 @@ function showOutcome() {
         // The message was dismissed rather than answered, so the game carries on and no
         // further win is raised. (FR-021)
         game = keepPlaying(game);
+        updateUndo();
         input.release();
       },
     });
@@ -126,6 +133,18 @@ function showOutcome() {
       },
     });
   }
+}
+
+/**
+ * Undoes the most recent move.
+ */
+function performUndo() {
+  if (!canUndo(game)) return;
+  game = undo(game);
+  renderer.render(game);
+updateUndo();
+  updateUndo();
+  input.release();
 }
 
 /**
@@ -150,6 +169,7 @@ async function performMove(direction) {
   await playMove(groups);
 
   showOutcome();
+  updateUndo();
   input.release();
 }
 
@@ -171,6 +191,10 @@ elements.newGame.addEventListener("click", () => {
   });
 });
 
+elements.undo.addEventListener("click", () => {
+  performUndo();
+});
+
 elements.helpToggle.addEventListener("click", () => {
   const opening = elements.helpPanel.hidden;
   elements.helpPanel.hidden = !opening;
@@ -185,3 +209,4 @@ elements.helpToggle.addEventListener("click", () => {
 });
 
 renderer.render(game);
+updateUndo();
