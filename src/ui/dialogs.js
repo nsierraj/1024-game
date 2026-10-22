@@ -129,3 +129,36 @@ export function createDialogs({ win, gameover, confirm }) {
     },
   };
 }
+
+/**
+ * Focus management helpers (additional).
+ */
+export function trapFocus(dialog) {
+  if (!dialog) return () => {};
+  const focusable = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  
+  function handler(e) {
+    if (e.key !== 'Tab') return;
+    if (focusable.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      }
+    } else {
+      if (document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    }
+  }
+  
+  dialog.addEventListener('keydown', handler);
+  if (first) first.focus();
+  return () => dialog.removeEventListener('keydown', handler);
+}

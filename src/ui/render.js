@@ -154,6 +154,7 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
     element.dataset.value = String(value);
     element.classList.add(`tile--${value}`);
     element.textContent = String(value);
+    element.setAttribute("aria-label", String(value));
     return element;
   }
 
@@ -166,6 +167,7 @@ export function createRenderer({ board, score, bestScore, scoreGain }) {
     if (element.textContent === String(value)) return;
     element.textContent = String(value);
     element.dataset.value = String(value);
+    element.setAttribute("aria-label", String(value));
     for (const cls of Array.from(element.classList)) {
       if (cls.startsWith("tile--")) element.classList.remove(cls);
     }
