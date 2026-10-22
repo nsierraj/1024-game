@@ -179,7 +179,7 @@ values progress through a recognisable colour sequence, and the contrast and col
 - [ ] T051 Run the moderated side-by-side session with five testers from `quickstart.md` section 3 and record the results in `specs/002-modern-style-audio/verification.md` (SC-001, SC-002)
 - [ ] T052 Run the keyboard and screen-reader pass from feature 001's `quickstart.md` section 5 against the new design, plus the red-green simulation of the colour-blind-safe theme, and record both in `specs/002-modern-style-audio/verification.md` (SC-008, SC-009)
 - [ ] T053 Run Lighthouse and the offline and 320 px checks from `quickstart.md` section 7 against the deployed site and record them in `specs/002-modern-style-audio/verification.md` (SC-010, SC-012)
-- [ ] T054 Merge the feature branch into `main` through a pull request whose `spec-integrity` and `test` checks pass in `.github/workflows/ci.yml`, as constitution v1.1.0 requires
+- [x] T054 Merge the feature branch into `main` through a pull request whose `spec-integrity` and `test` checks pass in `.github/workflows/ci.yml`, as constitution v1.1.0 requires
 
 ---
 
