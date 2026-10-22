@@ -6,6 +6,9 @@ import { resolveSwipe } from "./swipe.js";
 
 const DIRECTIONS = new Set(["up", "down", "left", "right"]);
 
+/** The most moves that may wait behind the one that is animating. (FR-006) */
+const MAX_PENDING = 2;
+
 export function createInput({ target, isBlocked, onMove } = {}) {
   const queue = [];
   let down = null;
@@ -19,9 +22,12 @@ export function createInput({ target, isBlocked, onMove } = {}) {
     return blockedFn();
   }
 
-  function tryMove(direction) {
+  function tryMove(direction, repeat = false) {
     if (!DIRECTIONS.has(direction)) return;
     if (isBlockedNow()) {
+      // A held key repeats faster than a move animates. Its repeats are not queued, and neither is
+      // a press that finds the queue full, so the board stops soon after the key is released.
+      if (repeat || queue.length >= MAX_PENDING) return;
       queue.push(direction);
       return;
     }
@@ -48,7 +54,7 @@ export function createInput({ target, isBlocked, onMove } = {}) {
         return;
       }
       if (event.preventDefault) event.preventDefault();
-      tryMove(direction);
+      tryMove(direction, Boolean(event.repeat));
     }
   }
 

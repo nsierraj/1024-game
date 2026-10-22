@@ -32,8 +32,8 @@ as an increment.
 
 **Purpose**: Record the starting point so the budgets and the "nothing else changed" rule can be shown.
 
-- [ ] T001 Create `specs/002-modern-style-audio/verification.md` as the running log of the release gates from `quickstart.md`, and record the baseline in it: the current asset sizes (everything except sound, and the four mp3 files), the current test count, and the current slide, merge, and spawn durations from `src/styles/board.css` (SC-010, SC-011)
-- [ ] T002 [P] Run `npm test` and `node scripts/check-specs.mjs` on the branch before any change and note that both pass in `specs/002-modern-style-audio/verification.md`, so any later failure is known to be new
+- [x] T001 Create `specs/002-modern-style-audio/verification.md` as the running log of the release gates from `quickstart.md`, and record the baseline in it: the current asset sizes (everything except sound, and the four mp3 files), the current test count, and the current slide, merge, and spawn durations from `src/styles/board.css` (SC-010, SC-011)
+- [x] T002 [P] Run `npm test` and `node scripts/check-specs.mjs` on the branch before any change and note that both pass in `specs/002-modern-style-audio/verification.md`, so any later failure is known to be new
 
 ---
 
@@ -43,9 +43,9 @@ as an increment.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Add the shared shape, depth, and type tokens to `:root` in `src/styles/base.css`: `--radius-board`, `--radius-tile`, `--radius-control`, `--shadow-tile`, `--shadow-raised`, `--tile-highlight`, `--font-ui` (system stack only), and the type scale, with the values in `contracts/theme-tokens.md` (FR-015, FR-025)
-- [ ] T004 Add the motion timeline custom properties to `:root` in `src/styles/board.css`: `--slide-duration: 100ms`, `--merge-delay: 60ms`, `--merge-duration: 90ms`, `--spawn-delay: 70ms`, `--spawn-duration: 80ms`, `--fade-duration: 80ms`, `--newgame-duration: 150ms`, replacing the current 90, 120, and 120 ms values, per `contracts/motion-contract.md` (FR-005)
-- [ ] T005 [P] Add the `--accent-fg` token beside `--accent` in every theme block of `src/styles/themes.css`, set to the light-theme value for the `contrast` and `colorblind` themes for now (FR-020)
+- [x] T003 Add the shared shape, depth, and type tokens to `:root` in `src/styles/base.css`: `--radius-board`, `--radius-tile`, `--radius-control`, `--shadow-tile`, `--shadow-raised`, `--tile-highlight`, `--font-ui` (system stack only), and the type scale, with the values in `contracts/theme-tokens.md` (FR-015, FR-025)
+- [x] T004 Add the motion timeline custom properties to `:root` in `src/styles/board.css`: `--slide-duration: 100ms`, `--merge-delay: 60ms`, `--merge-duration: 90ms`, `--spawn-delay: 70ms`, `--spawn-duration: 80ms`, `--fade-duration: 80ms`, `--newgame-duration: 150ms`, replacing the current 90, 120, and 120 ms values, per `contracts/motion-contract.md` (FR-005)
+- [x] T005 [P] Add the `--accent-fg` token beside `--accent` in every theme block of `src/styles/themes.css`, set to the light-theme value for the `contrast` and `colorblind` themes for now (FR-020)
 
 **Checkpoint**: Foundation ready. The four user stories can now proceed. US1, US3, and US4 share `src/styles/board.css`, so work on those three in priority order; US2 touches only audio files and can run in parallel with any of them.
 
@@ -64,19 +64,19 @@ rapid input never stutters or corrupts the board, and undo and new game animate.
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T006 [P] [US1] Write `tests/unit/motion.test.js`: read the timeline custom properties from `src/styles/board.css` and assert that for the slide, merge emphasis, and spawn entrance `delay + duration <= 150ms`, that the new-game cross-fade is at most 150 ms, and that only `transform` and `opacity` are animated; the duration-sum assertions pass once T004 lands, so the new-game and `transform`/`opacity`-only assertions are the ones expected to fail first (FR-001, FR-005, SC-003)
-- [ ] T007 [P] [US1] Extend `tests/unit/motion.test.js` with the reduced-motion rule: every `animation` and `transition` declared in `src/styles/board.css` and `src/styles/base.css` is neutralised inside the `prefers-reduced-motion: reduce` block (FR-007)
-- [ ] T008 [P] [US1] Update `tests/unit/animations.test.js` so a move ends on the last `animationend` or `transitionend`, with a 160 ms fallback timer, and so `MOVE_DURATION` is no longer a fixed wait (R-05)
-- [ ] T009 [P] [US1] Extend `tests/unit/input.test.js` so a move pressed while another is animating is queued, starts as soon as the first ends, and starts no later than 150 ms after the press, with the queue capped at 2 pending moves, extra presses ignored, repeat events not queued, and no accepted move lost or doubled (FR-006)
-- [ ] T010 [P] [US1] Extend `tests/integration/game-flow.test.js` with a 50-move burst applied through the queue, feeding the burst as moves complete so each is accepted, asserting the board and score equal those from applying the same moves one at a time (SC-004)
+- [x] T006 [P] [US1] Write `tests/unit/motion.test.js`: read the timeline custom properties from `src/styles/board.css` and assert that for the slide, merge emphasis, and spawn entrance `delay + duration <= 150ms`, that the new-game cross-fade is at most 150 ms, and that only `transform` and `opacity` are animated; the duration-sum assertions pass once T004 lands, so the new-game and `transform`/`opacity`-only assertions are the ones expected to fail first (FR-001, FR-005, SC-003)
+- [x] T007 [P] [US1] Extend `tests/unit/motion.test.js` with the reduced-motion rule: every `animation` and `transition` declared in `src/styles/board.css` and `src/styles/base.css` is neutralised inside the `prefers-reduced-motion: reduce` block (FR-007)
+- [x] T008 [P] [US1] Update `tests/unit/animations.test.js` so a move ends on the last `animationend` or `transitionend`, with a 160 ms fallback timer, and so `MOVE_DURATION` is no longer a fixed wait (R-05)
+- [x] T009 [P] [US1] Extend `tests/unit/input.test.js` so a move pressed while another is animating is queued, starts as soon as the first ends, and starts no later than 150 ms after the press, with the queue capped at 2 pending moves, extra presses ignored, repeat events not queued, and no accepted move lost or doubled (FR-006)
+- [x] T010 [P] [US1] Extend `tests/integration/game-flow.test.js` with a 50-move burst applied through the queue, feeding the burst as moves complete so each is accepted, asserting the board and score equal those from applying the same moves one at a time (SC-004)
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Rewrite the slide, merge, and spawn motion in `src/styles/board.css` to the three-part timeline: slide on `transform` with `cubic-bezier(0.25, 1, 0.5, 1)`, merge emphasis as a keyframe from scale 1 to 1.12 to 1, spawn entrance as scale 0.6 to 1 with opacity, all driven by the timeline properties (FR-001, FR-002, FR-003)
-- [ ] T012 [US1] Update `src/ui/animations.js` to start the timeline and resolve on the last `animationend` or `transitionend` with a 160 ms safety timer, keeping the reduced-motion path in the stylesheet (R-05, FR-006)
-- [ ] T013 [US1] Add the undo and new-game transitions to `src/ui/render.js`: surviving tiles slide, vanished tiles fade out over `--fade-duration`, restored tiles take the spawn entrance, and a new game cross-fades the tile layer over `--newgame-duration` (FR-004, FR-005)
-- [ ] T014 [US1] Wire the undo and new-game transitions in `src/main.js` so both call the new renderer paths, and keep input queued during them (FR-004, FR-006)
-- [ ] T015 [US1] Add the reduced-motion block to `src/styles/board.css`: every duration to 0, every animation to none, spawn and new game allowed a fade of at most 100 ms (FR-007)
+- [x] T011 [US1] Rewrite the slide, merge, and spawn motion in `src/styles/board.css` to the three-part timeline: slide on `transform` with `cubic-bezier(0.25, 1, 0.5, 1)`, merge emphasis as a keyframe from scale 1 to 1.12 to 1, spawn entrance as scale 0.6 to 1 with opacity, all driven by the timeline properties (FR-001, FR-002, FR-003)
+- [x] T012 [US1] Update `src/ui/animations.js` to start the timeline and resolve on the last `animationend` or `transitionend` with a 160 ms safety timer, keeping the reduced-motion path in the stylesheet (R-05, FR-006)
+- [x] T013 [US1] Add the undo and new-game transitions to `src/ui/render.js`: surviving tiles slide, vanished tiles fade out over `--fade-duration`, restored tiles take the spawn entrance, and a new game cross-fades the tile layer over `--newgame-duration` (FR-004, FR-005)
+- [x] T014 [US1] Wire the undo and new-game transitions in `src/main.js` so both call the new renderer paths, and keep input queued during them (FR-004, FR-006)
+- [x] T015 [US1] Add the reduced-motion block to `src/styles/board.css`: every duration to 0, every animation to none, spawn and new game allowed a fade of at most 100 ms (FR-007)
 
 **Checkpoint**: User Story 1 works on its own. Run T006 to T010; all pass.
 
@@ -270,3 +270,9 @@ Task: "Rewrite the slide, merge, and spawn motion in src/styles/board.css"  # US
 - T049 to T053 cannot be done in Node. They stay unticked until a person has run them; no result is recorded in `verification.md` before then.
 - The sound fix cannot be proven for Safari and iPhone from a desktop. T050 is the check that does.
 - Avoid: vague tasks, two tasks editing the same stylesheet at once, and cross-story changes that break independence.
+- 2026-10-22, User Story 1. Tiles are now positioned with the `translate` property instead of `transform`. A merge `scale` is applied after `translate` but before `transform`, so a tile positioned with `transform` was pushed out of its cell by the scale (a tile in the far column swung about 0.37 of a cell to the right during a merge). This was already true in feature 001. `tests/unit/motion.test.js` therefore allows `translate`, `scale`, and `opacity`, and the motion contract says so.
+- 2026-10-22, User Story 1. `playMove` waits on `getAnimations()` rather than `animationend`/`transitionend`, because `transitionend` does not fire for a tile that did not move and fires once per property. `MOVE_DURATION` is replaced by `MOVE_CAP` (160 ms).
+- 2026-10-22, User Story 1. An undo does not track tiles across the board: a tile in the same cell with the same value stays, the others fade out and the restored ones enter. This satisfies FR-004 and is recorded in the motion contract. The reload path stays instant.
+- 2026-10-22, User Story 1. Superseded feature 001 tests: the fixed-timer `MOVE_DURATION` test in `tests/unit/animations.test.js`, and the unbounded-queue test "keeps the order of the queued moves" in `tests/unit/input.test.js`, which now expects the queue to hold 2 pending moves. No rule test was touched.
+- 2026-10-22, User Story 1. T004 landed in Foundational, so the duration-sum assertions of T006 passed before the story's code; the fill-mode, timeline-property, delay-zeroing, and `translate` assertions were the ones that failed first, as T006 notes.
+

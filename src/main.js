@@ -156,7 +156,7 @@ function startNewGame() {
   game = createGame({ seed: Date.now(), bestScore: game.bestScore });
   winShown = false;
   gameOverShown = false;
-  renderer.render(game);
+  renderer.render(game, { transition: "newgame" });
   updateUndo();
   input.release();
   if (elements.board) elements.board.focus();
@@ -233,7 +233,7 @@ function performUndo() {
   // happen again. (FR-019, FR-028)
   winShown = false;
   gameOverShown = false;
-  renderer.render(game);
+  renderer.render(game, { transition: "undo" });
   announcer.announceUndo(game.score);
   updateUndo();
   input.release();

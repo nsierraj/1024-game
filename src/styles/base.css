@@ -16,6 +16,7 @@
   --text: #5c534a;
   --text-strong: #403a33;
   --accent: #6b5a4a;
+  --accent-fg: #ffffff;
   --border: #8c8278;
   --focus-ring: #3b6ea5;
 
@@ -50,6 +51,23 @@
   --gap: 12px;
   --control-size: 44px;
   --board-size: min(90vw, 90vh, 420px);
+
+  /* Shape. (FR-015) */
+  --radius-board: 14px;
+  --radius-tile: 10px;
+  --radius-control: 10px;
+
+  /* Depth: soft two-layer shadows and a 1px inner highlight on tiles. */
+  --shadow-tile: 0 1px 2px rgb(31 41 51 / 14%), 0 4px 10px rgb(31 41 51 / 10%);
+  --shadow-raised: 0 1px 2px rgb(31 41 51 / 16%), 0 6px 16px rgb(31 41 51 / 12%);
+  --tile-highlight: inset 0 1px 0 rgb(255 255 255 / 35%);
+
+  /* Type: the device's own fonts, so nothing is downloaded. (FR-025) */
+  --font-ui: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-size-small: 0.75rem;
+  --font-size-body: 1rem;
+  --font-size-large: 1.5rem;
+  --font-size-title: 2.75rem;
 }
 
 *,
@@ -77,7 +95,7 @@ body {
   min-height: 100vh;
   background-color: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-ui);
   font-size: 16px;
   line-height: 1.5;
 }
@@ -249,7 +267,7 @@ ul {
 .btn-primary {
   border-color: var(--accent);
   background-color: var(--accent);
-  color: var(--bg);
+  color: var(--accent-fg);
 }
 
 .notice {

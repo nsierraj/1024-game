@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { applyMove, canUndo, createGame, undo } from "../../src/core/game.js";
+import { createInput } from "../../src/ui/input.js";
+import { createRandom } from "../../src/core/random.js";
 
 /**
  * A random source that always returns the same value.
@@ -166,5 +168,58 @@ describe("a scripted game", () => {
     const restored = undo(result);
     assert.equal(restored.status, "active");
     assert.equal(restored.board.filter((value) => value !== 0).length, 15);
+  });
+
+  describe("a burst of rapid input (FR-006, SC-004)", () => {
+    const KEYS = { up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight" };
+    const DIRECTIONS = ["left", "up", "right", "down"];
+
+    /** A stand-in for the page that delivers key presses. */
+    function fakePage() {
+      const handlers = [];
+      return {
+        addEventListener: (type, handler) => handlers.push({ type, handler }),
+        removeEventListener() {},
+        press(key) {
+          const event = { key, target: null, preventDefault() {} };
+          for (const { type, handler } of handlers) if (type === "keydown") handler(event);
+        },
+      };
+    }
+
+    it("matches the same accepted moves applied one at a time", () => {
+      const burst = [];
+      for (let i = 0; i < 60; i += 1) burst.push(DIRECTIONS[(i * 7 + (i >> 2)) % 4]);
+
+      // The game that the input drives: each move is applied as the input hands it over, and the
+      // next one is released when the "animation" is over.
+      let live = createGame({ random: createRandom(7) });
+      const accepted = [];
+      const page = fakePage();
+      const input = createInput({
+        target: page,
+        onMove: (direction) => {
+          accepted.push(direction);
+          live = applyMove(live, direction);
+        },
+      });
+
+      // Press three keys while a move is running (one runs, two queue), plus one the full queue
+      // ignores, then let the animations end one by one. Every accepted move is applied in order.
+      for (let i = 0; i < burst.length; i += 4) {
+        for (const direction of burst.slice(i, i + 4)) page.press(KEYS[direction]);
+        while (input.pending > 0) input.release();
+        input.release();
+      }
+
+      assert.equal(accepted.length, 45, "the full queue should have ignored one press in four");
+
+      let sequential = createGame({ random: createRandom(7) });
+      for (const direction of accepted) sequential = applyMove(sequential, direction);
+
+      assert.deepEqual(live.board, sequential.board);
+      assert.equal(live.score, sequential.score);
+      assert.equal(live.moves, sequential.moves);
+    });
   });
 });

@@ -19,12 +19,16 @@ All times are milliseconds from the start of the move. Nothing ends after 150 (F
 
 | Part | Start | End | Property | Curve |
 |---|---|---|---|---|
-| Slide | 0 | 100 | `transform` | `cubic-bezier(0.25, 1, 0.5, 1)` (ease-out-quart) |
-| Merge emphasis | 60 | 150 | `transform: scale` 1 -> 1.12 -> 1 | `cubic-bezier(0.34, 1.4, 0.64, 1)` |
-| Spawn entrance | 70 | 150 | `transform: scale` 0.6 -> 1, `opacity` 0 -> 1 | `cubic-bezier(0.25, 1, 0.5, 1)` |
+| Slide | 0 | 100 | `translate` | `cubic-bezier(0.25, 1, 0.5, 1)` (ease-out-quart) |
+| Merge emphasis | 60 | 150 | `scale` 1 -> 1.12 -> 1 | `cubic-bezier(0.34, 1.4, 0.64, 1)` |
+| Spawn entrance | 70 | 150 | `scale` 0.6 -> 1, `opacity` 0 -> 1 | `cubic-bezier(0.25, 1, 0.5, 1)` |
 | Absorbed tile | 0 | 100 | slides with the merge, hidden when the slide ends | |
 
-Only `transform` and `opacity` animate. The merge emphasis starts before the slide ends, so the merged tile
+Only `translate`, `scale`, and `opacity` animate (the compositor-friendly properties). A tile is positioned
+with the individual `translate` property, not `transform`, because the individual `scale` property is applied
+after `translate` and so grows the tile about its own centre. Positioning with `transform` would multiply the
+offset by the scale and swing a merging tile out of its cell. Delayed animations hold their first frame
+(`animation-fill-mode: backwards`) so a new tile is not seen at full size before its entrance. The merge emphasis starts before the slide ends, so the merged tile
 is acknowledged as it arrives.
 
 ## Custom properties
@@ -39,8 +43,9 @@ The rule checked by `tests/unit/motion.test.js`: for the slide, merge, and spawn
 
 ## Completion
 
-A move is over when the last of its animations fires `animationend` or `transitionend`, or after 160 ms,
-whichever is first. Input that arrived during the move is queued and applied in order afterwards. The queue holds at most 2
+A move is over when every animation and transition it started has finished (read with `getAnimations()`, since
+`transitionend` does not fire for a tile that did not move and fires once per property), or after 160 ms,
+whichever is first. Under reduced motion it is over at once. Input that arrived during the move is queued and applied in order afterwards. The queue holds at most 2
 pending moves; presses made while it is full are ignored and a held key's repeat events are not queued
 (FR-006).
 The result is identical to applying the moves one at a time (SC-004).
@@ -49,7 +54,7 @@ The result is identical to applying the moves one at a time (SC-004).
 
 | Change | Behaviour |
 |---|---|
-| Undo | Surviving tiles slide to their restored cells; tiles that no longer exist fade out (80 ms); restored tiles enter with the spawn entrance. |
+| Undo | A tile in the same cell with the same value stays; every other tile fades out where it stands (80 ms) and every restored tile enters with the spawn entrance. Tiles are not tracked across an undo, so a reversed slide is not drawn as a slide. |
 | New game | The tile layer cross-fades over 150 ms. |
 | Reload with a saved game | No animation; the board is drawn in place. |
 

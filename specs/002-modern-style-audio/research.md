@@ -96,7 +96,9 @@ cited from the plan, data model, contracts, and quickstart.
     ease-out-quart curve; merge emphasis 60-150 ms (scale 1 -> 1.12 -> 1) on the merged tile; spawn entrance
     70-150 ms (scale 0.6 -> 1, opacity 0 -> 1) on the new tile, which starts after the slide is mostly done
     so it never covers a moving tile. See [contracts/motion-contract.md](contracts/motion-contract.md).
-  - Only `transform` and `opacity` animate. No layout properties.
+  - Only `translate`, `scale`, and `opacity` animate. No layout properties. Tiles are positioned with
+    `translate`, because the individual `scale` property is applied after it and so grows a tile about its own
+    centre; positioning with `transform` would multiply the offset by the scale.
   - The move ends on the last animation's `animationend` / `transitionend`, with a 160 ms timer only as a
     safety net, instead of a fixed timer. Input stays queued during the move, capped at 2 pending moves with extra presses ignored and key-repeat
     events not queued (FR-006).
