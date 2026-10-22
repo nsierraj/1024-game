@@ -64,6 +64,20 @@ and behaviour on a phone. Those are T050.
 
 The look itself, and the palette, are judged by people (T051), not by these checks.
 
+### User Story 4: palette (2026-10-22, desktop Chromium via Playwright; judged by one agent, not by testers)
+
+| Check | Result |
+|---|---|
+| `npm test` | 322 passing |
+| Contrast, all themes | text and tile values at least 4.5:1, interface colours at least 3:1; high-contrast 7:1 and 4.5:1. The lowest tile pair is 4.92:1 (dark 8) and 5.08:1 (light 512). |
+| Tile ladder | light and dark: hue falls from blue (215 degrees) to rose (345), no step over 60 degrees; the tile above 1024 is at least 15 CIELAB apart from the 1024 tile |
+| Colour-blind-safe theme, neighbouring values, CIELAB difference | deuteranopia: 17.0 to 111.3; protanopia: 24.7 to 104.8; threshold 15, closest pair 2 and 4 |
+| Token sources | every colour token is six-digit hex; `board.css` declares none; the dark theme and the system dark default hold identical tokens |
+| Saved themes | `system`, `light`, `dark`, `contrast`, `colorblind` all still resolve to a token block |
+| Appearance | light, dark, colour-blind-safe, and high-contrast screenshots reviewed: cohesive, readable, tiles move cool to warm |
+
+Whether the look reads as "modern" and "stylish" is for the testers (T051).
+
 ## Gates that need a person
 
 | Gate | Task | Result |

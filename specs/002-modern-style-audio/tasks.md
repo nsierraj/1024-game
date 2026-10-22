@@ -147,17 +147,17 @@ values progress through a recognisable colour sequence, and the contrast and col
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T034 [P] [US4] Extend `tests/unit/contrast.test.js` with the new pairs: `--accent-fg` on `--accent` at 4.5:1, `--accent` on `--bg` at 4.5:1, the `high` tile pair in every theme, and `--focus-ring` on both `--bg` and `--surface` at 3:1; and assert that no colour token (`--tile-*`, `--bg`, `--text`, and the rest) is declared in `src/styles/board.css`, because its `:root` value currently overrides `base.css`; watch it fail against the current tokens (FR-020, FR-021, SC-008)
-- [ ] T035 [P] [US4] Write `tests/unit/cvd.test.js`: simulate deuteranopia and protanopia with the Machado matrices on the colour-blind-safe theme's tile backgrounds and assert a minimum colour difference between each pair of neighbouring values (FR-022, SC-008)
-- [ ] T036 [P] [US4] Add to `tests/unit/contrast.test.js` a check that the saved theme values `system`, `light`, `dark`, `contrast`, and `colorblind` all still resolve to a defined token block in `src/styles/themes.css` (FR-023)
+- [x] T034 [P] [US4] Extend `tests/unit/contrast.test.js` with the new pairs: `--accent-fg` on `--accent` at 4.5:1, `--accent` on `--bg` at 4.5:1, the `high` tile pair in every theme, and `--focus-ring` on both `--bg` and `--surface` at 3:1; and assert that no colour token (`--tile-*`, `--bg`, `--text`, and the rest) is declared in `src/styles/board.css`, because its `:root` value currently overrides `base.css`; watch it fail against the current tokens (FR-020, FR-021, SC-008)
+- [x] T035 [P] [US4] Write `tests/unit/cvd.test.js`: simulate deuteranopia and protanopia with the Machado matrices on the colour-blind-safe theme's tile backgrounds and assert a minimum colour difference between each pair of neighbouring values (FR-022, SC-008)
+- [x] T036 [P] [US4] Add to `tests/unit/contrast.test.js` a check that the saved theme values `system`, `light`, `dark`, `contrast`, and `colorblind` all still resolve to a defined token block in `src/styles/themes.css` (FR-023)
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Replace the light palette in `:root` of `src/styles/base.css` with the verified values in `contracts/theme-tokens.md` (surfaces, text, accent, border, focus, and the eleven tile pairs) (FR-020, FR-021)
-- [ ] T038 [US4] Replace the dark palette in the `dark` block and in the `prefers-color-scheme: dark` default of `src/styles/themes.css` with the verified dark values, including the lavender `high` tile (FR-020, FR-021, FR-023)
-- [ ] T039 [US4] Update the `contrast` block in `src/styles/themes.css` to take the new shape, spacing, and no-shadow tokens, keeping its tile colours and 7:1 ratios, and the `colorblind` block to take the new surfaces and accent while keeping its Okabe-Ito tile set (FR-020, FR-021, FR-022)
-- [ ] T040 [US4] Make the tile ladder in `src/styles/board.css` use the per-value tokens for every value including `high`, so each theme supplies its own, and remove any colour that duplicates a token (FR-020)
-- [ ] T041 [US4] Confirm the stored theme names are unchanged in `src/services/persist.js` and `src/ui/themes.js` and that a saved choice and a first-visit device preference still apply (FR-023)
+- [x] T037 [US4] Replace the light palette in `:root` of `src/styles/base.css` with the verified values in `contracts/theme-tokens.md` (surfaces, text, accent, border, focus, and the eleven tile pairs) (FR-020, FR-021)
+- [x] T038 [US4] Replace the dark palette in the `dark` block and in the `prefers-color-scheme: dark` default of `src/styles/themes.css` with the verified dark values, including the lavender `high` tile (FR-020, FR-021, FR-023)
+- [x] T039 [US4] Update the `contrast` block in `src/styles/themes.css` to take the new shape, spacing, and no-shadow tokens, keeping its tile colours and 7:1 ratios, and the `colorblind` block to take the new surfaces and accent while keeping its Okabe-Ito tile set (FR-020, FR-021, FR-022)
+- [x] T040 [US4] Make the tile ladder in `src/styles/board.css` use the per-value tokens for every value including `high`, so each theme supplies its own, and remove any colour that duplicates a token (FR-020)
+- [x] T041 [US4] Confirm the stored theme names are unchanged in `src/services/persist.js` and `src/ui/themes.js` and that a saved choice and a first-visit device preference still apply (FR-023)
 
 **Checkpoint**: All four stories work. Run `npm test`; everything passes.
 
@@ -281,4 +281,7 @@ Task: "Rewrite the slide, merge, and spawn motion in src/styles/board.css"  # US
 - 2026-10-22, User Story 3. The tile's colour and shape moved from the tile box to a `::before` face inset from the cell. A tile is a padded box whose background is clipped to the content box, so a `box-shadow` on it would have drawn around the whole cell. The per-value rules now set `--tile-bg`. The `--tile-high-*` fallback that `board.css` declared on `:root` was removed, because it overrode the palette in `base.css` and the contrast test never read `board.css` (analysis finding I6).
 - 2026-10-22, User Story 3. At 320 px with 200% text and a five-digit best score the score boxes overflowed and the page scrolled sideways (366 px of content in a 320 px window). The score row now wraps and its boxes are capped at the row width; the check repeated clean afterwards.
 - 2026-10-22, User Story 3. Superseded feature 001 tests: the immediate-close assertions in `tests/unit/dialogs.test.js` now run with an injected synchronous scheduler, because a dialog leaves through a 120 ms transition and the handler runs after the real close. A new group of tests drives the transition by hand. No rule test was touched.
+- 2026-10-22, User Story 4. T034 to T036 were written first, but most of their assertions describe invariants the old palette already met (contrast, token sources), so only the ladder assertions failed beforehand: the old palette was one brown hue. They fail against that and pass against the new palette.
+- 2026-10-22, User Story 4. The colour-blind-safe theme's tile colours were measured before choosing the check. Under full-severity deuteranopia and protanopia the closest neighbouring pair is 2 and 4 at a CIELAB difference of 17.0 and 24.7, so the check asks for 15 (a difference of about 2.3 is the smallest anyone notices). The light and dark ladders are not held to this: they are not the colour-blind-safe themes, and their numbers always show.
+- 2026-10-22, User Story 4. The high-contrast theme gets a 2 px white edge on every tile in place of the soft highlight, because its black 2 and 4 tiles sat on a near-black board and were hard to see. Colour tokens remain six-digit hex wherever the contrast test reads them.
 

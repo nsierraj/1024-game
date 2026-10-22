@@ -9,41 +9,40 @@
 :root {
   color-scheme: light;
 
-  /* Surfaces and text. */
-  --bg: #faf8ef;
-  --surface: #eee4da;
-  --board-bg: #bbada0;
-  --text: #5c534a;
-  --text-strong: #403a33;
-  --accent: #6b5a4a;
+  /* The calm and soft light palette, with the value of every contrast ratio recorded in
+     specs/002-modern-style-audio/contracts/theme-tokens.md. Tile colours move from cool blue at the
+     low values to warm rose at the high ones; every value above 1024 shares the last pair. */
+  --bg: #f6f3ee;
+  --surface: #ece7de;
+  --board-bg: #d8d1c4;
+  --text: #3b4452;
+  --text-strong: #1f2933;
+  --accent: #4a56c8;
   --accent-fg: #ffffff;
-  --border: #8c8278;
-  --focus-ring: #3b6ea5;
-
-  /* Tile palette. A tile value is drawn in its foreground colour on its background colour. */
-  --tile-2-bg: #eee4da;
-  --tile-2-fg: #4a4239;
-  --tile-4-bg: #e6d7ba;
-  --tile-4-fg: #4a4239;
-  --tile-8-bg: #d9b98d;
-  --tile-8-fg: #40382f;
-  --tile-16-bg: #c2915c;
-  --tile-16-fg: #2b2015;
-  --tile-32-bg: #9c6c3c;
-  --tile-32-fg: #ffffff;
-  --tile-64-bg: #8f6234;
-  --tile-64-fg: #ffffff;
-  --tile-128-bg: #74502c;
-  --tile-128-fg: #ffffff;
-  --tile-256-bg: #5f4225;
-  --tile-256-fg: #ffffff;
-  --tile-512-bg: #4c3620;
+  --border: #8a8478;
+  --focus-ring: #3f4bbd;
+  --tile-2-bg: #e3e9f2;
+  --tile-2-fg: #1f2933;
+  --tile-4-bg: #cce0ea;
+  --tile-4-fg: #1f2933;
+  --tile-8-bg: #b6dfe2;
+  --tile-8-fg: #1f2933;
+  --tile-16-bg: #a1d9cc;
+  --tile-16-fg: #1f2933;
+  --tile-32-bg: #95d0a9;
+  --tile-32-fg: #1f2933;
+  --tile-64-bg: #a6cb86;
+  --tile-64-fg: #1f2933;
+  --tile-128-bg: #dac262;
+  --tile-128-fg: #1f2933;
+  --tile-256-bg: #dd8a40;
+  --tile-256-fg: #1f2933;
+  --tile-512-bg: #c54026;
   --tile-512-fg: #ffffff;
-  --tile-1024-bg: #3a2a1a;
+  --tile-1024-bg: #a12b48;
   --tile-1024-fg: #ffffff;
-  /* Every value above 1024 shares this pair. (FR-024) */
-  --tile-high-bg: #2b2015;
-  --tile-high-fg: #ffffff;
+  --tile-high-bg: #3b2a4a;
+  --tile-high-fg: #ffe9a8;
 
   /* Measurements. */
   --radius: 10px;

@@ -6,28 +6,72 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #faf8ef;
-  --surface: #eee4da;
-  --board-bg: #bbada0;
-  --text: #5c534a;
-  --text-strong: #403a33;
-  --accent: #6b5a4a;
+  --bg: #f6f3ee;
+  --surface: #ece7de;
+  --board-bg: #d8d1c4;
+  --text: #3b4452;
+  --text-strong: #1f2933;
+  --accent: #4a56c8;
   --accent-fg: #ffffff;
-  --border: #8c8278;
-  --focus-ring: #3b6ea5;
+  --border: #8a8478;
+  --focus-ring: #3f4bbd;
+  --tile-2-bg: #e3e9f2;
+  --tile-2-fg: #1f2933;
+  --tile-4-bg: #cce0ea;
+  --tile-4-fg: #1f2933;
+  --tile-8-bg: #b6dfe2;
+  --tile-8-fg: #1f2933;
+  --tile-16-bg: #a1d9cc;
+  --tile-16-fg: #1f2933;
+  --tile-32-bg: #95d0a9;
+  --tile-32-fg: #1f2933;
+  --tile-64-bg: #a6cb86;
+  --tile-64-fg: #1f2933;
+  --tile-128-bg: #dac262;
+  --tile-128-fg: #1f2933;
+  --tile-256-bg: #dd8a40;
+  --tile-256-fg: #1f2933;
+  --tile-512-bg: #c54026;
+  --tile-512-fg: #ffffff;
+  --tile-1024-bg: #a12b48;
+  --tile-1024-fg: #ffffff;
+  --tile-high-bg: #3b2a4a;
+  --tile-high-fg: #ffe9a8;
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1f1f1f;
-  --surface: #2d2a26;
-  --board-bg: #3a342f;
-  --text: #d7ccc2;
-  --text-strong: #f5f5f5;
-  --accent: #b8a08a;
-  --accent-fg: #1f1f1f;
-  --border: #857b70;
-  --focus-ring: #7aa2f7;
+  --bg: #141a26;
+  --surface: #232c3e;
+  --board-bg: #1b2230;
+  --text: #cdd5e0;
+  --text-strong: #f1f4f8;
+  --accent: #8d98ff;
+  --accent-fg: #101827;
+  --border: #7d879a;
+  --focus-ring: #a9b2ff;
+  --tile-2-bg: #364963;
+  --tile-2-fg: #ffffff;
+  --tile-4-bg: #396174;
+  --tile-4-fg: #ffffff;
+  --tile-8-bg: #397a7f;
+  --tile-8-fg: #ffffff;
+  --tile-16-bg: #409682;
+  --tile-16-fg: #101827;
+  --tile-32-bg: #46a466;
+  --tile-32-fg: #101827;
+  --tile-64-bg: #81b356;
+  --tile-64-fg: #101827;
+  --tile-128-bg: #c7b360;
+  --tile-128-fg: #101827;
+  --tile-256-bg: #d29560;
+  --tile-256-fg: #101827;
+  --tile-512-bg: #d67966;
+  --tile-512-fg: #101827;
+  --tile-1024-bg: #d3738b;
+  --tile-1024-fg: #101827;
+  --tile-high-bg: #e9d8ff;
+  --tile-high-fg: #2a1a3d;
 }
 
 :root[data-theme="contrast"] {
@@ -35,7 +79,9 @@
   /* Crisp edges: no soft shadows or highlights in the high-contrast theme. */
   --shadow-tile: 0 0 0 0 transparent;
   --shadow-raised: 0 0 0 0 transparent;
-  --tile-highlight: 0 0 0 0 transparent;
+  /* Instead of a soft highlight, every tile gets a 2px white edge, so the black 2 and 4 tiles stay
+     visible on the dark board. */
+  --tile-highlight: inset 0 0 0 2px #ffffff;
   --bg: #000000;
   --surface: #111111;
   --board-bg: #222222;
@@ -71,14 +117,14 @@
 
 :root[data-theme="colorblind"] {
   color-scheme: light;
-  --bg: #faf8ef;
-  --surface: #eee4da;
-  --board-bg: #bbada0;
-  --text: #3b3b3b;
-  --text-strong: #1f1f1f;
-  --accent: #6b5a4a;
+  --bg: #f6f3ee;
+  --surface: #ece7de;
+  --board-bg: #d8d1c4;
+  --text: #3b4452;
+  --text-strong: #1f2933;
+  --accent: #4a56c8;
   --accent-fg: #ffffff;
-  --border: #8c8278;
+  --border: #8a8478;
   --focus-ring: #0072b2;
   --tile-2-bg: #f0e442;
   --tile-2-fg: #1f1f1f;
@@ -107,14 +153,36 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
-    --bg: #1f1f1f;
-    --surface: #2d2a26;
-    --board-bg: #3a342f;
-    --text: #d7ccc2;
-    --text-strong: #f5f5f5;
-    --accent: #b8a08a;
-    --accent-fg: #1f1f1f;
-    --border: #857b70;
-    --focus-ring: #7aa2f7;
+    --bg: #141a26;
+    --surface: #232c3e;
+    --board-bg: #1b2230;
+    --text: #cdd5e0;
+    --text-strong: #f1f4f8;
+    --accent: #8d98ff;
+    --accent-fg: #101827;
+    --border: #7d879a;
+    --focus-ring: #a9b2ff;
+    --tile-2-bg: #364963;
+    --tile-2-fg: #ffffff;
+    --tile-4-bg: #396174;
+    --tile-4-fg: #ffffff;
+    --tile-8-bg: #397a7f;
+    --tile-8-fg: #ffffff;
+    --tile-16-bg: #409682;
+    --tile-16-fg: #101827;
+    --tile-32-bg: #46a466;
+    --tile-32-fg: #101827;
+    --tile-64-bg: #81b356;
+    --tile-64-fg: #101827;
+    --tile-128-bg: #c7b360;
+    --tile-128-fg: #101827;
+    --tile-256-bg: #d29560;
+    --tile-256-fg: #101827;
+    --tile-512-bg: #d67966;
+    --tile-512-fg: #101827;
+    --tile-1024-bg: #d3738b;
+    --tile-1024-fg: #101827;
+    --tile-high-bg: #e9d8ff;
+    --tile-high-fg: #2a1a3d;
   }
 }
