@@ -3,7 +3,7 @@
  *
  * The rules say all user-facing text lives in one place so that wording changes do not scatter
  * through the renderers, and so the announcement policy can be read in one file. `index.html`
- * carries the same words in its static shell; the test suite checks the two do not drift.
+ * carries the same words in its static shell, and T060 checks that the two do not drift.
  */
 
 /**

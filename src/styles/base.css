@@ -12,6 +12,7 @@
   /* Surfaces and text. */
   --bg: #faf8ef;
   --surface: #eee4da;
+  --board-bg: #bbada0;
   --text: #5c534a;
   --text-strong: #403a33;
   --accent: #6b5a4a;
@@ -159,6 +160,27 @@ ul {
   font-weight: 700;
   opacity: 0;
   pointer-events: none;
+}
+
+/* The indicator is shown by adding the class again, so the animation runs from the start. */
+.score-gain--visible {
+  animation: score-gain-rise 700ms ease-out;
+}
+
+@keyframes score-gain-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
 }
 
 /* Controls. */

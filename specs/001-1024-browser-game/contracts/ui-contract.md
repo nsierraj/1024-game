@@ -106,6 +106,14 @@ The board uses native grid semantics rather than a table or a canvas (D-08).
 - The board is not a single composite widget, so no `aria-activedescendant` indirection is
   needed. Focus stays on the board container or on a control.
 
+> **Amendment (2026-10-21)**: the grid and the tiles are two layers, and the contract above did
+> not say so. `#board` is the grid: four rows of four cells that always exist, and each cell
+> carries the value it holds as text. The tiles are drawn in a separate layer placed over the
+> grid, which carries `aria-hidden="true"`, because a tile that slides has to travel smoothly
+> from one cell to the next and a grid cell cannot move on its own. The layer is hidden from
+> assistive technology so that nothing is read twice: the grid carries the meaning and the layer
+> carries the movement.
+
 ## Focus management
 
 | Event | Focus behaviour |
@@ -119,6 +127,14 @@ The board uses native grid semantics rather than a table or a canvas (D-08).
 
 Focus is always visibly indicated. The focus indicator is never removed, only restyled
 (FR-048).
+
+> **Amendment (2026-10-21)**: the Escape row above says that Escape closes the current dialog,
+> and it does, but what that means for the game was left open. On the confirmation dialog Escape
+> means "cancel", so the game in progress continues, which the table already says. On the win
+> dialog a dismissal is a win that carries on rather than one that is raised again, so the game
+> never sits in a state with no way forward and FR-021 is not broken. On the game-over dialog
+> Escape simply closes the message; the game is over either way, and the new-game control in the
+> page is always available to start another one.
 
 ## Themes
 

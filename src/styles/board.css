@@ -1,0 +1,223 @@
+/*
+ * The board, the tiles, and the way a move looks.
+ *
+ * The board is a native grid of sixteen cells, and it carries the semantics: the rows and cells
+ * are what a screen reader reads, and each cell's text is the value it holds. The tiles are a
+ * separate layer of absolutely positioned boxes drawn on top of the grid, because a tile that
+ * slides has to move smoothly between cells, and a grid cell cannot do that without being
+ * re-parented. The layer is hidden from assistive technology, so nothing is announced twice.
+ */
+
+:root {
+  /* The gap between the cells, and the inset of a tile inside its cell. */
+  --board-inset: 5px;
+
+  /* How long a move takes. The contract allows 150 ms; the slide and the merge finish together
+     in less than that. (FR-036) */
+  --slide-duration: 90ms;
+  --merge-duration: 120ms;
+  --spawn-duration: 120ms;
+}
+
+.board-wrap {
+  position: relative;
+  width: var(--board-size);
+  height: var(--board-size);
+}
+
+.board {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+  background-color: var(--board-bg);
+  /* The board owns every gesture that starts on it, so the browser does not scroll or zoom
+     when the player swipes. (FR-013) */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/*
+ * A cell is the slot a tile sits in. The padding is the gap between the slots, and the
+ * background is clipped to the content box so the gap shows the board behind it.
+ */
+.board-cell {
+  position: relative;
+  padding: var(--board-inset);
+  border-radius: var(--radius-small);
+  background-color: var(--surface);
+  background-clip: content-box;
+}
+
+/* The layer the tiles are drawn in. */
+.tile-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* While the board is redrawn rather than slid, the tiles take their new places at once. */
+.tile-layer--instant .tile {
+  transition: none;
+}
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25%;
+  height: 25%;
+  padding: var(--board-inset);
+  border-radius: var(--radius-small);
+  background-color: var(--tile-1024-bg);
+  background-clip: content-box;
+  color: var(--tile-1024-fg);
+  font-weight: 700;
+  line-height: 1;
+  /* A tile is placed by its column and row. The percentage is of the tile's own width, which is
+     a quarter of the board, so a whole number moves it exactly one cell. */
+  --col: 0;
+  --row: 0;
+  transform: translate(calc(var(--col) * 100%), calc(var(--row) * 100%));
+  transition:
+    transform var(--slide-duration) cubic-bezier(0.2, 0, 0.2, 1),
+    opacity var(--slide-duration) linear,
+    scale var(--slide-duration) ease-out;
+}
+
+/* The value decides the size of the numbers, so the board stays readable at every value. */
+.tile[data-value="2"],
+.tile[data-value="4"] {
+  font-size: clamp(1.5rem, 7vw, 2.25rem);
+}
+
+.tile[data-value="8"],
+.tile[data-value="16"] {
+  font-size: clamp(1.375rem, 6vw, 2rem);
+}
+
+.tile[data-value="32"],
+.tile[data-value="64"] {
+  font-size: clamp(1.25rem, 5vw, 1.75rem);
+}
+
+.tile[data-value="128"],
+.tile[data-value="256"],
+.tile[data-value="512"] {
+  font-size: clamp(1.125rem, 4.5vw, 1.5rem);
+}
+
+.tile[data-value="1024"] {
+  font-size: clamp(1rem, 4vw, 1.25rem);
+}
+
+/* The colour of a tile. The ladder darkens as the value grows, so that the text on it stays
+   readable. The values above 1024 share the last pair until the high tile styling lands. */
+.tile[data-value="2"] {
+  background-color: var(--tile-2-bg);
+  color: var(--tile-2-fg);
+}
+
+.tile[data-value="4"] {
+  background-color: var(--tile-4-bg);
+  color: var(--tile-4-fg);
+}
+
+.tile[data-value="8"] {
+  background-color: var(--tile-8-bg);
+  color: var(--tile-8-fg);
+}
+
+.tile[data-value="16"] {
+  background-color: var(--tile-16-bg);
+  color: var(--tile-16-fg);
+}
+
+.tile[data-value="32"] {
+  background-color: var(--tile-32-bg);
+  color: var(--tile-32-fg);
+}
+
+.tile[data-value="64"] {
+  background-color: var(--tile-64-bg);
+  color: var(--tile-64-fg);
+}
+
+.tile[data-value="128"] {
+  background-color: var(--tile-128-bg);
+  color: var(--tile-128-fg);
+}
+
+.tile[data-value="256"] {
+  background-color: var(--tile-256-bg);
+  color: var(--tile-256-fg);
+}
+
+.tile[data-value="512"] {
+  background-color: var(--tile-512-bg);
+  color: var(--tile-512-fg);
+}
+
+/* A tile that was absorbed by a merge slides into the tile that absorbed it and fades out. */
+.tile--absorbed {
+  z-index: 1;
+  opacity: 0;
+  scale: 0.4;
+}
+
+/* The tile that survived the merge grows as it settles. */
+.tile--merged {
+  z-index: 2;
+  animation: tile-merge var(--merge-duration) ease-out;
+}
+
+/* A new tile appears in place. */
+.tile--spawned {
+  animation: tile-appear var(--spawn-duration) ease-out;
+}
+
+@keyframes tile-merge {
+  0% {
+    scale: 1;
+  }
+
+  45% {
+    scale: 1.22;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes tile-appear {
+  0% {
+    scale: 0.2;
+    opacity: 0;
+  }
+
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+/* The player asked for less movement, so the game changes state without animating it. The
+   override is in the stylesheet rather than in the animation code, so there is one place where
+   the preference is honoured. (FR-037) */
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none !important;
+    animation: none !important;
+  }
+}

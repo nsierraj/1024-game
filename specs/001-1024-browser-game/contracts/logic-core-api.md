@@ -122,7 +122,7 @@ export function hasNoAdjacentEqual(board: number[]): boolean;
 
 ```js
 /**
- * @param {{ random?: () => number, bestScore?: number }} [options]
+ * @param {{ random?: () => number, bestScore?: number, seed?: number }} [options]
  * @returns {Game}
  */
 export function createGame(options?: CreateGameOptions): Game;
@@ -132,6 +132,12 @@ export function createGame(options?: CreateGameOptions): Game;
 - Each starting tile is `2` with probability `0.9` and `4` with probability `0.1` (FR-003).
 - `options.random` defaults to a seeded `mulberry32`. `options.bestScore` seeds the best score
   carried over from a previous game (FR-016).
+- `options.seed` is the seed the game records. It is used when `options.random` is not given, and
+  is informational otherwise. The default seed is fixed, because the core cannot reach for the
+  clock; a caller that wants a different game passes a seed or a generator of its own.
+- The generator becomes part of the returned game, as `game.random`, because `applyMove` has to
+  place a tile and takes no randomness of its own. A game restored from storage is given a
+  generator by the storage layer, not by the core.
 
 ```js
 /**
@@ -144,6 +150,10 @@ export function applyMove(game: Game, direction: Direction): MoveResult;
 
 **Apply-move rules**
 
+The result is the **new game state** with the report of the move added to it, so the caller can
+assign it straight back to the game's state and read `changed`, `gained`, `merged`, `transitions`,
+and `spawned` to drive the animation.
+
 - If the slide does not change the board, the result has `changed === false`, the board is
   unchanged, no tile is placed, the score is unchanged, and the undo snapshot is **not** replaced
   (FR-005).
@@ -152,7 +162,8 @@ export function applyMove(game: Game, direction: Direction): MoveResult;
 - The new tile is `2` with probability `0.9` and `4` with probability `0.1` (FR-003).
 - `score` increases by `gained` (FR-014). `bestScore` becomes `Math.max(bestScore, score)`
   (FR-017).
-- The pre-move state (board, score, bestScore, moves) becomes the undo snapshot (FR-025).
+- The pre-move state (board, score, bestScore, moves) becomes the undo snapshot (FR-025), carried
+  on the result as `undo`.
 - `moves` increments by 1.
 - `transitions` carries the per-cell movement from the slide, so the renderer can animate a tile
   that both slides and merges.
@@ -161,6 +172,23 @@ export function applyMove(game: Game, direction: Direction): MoveResult;
 - If `status` was `"won"` and `endless` is `true`, the status returns to `"active"` and no further
   win is raised (FR-021).
 - If the board is full and no adjacent pair is equal, `status` becomes `"gameover"` (FR-022).
+  The check runs whether the slide changed the board or not. A board that is full and has no equal
+  neighbours cannot be changed by any slide, so the rejected move is the only moment the end of the
+  game can be noticed.
+
+```js
+/**
+ * @param {Game} game
+ * @returns {Game} the new state, or the same state when there is no win to keep playing after
+ */
+export function keepPlaying(game: Game): Game;
+```
+
+- Sets `endless` to `true` and the status back to `"active"`, so the player can carry on after a
+  win and no further win is raised (FR-020, FR-021).
+- The state is returned unchanged when the status is not `"won"`.
+- The game is otherwise untouched: the board, the score, the best score, the move count, and the
+  undo snapshot are all preserved.
 
 ```js
 /**
@@ -178,6 +206,10 @@ export function undo(game: Game): Game;
 - The status is recomputed from the restored board: `"won"` if the restored board contains a tile
   `>= 1024`, `"gameover"` if the restored board is full with no adjacent equal pair, otherwise
   `"active"`.
+- The recomputed status is never `"won"` when `endless` is `true`, because the player already
+  answered the win and no further win is raised (FR-021).
+- The report of the move that was undone is cleared, so the restored state does not carry the
+  description of a move that no longer happened.
 - Undo is available from the game-over state (FR-028) and unavailable when there is no snapshot
   (FR-027).
 
@@ -223,7 +255,8 @@ support, not compiled types (D-03).
  *   endless: boolean,
  *   status: "active" | "won" | "gameover",
  *   undo: UndoSnapshot | null,
- *   seed: number
+ *   seed: number,
+ *   random: () => number
  * }} Game
  *
  * @typedef {{
@@ -244,7 +277,8 @@ support, not compiled types (D-03).
  *   transitions: SlideTransition[],
  *   spawned: { index: number, value: number } | null,
  *   status: "active" | "won" | "gameover",
- *   hasWon: boolean
+ *   hasWon: boolean,
+ *   undo: UndoSnapshot | null
  * }} MoveResult
  */
 ```
@@ -293,3 +327,14 @@ The `transitions` list is a contract requirement in its own right rather than a 
 requirement, so it has no row in the table above. It is covered by `tests/unit/board.test.js`
 alongside FR-006, because a transition list that does not agree with the board the slide produced
 would be worse than no transition list at all.
+
+> **Amendment (2026-10-21)**: implementing the core exposed three gaps in the contract above, and
+> they are now closed. The generator became part of the game, as `game.random`, because
+> `applyMove` places a tile and takes no randomness of its own, and the core cannot call
+> `Math.random` to make one up. `keepPlaying` was added, because FR-020 offers the player a choice
+> to keep playing after a win and `endless` had no way to be set. And `applyMove` now returns the
+> new game state with the report of the move added to it, so that the rule "the pre-move state
+> becomes the undo snapshot" is carried by the result rather than left to the caller to
+> reconstruct. The game-over check was also moved so that it runs on a rejected move, because a
+> full board with no equal neighbours cannot be changed by any slide, and the rejected move is the
+> only moment the end of the game can be noticed.
