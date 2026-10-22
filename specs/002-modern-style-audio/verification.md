@@ -93,6 +93,27 @@ Whether the look reads as "modern" and "stylish" is for the testers (T051).
 | `npm test` and `node scripts/check-specs.mjs` | T047 | 322 passing; spec check passes; every feature 001 test still green and untouched except the ones listed in `tasks.md` as superseded |
 | axe-core 4.10.2 (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice), run from a scratch directory | T048 | 0 violations in the system, light, dark, high-contrast, and colour-blind-safe modes, with the page and the help panel open; 0 violations with the game-over and the confirmation dialogs open in light and dark. The win dialog and the high-contrast dialogs were not scanned. |
 
+### Deployed site (2026-10-22, after pull request 21 merged as `025f660`; desktop Chromium and Chrome, not a phone)
+
+Checked against https://nsierraj.github.io/1024-game/ once the Pages build for `025f660` had succeeded. These are supporting
+evidence for T053. They do not close it: installing the app and playing in real airplane mode on a phone were not done.
+
+| Check | Result |
+|---|---|
+| Live site carries this feature | `CACHE_NAME` is `1024-v4`; the Content-Security-Policy tag is present; `assets/audio/move.mp3` returns 404 (the files are gone) |
+| Lighthouse 12.8.2, simulated mobile (slow 4G, 4x CPU) | Performance 97, Accessibility 100, Best Practices 100, SEO 100 |
+| Lighthouse timings | first contentful paint 1.8 s, largest contentful paint 2.1 s, interactive 2.1 s, blocking time 0 ms, layout shift 0 |
+| Lighthouse transfer size | 225 KiB. Higher than the 121.5 KB on disk because the page's first load and the service worker's precache each fetch the files; under the 300 KB limit either way. |
+| 320 px wide | board square at 288 px, no sideways scroll; still none with text at 200% |
+| Service worker | controls the page; one cache, `1024-v4`, holding 31 entries |
+| Offline (network switched off after install) | loads from the cache with all 16 cells; 40 keyboard moves play |
+| Sound turned on for the first time while offline | control shows "Sound: on" and the setting is saved: there is nothing to fetch |
+| Requests for audio | none |
+| Console errors | four `ERR_FAILED` requests, all to random-looking paths at the site root, none to a game file: GitHub Pages' own requests, blocked while offline |
+
+Largest contentful paint is 2.1 s under Lighthouse's slow-4G profile, which is slower than the "fast 4G" in the
+requirement (FR-057 of feature 001), so the requirement is expected to hold; a run on the actual fast-4G profile is not recorded.
+
 ## Gates that need a person
 
 | Gate | Task | Result |
