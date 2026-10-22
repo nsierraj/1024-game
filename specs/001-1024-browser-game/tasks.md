@@ -257,7 +257,7 @@ and confirm every tile value, score change, win, and game over is perceivable.
 - [x] T069 [P] Update `README.md` with how to run the game locally and how to run the test suite
 - [x] T070 Confirm `package.json` still declares no `dependencies` and no `devDependencies`, preserving Principle I
 - [ ] T071 Run the full `quickstart.md` validation end to end, including the manual browser matrix check and the offline airplane-mode check (SC-011, SC-006)
-- [ ] T072 Merge the feature branch into `main` through a pull request whose `spec-integrity` and `test` checks pass in `.github/workflows/ci.yml`, as constitution v1.1.0 requires
+- [x] T072 Merge the feature branch into `main` through a pull request whose `spec-integrity` and `test` checks pass in `.github/workflows/ci.yml`, as constitution v1.1.0 requires
 
 ## Phase 11: Analysis Remediation (2026-10-22 clarifications)
 
