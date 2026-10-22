@@ -167,13 +167,13 @@ values progress through a recognisable colour sequence, and the contrast and col
 
 **Purpose**: Documentation, the spec follow-ups from clarification, and the release gates.
 
-- [ ] T042 [P] Update `specs/002-modern-style-audio/spec.md` to cite feature 001's browser matrix by ID in FR-014 and SC-007, and to name the baseline release for SC-001 as the build merged as pull request 20, so the comparison stays valid (checklist items CHK006 and CHK036 in `specs/002-modern-style-audio/checklists/ux-audio.md`)
-- [ ] T043 [P] Update `README.md` for the new look, the runtime sound, and the removal of the audio files
-- [ ] T044 [P] Verify the asset budgets and record them in `specs/002-modern-style-audio/verification.md`: everything except sound under 300 KB, sound at 0 KB (limit 100 KB), and a player who never enables sound doing no audio work (FR-025, SC-010)
-- [ ] T045 [P] Run the contrast, colour-blind, and CSP tests and record the results in `specs/002-modern-style-audio/verification.md` (SC-008, FR-025)
-- [ ] T046 Confirm `package.json` still declares no `dependencies` and no `devDependencies`, preserving Principle I
-- [ ] T047 Run `npm test` and `node scripts/check-specs.mjs` and confirm both pass; confirm the feature 001 tests are unchanged and still green (SC-011)
-- [ ] T048 Run the automated accessibility scan in all five theme modes and record zero violations in `specs/002-modern-style-audio/verification.md` (SC-009)
+- [x] T042 [P] Update `specs/002-modern-style-audio/spec.md` to cite feature 001's browser matrix by ID in FR-014 and SC-007, and to name the baseline release for SC-001 as the build merged as pull request 20, so the comparison stays valid (checklist items CHK006 and CHK036 in `specs/002-modern-style-audio/checklists/ux-audio.md`)
+- [x] T043 [P] Update `README.md` for the new look, the runtime sound, and the removal of the audio files
+- [x] T044 [P] Verify the asset budgets and record them in `specs/002-modern-style-audio/verification.md`: everything except sound under 300 KB, sound at 0 KB (limit 100 KB), and a player who never enables sound doing no audio work (FR-025, SC-010)
+- [x] T045 [P] Run the contrast, colour-blind, and CSP tests and record the results in `specs/002-modern-style-audio/verification.md` (SC-008, FR-025)
+- [x] T046 Confirm `package.json` still declares no `dependencies` and no `devDependencies`, preserving Principle I
+- [x] T047 Run `npm test` and `node scripts/check-specs.mjs` and confirm both pass; confirm the feature 001 tests are unchanged and still green (SC-011)
+- [x] T048 Run the automated accessibility scan in all five theme modes and record zero violations in `specs/002-modern-style-audio/verification.md` (SC-009)
 - [ ] T049 Run the motion check from `quickstart.md` section 4 on a mid-range phone, with a Chrome performance trace, and record the frame rate and durations in `specs/002-modern-style-audio/verification.md` (SC-003, SC-004)
 - [ ] T050 Run the sound check from `quickstart.md` section 5 on desktop Chrome, Safari, and Firefox, a real iPhone, and a real Android phone, and record for each whether the control ever showed "on" while nothing was audible in `specs/002-modern-style-audio/verification.md` (FR-014, SC-005, SC-006, SC-007)
 - [ ] T051 Run the moderated side-by-side session with five testers from `quickstart.md` section 3 and record the results in `specs/002-modern-style-audio/verification.md` (SC-001, SC-002)

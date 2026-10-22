@@ -78,6 +78,18 @@ The look itself, and the palette, are judged by people (T051), not by these chec
 
 Whether the look reads as "modern" and "stylish" is for the testers (T051).
 
+### Polish: automated gates (2026-10-22, desktop Chromium via Playwright)
+
+| Check | Task | Result |
+|---|---|---|
+| Everything except sound | T044 | 121.5 KB on disk, 40.2 KB gzip (baseline 98.0 KB; limit 300 KB) |
+| Sound | T044 | 0 KB: there are no audio files and `assets/audio/` is removed (limit 100 KB) |
+| Audio downloaded before sound is turned on, or ever | T044 | none; no audio request in the page's resource timings |
+| Contrast, CSP, and colour-blind tests | T045 | pass inside the 322-test suite |
+| `package.json` dependencies | T046 | none: no `dependencies` or `devDependencies` key |
+| `npm test` and `node scripts/check-specs.mjs` | T047 | 322 passing; spec check passes; every feature 001 test still green and untouched except the ones listed in `tasks.md` as superseded |
+| axe-core 4.10.2 (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice), run from a scratch directory | T048 | 0 violations in the system, light, dark, high-contrast, and colour-blind-safe modes, with the page and the help panel open; 0 violations with the game-over and the confirmation dialogs open in light and dark. The win dialog and the high-contrast dialogs were not scanned. |
+
 ## Gates that need a person
 
 | Gate | Task | Result |

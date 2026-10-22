@@ -14,7 +14,7 @@ feature specification are written first; the implementation follows them.
 | Project constitution | Ratified v1.0.0 — [`constitution.md`](.specify/memory/constitution.md) |
 | Feature specification | Done — [`spec.md`](specs/001-1024-browser-game/spec.md) |
 | Technical plan | Done — [`plan.md`](specs/001-1024-browser-game/plan.md) |
-| Implementation | Built. The manual release gates (screen reader pass, browser matrix, airplane mode) are still to be run — see [`verification.md`](specs/001-1024-browser-game/verification.md) |
+| Implementation | Feature 001 built and merged; its manual gates are in [`verification.md`](specs/001-1024-browser-game/verification.md). Feature 002 (modern style, smoother motion, sound fixes) is built on its branch, with its manual gates still to run: [`verification.md`](specs/002-modern-style-audio/verification.md) |
 
 ## Run it locally
 
@@ -35,7 +35,9 @@ The service worker and install support need a secure context; `localhost` counts
 - Light, dark, high-contrast, and color-blind-safe themes, following the system preference until
   you override it
 - Installable, and fully playable offline once installed
-- Optional sound effects, off by default
+- Five soft sound effects made in the game itself (no audio files to download), off by default
+- A calm, modern look with smooth, interruptible tile motion that finishes inside 150 ms, and the same palette
+  character in all four themes
 - WCAG 2.2 Level AA, playable with a keyboard alone and narrated by a screen reader
 
 ## Principles

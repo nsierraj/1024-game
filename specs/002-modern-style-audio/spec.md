@@ -235,7 +235,8 @@ Sound
   data is fetched or prepared only when the player first turns sound on, nothing is downloaded by a
   player who never does, and the sound stays within its 100 KB size budget.
 - **FR-014**: When sound is on, the player MUST be able to hear each effect at a normal device volume on
-  every supported desktop and phone browser. The sound control MUST NOT show "on" unless the sound is
+  every supported desktop and phone browser, meaning the browsers and devices in feature 001's success
+  criterion SC-011. The sound control MUST NOT show "on" unless the sound is
   ready to play, and if it cannot be made ready it MUST show "off" instead. After a reload with sound
   saved as on, the control MUST show "off" until the player's first tap or key press, then switch to "on"
   and play, without the player having to turn sound on again; the saved choice MUST NOT be lost.
@@ -296,7 +297,9 @@ Continuity
 ### Measurable Outcomes
 
 - **SC-001**: In a moderated side-by-side session, at least 4 of 5 testers rate the redesigned game as
-  more modern than the current one, and none rates it as harder to read or use.
+  more modern than the previous release, and none rates it as harder to read or use. The previous release is
+  the build of feature 001 as it stood after pull request 20 (commit 825bc7a), so the comparison stays valid after
+  this feature ships.
 - **SC-002**: In the same session, at least 4 of 5 testers describe the tile movement as smooth, and none
   reports stepping, flicker, or lag on a current mid-range phone.
 - **SC-003**: Every board change (slide, merge, new tile, undo, new game) completes within 150
@@ -309,7 +312,7 @@ Continuity
 - **SC-006**: With sound on, no effect clips, pops, or distorts. As the game plays them, each effect peaks
   between 12 and 3 decibels below full scale, and the loudest and quietest of the five differ by no more
   than 3 decibels.
-- **SC-007**: On every supported desktop and phone browser, a player who turns sound on hears each of the
+- **SC-007**: On every browser and device in feature 001's SC-011, a player who turns sound on hears each of the
   five effects from the next event, with no reload and no second tap, in every trial. No trial ends with
   the control showing "on" and nothing audible.
 - **SC-008**: All four themes pass the contrast checks already in force, the high-contrast theme reaches at
