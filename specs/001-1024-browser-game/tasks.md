@@ -106,12 +106,12 @@ not possible.
 
 ### Tests for User Story 2 ⚠️
 
-- [x] T025 [P] [US2] Write the undo cases in `tests/unit/game.test.js`: undo restores board, score, and best score (FR-026), the best score never decreases across an undo, the snapshot is cleared so a second undo does nothing (FR-025), undo is unavailable at the start of a new game (FR-027), and undo works from the game-over state (FR-028)
+- [x] T025 [P] [US2] Write the undo cases in `tests/unit/game.test.js`: undo restores board, score, and best score (FR-026), the best score never decreases across an undo (superseded by T073: undo lowers the best score), the snapshot is cleared so a second undo does nothing (FR-025), undo is unavailable at the start of a new game (FR-027), and undo works from the game-over state (FR-028)
 - [x] T026 [P] [US2] Extend `tests/integration/game-flow.test.js` with the undo scenarios: undo after a merge, undo from game over, and a second undo that changes nothing
 
 ### Implementation for User Story 2
 
-- [x] T027 [US2] Implement `undo` in `src/core/game.js` to satisfy T025: restore the snapshot, keep the best score monotonic, clear the snapshot afterwards, and recompute the status from the restored board
+- [x] T027 [US2] Implement `undo` in `src/core/game.js` to satisfy T025: restore the snapshot, keep the best score monotonic, clear the snapshot afterwards, and recompute the status from the restored board (superseded by T074: the snapshot restores the best score, the win, and the status exactly)
 - [x] T028 [P] [US2] Add the `#undo` button to the controls row in `index.html`
 - [x] T029 [US2] Wire the `#undo` control in `src/main.js` to call `undo`, re-render the board, and set the button's `disabled` state from `canUndo` so it is unavailable at the start of a new game (FR-027)
 
@@ -233,14 +233,14 @@ and confirm every tile value, score change, win, and game over is perceivable.
 
 ### Tests for User Story 7 ⚠️
 
-- [ ] T060 [P] [US7] Write `tests/unit/a11y.test.js` covering the announcement strings in `src/ui/strings.js` and the board cell text, where an occupied cell reads its value and an empty cell reads "empty" (FR-050, FR-052), and check that `index.html` and `STRINGS` do not drift, since the shell carries the same words as the static copy of the interface
+- [x] T060 [P] [US7] Write `tests/unit/a11y.test.js` covering the announcement strings in `src/ui/strings.js` and the board cell text, where an occupied cell reads its value and an empty cell reads "empty" (FR-050, FR-052), and check that `index.html` and `STRINGS` do not drift, since the shell carries the same words as the static copy of the interface
 
 ### Implementation for User Story 7
 
-- [ ] T061 [US7] Create `src/ui/a11y.js` with the polite live region, the throttled score announcements, and the win and game-over announcements (FR-051)
-- [ ] T062 [US7] Render all 16 grid cells in `src/ui/render.js` with `role="row"` and `role="gridcell"`, each reading its tile value or the word "empty" (FR-052)
-- [ ] T063 [US7] Implement focus trapping and focus restoration in `src/ui/dialogs.js`, so focus moves into a dialog on open and returns to the opening control on close (FR-048)
-- [ ] T064 [US7] Ensure every control in `index.html` is reachable and operable by keyboard and that the focus indicator is never removed, only restyled, in `src/styles/base.css` (FR-047, FR-048)
+- [x] T061 [US7] Create `src/ui/a11y.js` with the polite live region, the throttled score announcements, and the win and game-over announcements (FR-051)
+- [x] T062 [US7] Render all 16 grid cells in `src/ui/render.js` with `role="row"` and `role="gridcell"`, each reading its tile value or the word "empty" (FR-052)
+- [x] T063 [US7] Implement focus trapping and focus restoration in `src/ui/dialogs.js`, so focus moves into a dialog on open and returns to the opening control on close (FR-048)
+- [x] T064 [US7] Ensure every control in `index.html` is reachable and operable by keyboard and that the focus indicator is never removed, only restyled, in `src/styles/base.css` (FR-047, FR-048)
 - [ ] T065 [US7] Run the manual keyboard and screen-reader pass from `quickstart.md` and record the result in `specs/001-1024-browser-game/verification.md` (FR-055, SC-004)
 
 **Checkpoint**: All user stories should now be independently functional
@@ -251,13 +251,30 @@ and confirm every tile value, score change, win, and game over is perceivable.
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T066 [P] Verify the asset budgets from `quickstart.md`: under 300 KB for all assets except sound, under 100 KB for the sound, and under 400 KB combined (FR-058, SC-008, SC-015)
-- [ ] T067 [P] Verify the contrast ratios of all four shipped themes, with the high-contrast theme reaching 7:1 for body text, and record them in `specs/001-1024-browser-game/verification.md` (FR-045, SC-016)
-- [ ] T068 Create `specs/001-1024-browser-game/verification.md` as the running log of the release gate results from `quickstart.md`
-- [ ] T069 [P] Update `README.md` with how to run the game locally and how to run the test suite
-- [ ] T070 Confirm `package.json` still declares no `dependencies` and no `devDependencies`, preserving Principle I
+- [x] T066 [P] Verify the asset budgets from `quickstart.md`: under 300 KB for all assets except sound, under 100 KB for the sound, and under 400 KB combined (FR-058, SC-008, SC-015)
+- [x] T067 [P] Verify the contrast ratios of all four shipped themes, with the high-contrast theme reaching 7:1 for body text, and record them in `specs/001-1024-browser-game/verification.md` (FR-045, SC-016)
+- [x] T068 Create `specs/001-1024-browser-game/verification.md` as the running log of the release gate results from `quickstart.md`
+- [x] T069 [P] Update `README.md` with how to run the game locally and how to run the test suite
+- [x] T070 Confirm `package.json` still declares no `dependencies` and no `devDependencies`, preserving Principle I
 - [ ] T071 Run the full `quickstart.md` validation end to end, including the manual browser matrix check and the offline airplane-mode check (SC-011, SC-006)
 - [ ] T072 Merge the feature branch into `main` through a pull request whose `spec-integrity` and `test` checks pass in `.github/workflows/ci.yml`, as constitution v1.1.0 requires
+
+## Phase 11: Analysis Remediation (2026-10-22 clarifications)
+
+**Purpose**: Bring the code, tests, and contracts in line with the five clarifications recorded in
+`spec.md` on 2026-10-22 and with the findings of the `/speckit-analyze` run that followed. Tests
+come first for every rule change (Constitution Principle III).
+
+- [x] T073 Rewrite the undo expectations in `tests/unit/game.test.js` and `tests/integration/game-flow.test.js` so undo lowers the best score back to its pre-move value (FR-026) and rewinds `hasWon`, `endless`, and `status` when the undone move created the first 1024 tile (FR-019); watch them fail
+- [x] T074 Change `applyMove` and `undo` in `src/core/game.js` so the undo snapshot carries `hasWon`, `endless`, and `status`, and undo restores all of them and the best score exactly; update the undo section of `contracts/logic-core-api.md` and `data-model.md`
+- [x] T075 Fix `src/main.js` so undoing from game over re-arms the game-over dialog (reset `gameOverShown` and `winShown`), and add an Undo button to the game-over dialog in `index.html` and `src/ui/dialogs.js` so FR-028 is reachable without an Escape key
+- [x] T076 Write the storage tests first in `tests/unit/persist.test.js` and `tests/integration/storage-flow.test.js`: a v1 record is converted and resumed, a corrupt or unknown record starts fresh, and a readable best score and the settings survive both (FR-061)
+- [x] T077 Implement stored-game version 2 in `src/services/persist.js`: key `1024:v2:game`, the extended undo snapshot, a conversion from the `1024:v1:game` record, and a separate `1024:v2:best` record so a corrupt game record cannot take the best score with it; update `contracts/storage-schema.md` and the key constants used by `src/main.js`
+- [x] T078 Wire the announcer: make `createAnnouncer` in `src/ui/a11y.js` take its element, read all text from `STRINGS`, drop the module-level state, and call it from `src/main.js` on a merge, a win, and a game over (FR-051); write `tests/unit/a11y.test.js` cases that drive it without a browser; correct T063 (the dialogs are native modal `<dialog>` elements, so the browser contains and restores focus) and remove the unused `trapFocus`
+- [x] T079 Remove the four mp3 files from `PRECACHE_ASSETS` in `sw.js`, bump `CACHE_NAME`, restore sound on a reload with sound saved on, and update `tests/unit/precache.test.js` and `contracts/offline-contract.md` (FR-040, SC-015)
+- [x] T080 Add a strict Content-Security-Policy `<meta>` to `index.html` allowing only same-origin resources (Constitution Principle V, FR-062), and extend `tests/unit/styles.test.js` or add a test that fails if `index.html` gains an inline script, inline event handler, or external origin
+- [x] T081 Update `README.md`, `verification.md`, and the checklist notes after T073 to T080, leaving the manual gates (T065, T071) unrecorded until a person has run them
+- [x] T082 Remove `maximum-scale=1, user-scalable=no` from the viewport tag in `index.html`, which stops the player zooming the page and fails WCAG 1.4.4 (FR-054, FR-055); a swipe on the board is already kept from zooming by `touch-action: none` in `src/styles/board.css` (FR-013); add the zoom tests to `tests/unit/a11y.test.js`
 
 ---
 
@@ -419,3 +436,10 @@ With multiple developers:
 - 2026-10-21, User Story 6. Added themes (system/light/dark/contrast/colorblind), theme
   selection and persistence, lazy-loaded audio with gain cap, sound toggle with aria-pressed,
   and reduced-motion support across styles and animations.
+- 2026-10-22, remediation. T063 was closed by the browser rather than by `trapFocus`: the three
+  dialogs are native `<dialog>` elements opened with `showModal()`, which makes the rest of the
+  page inert and returns focus on close, so the hand-written `trapFocus` was redundant and has
+  been removed (T078). T060 to T064 are ticked on the strength of the code and its tests; the
+  manual screen-reader and keyboard pass in T065 is the check that proves them for a person, and
+  it has not been run. T071 (browser matrix, airplane mode) and T072 (merge) are also still open.
+

@@ -35,9 +35,9 @@ game-over outcome entirely on its own.
    **Then** the tiles form two merged pairs, not one quadruple.
 4. **Given** three tiles showing the same value in a row, **When** the player slides toward them,
    **Then** the two tiles nearest the direction of travel merge and the third tile remains separate.
-5. **Given** a board that is full and has no two neighbouring tiles showing the same value,
-   **When** the player attempts any move, **Then** the game ends and presents the final score with a
-   way to try again.
+5. **Given** a move that leaves the board full with no two neighbouring tiles showing the same
+   value, **When** that move completes, **Then** the game ends immediately and presents the final
+   score with a way to try again, without waiting for another move attempt.
 6. **Given** a direction in which no tile can move or merge, **When** the player slides in that
    direction, **Then** nothing changes: no tile is added, the score is unchanged, and the move is
    not counted.
@@ -214,15 +214,20 @@ and confirm every tile value, score change, win, and game over is perceivable.
   untouched.
 - Undo is pressed twice in a row: only the single most recent valid move can be reversed.
 - Undo is used after the game ended: the final move is reversed and the game returns to an active
-  state, including the win state if that was what ended it.
+  state.
+- Undo is used on the move that created the first 1024 tile, whether or not the player has since
+  chosen to keep playing: the board returns to before that tile existed, the win and any
+  keep-playing choice are rewound, and the win message appears again when a 1024 tile is next
+  created.
 - A new game is requested while a game is in progress: the player is asked to confirm, and
   declining leaves the current game in play.
 - The best score is set during a move that is then undone: the best score returns to its previous
   value rather than keeping the undone points.
 - The device cannot store data: the game runs for the current session only, with no errors shown
   and no interruption to play.
-- The stored game is unreadable or from an incompatible version: the game starts cleanly rather
-  than failing to open.
+- The stored game is unreadable or from an unrecognised format: the game starts cleanly rather
+  than failing to open, keeping any best score and settings that can still be read. A stored game
+  from an earlier recognised version is converted and resumed instead (FR-061).
 - A swipe is too short, or a touch is a tap rather than a gesture: it is ignored, and no move is
   made.
 - A swipe is diagonal rather than perfectly vertical or horizontal: the tiles move in whichever
@@ -238,8 +243,9 @@ and confirm every tile value, score change, win, and game over is perceivable.
   removed or reduced to a simple fade, and the game stays fully playable.
 - The device's sound is blocked by the operating system's automatic-play rules: the game remains
   fully playable and simply produces no sound until the player interacts with the page.
-- The player turns sound on for the first time while offline: the bundled sound files load and play
-  normally, because they ship with the game rather than being fetched from a server.
+- The player turns sound on for the first time while offline, before the sound files have ever been
+  fetched: sound cannot load, the sound control stays off, nothing is shown, and play is
+  unaffected. Once the files have been fetched online, sound works offline.
 - The player resizes the window or rotates the phone between portrait and landscape: the board
   stays square and the layout remains usable.
 - The player enlarges text to 200%: no content or control is lost, clipped, or made unreachable.
@@ -266,6 +272,21 @@ and confirm every tile value, score change, win, and game over is perceivable.
   at 100 KB in total, and load it only when the player first enables sound
 - Q: Which extra color themes should ship alongside the light and dark themes? → A: Two extra
   themes: one high-contrast theme, and one color-blind-safe palette with its own tile colors
+
+### Session 2026-10-22
+
+- Q: If a player installs the game, goes offline without ever having turned sound on, and then
+  switches sound on, what should happen? → A: Sound cannot load until it has been fetched once
+  online; the sound control stays off, nothing is shown, and play is unaffected
+- Q: When the player's last move leaves no legal move, should game over appear immediately or only
+  on the next move attempt? → A: Immediately after that move
+- Q: After undoing a move that had raised the best score, should the best score go back down or stay
+  at the higher value? → A: It goes back down to its pre-move value
+- Q: If the player undoes the move that created their first 1024 tile and then creates a 1024 tile
+  again, should the win message appear again? → A: Yes, the win is rewound by the undo
+- Q: When a new release changes how a saved game is stored, what happens to a game in progress from
+  the older release? → A: Recognised earlier versions are converted and resumed; corrupted or
+  unrecognised saves start fresh, keeping a readable best score and settings
 
 ## Requirements *(mandatory)*
 
@@ -317,11 +338,14 @@ Scoring
 Win, endless mode, and game over
 
 - **FR-019**: When a 1024 tile is created for the first time in a game, the game MUST show a win
-  message.
+  message. If the player undoes the move that created that tile, the win MUST be rewound with it
+  (including any keep-playing choice), and the win message MUST appear again when a 1024 tile is
+  next created.
 - **FR-020**: The win message MUST offer exactly two choices: keep playing, and start a new game.
 - **FR-021**: After the player chooses to keep playing, play MUST continue with no further win
   messages, and tiles MUST be allowed to exceed 1024.
-- **FR-022**: The game MUST end when the board is full and no two neighbouring tiles share a value.
+- **FR-022**: The game MUST end immediately after the move that leaves the board full with no two
+  neighbouring tiles sharing a value, without waiting for the player to attempt another move.
 - **FR-023**: When the game ends, the game MUST present the final score and a way to try again.
 - **FR-024**: Tiles showing values above 1024 MUST remain visually distinct and readable.
 
@@ -329,7 +353,8 @@ Undo
 
 - **FR-025**: The player MUST be able to undo the single most recent valid move.
 - **FR-026**: Undoing MUST restore the board, the current score, and the best score to their values
-  from before that move.
+  from before that move. This includes lowering the best score when the undone move had raised it;
+  the best score MUST NOT keep points from a move that was undone.
 - **FR-027**: The undo action MUST be unavailable at the start of a new game, and MUST become
   unavailable again after an undo until the player makes another valid move.
 - **FR-028**: The undo action MUST be available from the game-over state.
@@ -360,9 +385,11 @@ Animation, motion, and sound
   and spawning motion MUST be removed or reduced to a simple fade.
 - **FR-038**: Sound effects MUST be available for moves, merges, winning, and game over.
 - **FR-039**: Sound MUST be off by default and MUST be switchable through a visible control.
-- **FR-040**: Sound MUST remain available with no network connection, and the sound files MUST be
-  loaded only when the player first enables sound, so that a player who never turns sound on never
-  downloads any audio.
+- **FR-040**: The sound files MUST be loaded only when the player first enables sound, so that a
+  player who never turns sound on never downloads any audio. Once the sound files have been
+  fetched, sound MUST remain available with no network connection. If the player enables sound
+  while offline before the files have ever been fetched, the sound control MUST stay off, nothing
+  MUST be shown to the player, and play MUST be unaffected.
 
 Themes
 
@@ -416,7 +443,10 @@ Performance and delivery
 - **FR-060**: The game MUST be installable on a phone home screen and on a desktop application
   list, and MUST run fully offline once installed.
 - **FR-061**: A newly published version of the game MUST become available to returning players
-  without breaking a game that is in progress.
+  without breaking a game that is in progress. When a new version changes how a game is stored, a
+  saved game from an earlier version the game recognises MUST be converted and resumed. A saved
+  game that is corrupted or from an unrecognised format MUST start a fresh game, and a best score
+  and settings that can still be read MUST be kept.
 
 Privacy and independence
 

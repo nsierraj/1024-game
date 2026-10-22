@@ -147,6 +147,15 @@ Four effects: `move`, `merge`, `win`, `gameover`.
 A failed fetch leaves the sound off and reports nothing to the player beyond the control staying
 in its off state. Sound is a nicety; a failure to load it must not block play.
 
+**Offline before the first fetch (clarified 2026-10-22).** The files are not precached, so a player
+who installs the game, goes offline, and enables sound for the first time cannot load them. The
+control stays off, nothing is shown, and play is unaffected. Once the files have been fetched
+online, the runtime strategy has cached them and sound works offline.
+
+**Reload with sound saved on.** The audio service fetches the files again at startup. If that
+fails, the control is shown off and the saved setting is cleared, so the control never claims
+sound is on when it is not.
+
 ### Playback
 
 - One effect plays at a time per event. A merge replaces a move effect rather than stacking with

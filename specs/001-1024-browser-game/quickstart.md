@@ -110,7 +110,7 @@ The storage contract is in [contracts/storage-schema.md](contracts/storage-schem
 To inspect the stored values, open the developer tools and run:
 
 ```js
-JSON.parse(localStorage.getItem("1024:v1:game"))
+JSON.parse(localStorage.getItem("1024:v2:game"))
 JSON.parse(localStorage.getItem("1024:v1:settings"))
 ```
 

@@ -346,13 +346,72 @@ describe("undo", () => {
     assert.equal(canUndo(restored), false);
   });
 
-  it("keeps the best score when it was higher than the score before the move (FR-026)", () => {
+  it("lowers the best score the undone move had raised (FR-026)", () => {
     const game = gameWith(rowOf(2, 2, 0, 0));
+    const moved = applyMove(game, "left");
+    assert.equal(moved.bestScore, 4);
+
+    const restored = undo(moved);
+
+    assert.equal(restored.bestScore, 0);
+  });
+
+  it("keeps a best score the undone move did not raise (FR-026)", () => {
+    const game = gameWith(rowOf(2, 2, 0, 0), { bestScore: 50 });
     const moved = applyMove(game, "left");
 
     const restored = undo(moved);
 
-    assert.equal(restored.bestScore, 4);
+    assert.equal(restored.bestScore, 50);
+  });
+
+  it("rewinds the win when the undone move created the first 1024 tile (FR-019)", () => {
+    const game = gameWith(rowOf(512, 512, 0, 0));
+    const won = applyMove(game, "left");
+    assert.equal(won.status, "won");
+    assert.equal(won.hasWon, true);
+
+    const restored = undo(won);
+
+    assert.equal(restored.hasWon, false);
+    assert.equal(restored.endless, false);
+    assert.equal(restored.status, "active");
+    assert.deepEqual(restored.board, game.board);
+  });
+
+  it("raises the win again when 1024 is created after an undo (FR-019)", () => {
+    const game = gameWith(rowOf(512, 512, 0, 0));
+    const restored = undo(applyMove(game, "left"));
+
+    const again = applyMove(restored, "left");
+
+    assert.equal(again.status, "won");
+    assert.equal(again.hasWon, true);
+  });
+
+  it("rewinds the keep-playing choice with the win (FR-019)", () => {
+    const game = gameWith(rowOf(512, 512, 0, 0));
+    const continued = keepPlaying(applyMove(game, "left"));
+    assert.equal(continued.endless, true);
+
+    const restored = undo(continued);
+
+    assert.equal(restored.hasWon, false);
+    assert.equal(restored.endless, false);
+    assert.equal(restored.status, "active");
+    assert.equal(applyMove(restored, "left").status, "won");
+  });
+
+  it("keeps the win when a later move is undone (FR-021)", () => {
+    const game = gameWith(rowOf(1024, 0, 0, 2));
+    const won = keepPlaying({ ...game, hasWon: true, endless: true, status: "active" });
+    const moved = applyMove(won, "left");
+
+    const restored = undo(moved);
+
+    assert.equal(restored.hasWon, true);
+    assert.equal(restored.endless, true);
+    assert.equal(restored.status, "active");
   });
 
   it("does nothing when there is nothing to undo (FR-027)", () => {

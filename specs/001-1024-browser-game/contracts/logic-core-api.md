@@ -162,7 +162,7 @@ and `spawned` to drive the animation.
 - The new tile is `2` with probability `0.9` and `4` with probability `0.1` (FR-003).
 - `score` increases by `gained` (FR-014). `bestScore` becomes `Math.max(bestScore, score)`
   (FR-017).
-- The pre-move state (board, score, bestScore, moves) becomes the undo snapshot (FR-025), carried
+- The pre-move state (board, score, bestScore, moves, hasWon, endless, status) becomes the undo snapshot (FR-025), carried
   on the result as `undo`.
 - `moves` increments by 1.
 - `transitions` carries the per-cell movement from the slide, so the renderer can animate a tile
@@ -198,16 +198,12 @@ export function keepPlaying(game: Game): Game;
 export function undo(game: Game): Game;
 ```
 
-- Restores the board, the score, the move count, and the snapshot's best score, but
-  `bestScore` is restored only when the snapshot's value is **higher** than the current value.
-  The best score never decreases (FR-026).
+- Restores the board, the score, the move count, the best score, `hasWon`, `endless`, and
+  `status` to the snapshot's values. The best score goes back down when the undone move had
+  raised it (FR-026), and undoing the move that created the first 1024 tile rewinds the win and
+  any keep-playing choice, so the win is raised again when 1024 is next created (FR-019).
 - After a successful undo the snapshot is cleared, because only one level of undo exists
   (FR-025).
-- The status is recomputed from the restored board: `"won"` if the restored board contains a tile
-  `>= 1024`, `"gameover"` if the restored board is full with no adjacent equal pair, otherwise
-  `"active"`.
-- The recomputed status is never `"won"` when `endless` is `true`, because the player already
-  answered the win and no further win is raised (FR-021).
 - The report of the move that was undone is cleared, so the restored state does not carry the
   description of a move that no longer happened.
 - Undo is available from the game-over state (FR-028) and unavailable when there is no snapshot
@@ -263,7 +259,10 @@ support, not compiled types (D-03).
  *   board: Board,
  *   score: number,
  *   bestScore: number,
- *   moves: number
+ *   moves: number,
+ *   hasWon: boolean,
+ *   endless: boolean,
+ *   status: "active" | "won" | "gameover"
  * }} UndoSnapshot
  *
  * @typedef {{

@@ -48,6 +48,9 @@
  * @property {number} score
  * @property {number} bestScore
  * @property {number} moves
+ * @property {boolean} hasWon Whether a 1024 tile had been created before the move.
+ * @property {boolean} endless Whether the player had chosen to keep playing before the move.
+ * @property {"active" | "won" | "gameover"} status The status before the move.
  */
 
 /**

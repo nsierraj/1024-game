@@ -18,4 +18,22 @@ describe("precache", () => {
       assert.ok(existsSync(fullPath), `precache asset missing: ${asset}`);
     }
   });
+
+  it("does not precache the sound files, so a player who never enables sound downloads none (FR-040)", () => {
+    const content = readFileSync(join(process.cwd(), "sw.js"), "utf8");
+    const match = content.match(/PRECACHE_ASSETS\s*=\s*\[([\s\S]*?)\]/);
+    assert.ok(match, "PRECACHE_ASSETS not found");
+    assert.ok(!/\.mp3|assets\/audio/.test(match[1]), "an audio file is precached");
+  });
+
+  it("caches other same-origin requests at runtime, so sound works offline once fetched (FR-040)", () => {
+    const content = readFileSync(join(process.cwd(), "sw.js"), "utf8");
+    assert.match(content, /cache\.put\(request, copy\)/);
+  });
+
+  it("never skips waiting on its own (FR-061)", () => {
+    const content = readFileSync(join(process.cwd(), "sw.js"), "utf8");
+    const code = content.replace(/\/\*[\s\S]*?\*\//g, "");
+    assert.ok(!code.includes("skipWaiting"));
+  });
 });

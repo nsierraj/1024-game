@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>1024</title>
     <meta
       name="description"
@@ -99,25 +103,25 @@
             aria-label="Game board, 4 by 4. Use the arrow keys to slide the tiles."
             tabindex="0"
           >
-            <div class="board-row">
+            <div class="board-row" role="row">
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
             </div>
-            <div class="board-row">
+            <div class="board-row" role="row">
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
             </div>
-            <div class="board-row">
+            <div class="board-row" role="row">
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
             </div>
-            <div class="board-row">
+            <div class="board-row" role="row">
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
               <div class="board-cell" role="gridcell"></div>
@@ -126,7 +130,7 @@
           </div>
           <div id="tile-layer" class="tile-layer" aria-hidden="true"></div>
         </div>
-        <div id="score-gain" class="score-gain" aria-live="polite"></div>
+        <div id="score-gain" class="score-gain" aria-hidden="true"></div>
       </section>
     </main>
 
@@ -147,6 +151,7 @@
         <p class="modal-text">No more moves.</p>
         <p class="modal-score">Score: <span id="gameover-score">0</span></p>
         <div class="modal-actions">
+          <button type="button" id="gameover-undo" class="btn">Undo last move</button>
           <button type="button" id="gameover-new-game" class="btn btn-primary">Try again</button>
         </div>
       </form>
@@ -163,7 +168,7 @@
       </form>
     </dialog>
 
-    <div id="announcer" class="sr-only" aria-live="polite"></div>
+    <div id="status-region" class="visually-hidden" role="status" aria-live="polite"></div>
 
     <script type="module" src="src/main.js"></script>
   </body>

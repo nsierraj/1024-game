@@ -14,9 +14,20 @@ feature specification are written first; the implementation follows them.
 | Project constitution | Ratified v1.0.0 — [`constitution.md`](.specify/memory/constitution.md) |
 | Feature specification | Done — [`spec.md`](specs/001-1024-browser-game/spec.md) |
 | Technical plan | Done — [`plan.md`](specs/001-1024-browser-game/plan.md) |
-| Implementation | Not started |
+| Implementation | Built. The manual release gates (screen reader pass, browser matrix, airplane mode) are still to be run — see [`verification.md`](specs/001-1024-browser-game/verification.md) |
 
-## What the game will do
+## Run it locally
+
+You need Node 22 or newer. There is nothing to install and nothing to build.
+
+```bash
+node scripts/serve.mjs   # or: npm run serve — serves the game at http://localhost:8080
+npm test                 # runs the whole automated test suite
+```
+
+The service worker and install support need a secure context; `localhost` counts as one.
+
+## What the game does
 
 - Classic 4x4 board with a win at the 1024 tile, plus an endless mode to keep chasing a score
 - Arrow keys on desktop, swipe on touch

@@ -2,10 +2,14 @@
  * Service worker for 1024.
  *
  * Precaches the app shell and assets. Uses network-first for navigation and cache-first for
- * static assets. The worker MUST NOT call skipWaiting() on its own. (FR-059, FR-061)
+ * static assets. The worker MUST NOT call skipWaiting() on its own. (FR-060, FR-061)
+ *
+ * The sound files are deliberately not precached: a player who never turns sound on must never
+ * download any audio. They are cached by the fetch handler below the first time they are fetched,
+ * so sound keeps working offline from then on. (FR-040, SC-015)
  */
 
-const CACHE_NAME = "1024-v2";
+const CACHE_NAME = "1024-v3";
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
@@ -31,10 +35,6 @@ const PRECACHE_ASSETS = [
   "./src/styles/base.css",
   "./src/styles/board.css",
   "./src/styles/themes.css",
-  "./assets/audio/gameover.mp3",
-  "./assets/audio/merge.mp3",
-  "./assets/audio/move.mp3",
-  "./assets/audio/win.mp3",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/icon-maskable-512.png",
